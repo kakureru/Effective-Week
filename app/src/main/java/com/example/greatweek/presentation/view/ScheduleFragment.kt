@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.example.greatweek.domain.usecase.GetWeekUseCase
-import com.example.greatweek.domain.usecase.goal.GetGoalsByDayUseCase
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.WeekAdapter
 import com.example.greatweek.presentation.viewmodel.ScheduleViewModel
@@ -25,8 +24,7 @@ class ScheduleFragment : Fragment() {
     private val goalRepository by lazy { GoalRepositoryImpl(
         (activity?.application as GreatWeekApplication).database.GoalDao()
     ) }
-    private val getGoalsByDayUseCase by lazy { GetGoalsByDayUseCase(goalRepository = goalRepository) }
-    private val getWeekUseCase by lazy { GetWeekUseCase(getGoalsByDayUseCase = getGoalsByDayUseCase) }
+    private val getWeekUseCase by lazy { GetWeekUseCase(goalRepository = goalRepository) }
 
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!

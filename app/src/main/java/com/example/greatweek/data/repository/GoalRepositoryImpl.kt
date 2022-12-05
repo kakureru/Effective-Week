@@ -6,7 +6,7 @@ import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
 
 class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
-    override fun getGoalsByDayUseCase(dayId: Int): MutableList<Goal> {
+    override fun getGoalsByDay(dayId: Int): MutableList<Goal> {
         val goals = goalDao.getGoalsByDay(dayId = dayId)
         return mapToGoal(goals)
     }
