@@ -15,6 +15,7 @@
         android:layout_margin="@dimen/card_margin">
 
         <TextView
+            android:id="@+id/week_day_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
