@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Role(
+data class Roles(
     @PrimaryKey val id: Int,
     @NonNull val name: String
 )

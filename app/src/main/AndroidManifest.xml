@@ -4,6 +4,7 @@
     package="com.example.greatweek">
 
     <application
+        android:name="com.example.greatweek.presentation.GreatWeekApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
