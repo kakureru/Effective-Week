@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Roles(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @NonNull val name: String
 )
