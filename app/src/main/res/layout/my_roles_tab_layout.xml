@@ -1,64 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bottom_sheet_layout"
-    android:layout_width="match_parent"
-    android:layout_height="450dp"
-    android:background="@drawable/my_roles_tab_rounded"
-    android:orientation="vertical"
-    app:behavior_hideable="false"
-    app:behavior_peekHeight="70dp"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="scheduleFragment"
+            type="com.example.greatweek.presentation.view.ScheduleFragment" />
+    </data>
 
     <LinearLayout
-        android:id="@+id/bottom_sheet_header"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="450dp"
+        android:background="@drawable/my_roles_tab_rounded"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|top"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/ic_handle" />
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="70dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout
+            android:id="@+id/bottom_sheet_header"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/my_roles_margin"
-            android:orientation="horizontal">
+            android:layout_height="62dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:layout_marginTop="3dp"
-                android:gravity="top"
-                android:text="My Roles"
-                android:textColor="?attr/colorOnSecondary"
-                android:textSize="18sp" />
+                android:layout_gravity="center|top"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/ic_handle" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_role_add" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/my_roles_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:layout_marginTop="3dp"
+                    android:gravity="top"
+                    android:text="My Roles"
+                    android:textColor="?attr/colorOnSecondary"
+                    android:textSize="18sp" />
+
+                <ImageButton
+                    android:onClick="@{() -> scheduleFragment.openAddRoleDialog()}"
+                    android:id="@+id/add_role_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_role_add" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginHorizontal="@dimen/my_roles_margin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:itemCount="2"
+            tools:listitem="@layout/role_card_layout" />
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginHorizontal="@dimen/my_roles_margin"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:itemCount="2"
-        tools:listitem="@layout/role_card_layout" />
-</LinearLayout>
+</layout>

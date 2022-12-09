@@ -19,9 +19,13 @@
         tools:itemCount="2"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/roles_tab"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <include layout="@layout/my_roles_tab_layout" />
+
+        <include layout="@layout/my_roles_tab_layout"
+            android:id="@+id/bottom_sheet_layout"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

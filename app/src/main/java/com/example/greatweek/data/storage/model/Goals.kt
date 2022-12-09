@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
     )]
 )
 data class Goals(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @NonNull val title: String,
     val description: String,
     @ColumnInfo(name = "role_id") val roleId: String,
