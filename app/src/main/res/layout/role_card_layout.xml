@@ -15,6 +15,7 @@
         android:layout_margin="@dimen/card_margin">
 
         <TextView
+            android:id="@+id/role_text_view"
             style="@style/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,7 +23,8 @@
             android:textColor="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/priorities"
+            android:id="@+id/goals_recycler_view"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
