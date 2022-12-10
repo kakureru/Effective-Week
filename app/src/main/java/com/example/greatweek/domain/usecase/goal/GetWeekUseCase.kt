@@ -1,4 +1,4 @@
-package com.example.greatweek.domain.usecase
+package com.example.greatweek.domain.usecase.goal
 
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.repository.GoalRepository

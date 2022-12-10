@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.greatweek.R
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.databinding.FragmentScheduleBinding
-import com.example.greatweek.domain.usecase.GetWeekUseCase
+import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.WeekAdapter
 import com.example.greatweek.presentation.viewmodel.ScheduleViewModel
