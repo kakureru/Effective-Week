@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.coroutineScope
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.usecase.role.AddRoleUseCase
@@ -63,8 +64,10 @@ class RoleTabFragment : Fragment() {
 
         val roleAdapter = RoleAdapter()
         binding.rolesRecyclerView.adapter = roleAdapter
-        GlobalScope.launch(Dispatchers.IO) {
-            roleAdapter.submitList(viewModel.getRoles())
+        lifecycle.coroutineScope.launch {
+            viewModel.getRoles().collect() {
+                roleAdapter.submitList(it)
+            }
         }
     }
 
@@ -97,6 +100,7 @@ class RoleTabFragment : Fragment() {
         Toast.makeText(context, "Role Added", Toast.LENGTH_SHORT).show()
         GlobalScope.launch(Dispatchers.IO) {
             viewModel.addRole(name = name)
+
         }
     }
 

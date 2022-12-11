@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.greatweek.data.storage.model.Roles
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RoleDao {
@@ -12,5 +13,5 @@ interface RoleDao {
     fun addRole(role: Roles)
 
     @Query("SELECT * FROM roles")
-    fun getRoles(): List<Roles>
+    fun getRoles(): Flow<List<Roles>>
 }

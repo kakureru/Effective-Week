@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.greatweek.R
 import com.example.greatweek.data.repository.GoalRepositoryImpl
@@ -64,8 +65,10 @@ class ScheduleFragment : Fragment() {
 
         val weekAdapter = WeekAdapter()
         binding.week.adapter = weekAdapter
-        GlobalScope.launch(Dispatchers.IO) {
-            weekAdapter.submitList(viewModel.getWeek())
+        lifecycle.coroutineScope.launch {
+            viewModel.getWeek().collect() {
+                weekAdapter.submitList(it)
+            }
         }
     }
 
