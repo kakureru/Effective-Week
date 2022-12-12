@@ -6,9 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -19,19 +17,22 @@ import com.example.greatweek.R
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
 
 
-typealias RoleDialogListener = (requestKey: String, role: String) -> Unit
+typealias RoleDialogListener = (requestKey: String, roleId: Int, roleName: String) -> Unit
 
 class RoleDialogFragment : DialogFragment() {
 
-    private val role: String
-        get() = requireArguments().getString(ARG_ROLE).toString()
+    private val roleId: Int
+        get() = requireArguments().getInt(ARG_ROLE_ID)
+
+    private val roleName: String
+        get() = requireArguments().getString(ARG_ROLE_NAME).toString()
 
     private val requestKey: String
         get() = requireArguments().getString(ARG_REQUEST_KEY)!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialogBinding = RoleDialogLayoutBinding.inflate(layoutInflater)
-        dialogBinding.roleEditText.setText(role)
+        dialogBinding.roleEditText.setText(roleName)
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogBinding.root)
@@ -45,7 +46,12 @@ class RoleDialogFragment : DialogFragment() {
                 dialogBinding.roleEditText.error = getString(R.string.empty_value)
                 return@setOnClickListener
             }
-            parentFragmentManager.setFragmentResult(requestKey, bundleOf(KEY_ROLE_RESPONSE to enteredText))
+            parentFragmentManager.setFragmentResult(
+                requestKey, bundleOf(
+                    KEY_ROLE_ID_RESPONSE to roleId,
+                    KEY_ROLE_NAME_RESPONSE to enteredText
+                )
+            )
             dismiss()
         }
 
@@ -79,15 +85,34 @@ class RoleDialogFragment : DialogFragment() {
     }
 
     companion object {
-        @JvmStatic private val TAG = RoleDialogFragment::class.java.simpleName
-        @JvmStatic private val KEY_ROLE_RESPONSE = "KEY_ROLE_RESPONSE"
-        @JvmStatic private val ARG_ROLE = "ARG_ROLE"
-        @JvmStatic private val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+        @JvmStatic
+        private val TAG = RoleDialogFragment::class.java.simpleName
 
-        fun show(manager: FragmentManager, role: String, requestKey: String) {
+        @JvmStatic
+        private val KEY_ROLE_NAME_RESPONSE = "KEY_ROLE_NAME_RESPONSE"
+
+        @JvmStatic
+        private val KEY_ROLE_ID_RESPONSE = "KEY_ROLE_ID_RESPONSE"
+
+        @JvmStatic
+        private val ARG_ROLE_NAME = "ARG_ROLE_NAME"
+
+        @JvmStatic
+        private val ARG_ROLE_ID = "ARG_ROLE_ID"
+
+        @JvmStatic
+        private val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+
+        fun show(
+            manager: FragmentManager,
+            roleId: Int = -1,
+            roleName: String = "",
+            requestKey: String
+        ) {
             val dialogFragment = RoleDialogFragment()
             dialogFragment.arguments = bundleOf(
-                ARG_ROLE to role,
+                ARG_ROLE_ID to roleId,
+                ARG_ROLE_NAME to roleName,
                 ARG_REQUEST_KEY to requestKey
             )
             dialogFragment.show(manager, TAG)
@@ -103,7 +128,11 @@ class RoleDialogFragment : DialogFragment() {
                 requestKey,
                 lifecycleOwner,
                 FragmentResultListener { key, result ->
-                    listener.invoke(key, result.getString(KEY_ROLE_RESPONSE).toString())
+                    listener.invoke(
+                        key,
+                        result.getInt(KEY_ROLE_ID_RESPONSE),
+                        result.getString(KEY_ROLE_NAME_RESPONSE).toString()
+                    )
                 })
         }
 

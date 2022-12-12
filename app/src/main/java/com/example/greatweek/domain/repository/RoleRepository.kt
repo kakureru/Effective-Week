@@ -8,4 +8,8 @@ interface RoleRepository {
     fun addRole(name: String)
 
     fun getRoles(): Flow<List<Role>>
+
+    fun deleteRole(roleId: Int)
+
+    fun renameRole(roleId: Int, newName: String)
 }

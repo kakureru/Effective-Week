@@ -14,13 +14,28 @@
         android:orientation="vertical"
         android:layout_margin="@dimen/card_margin">
 
-        <TextView
-            android:id="@+id/role_text_view"
-            style="@style/title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Role"
-            android:textColor="@color/white" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/role_text_view"
+                style="@style/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Role"
+                android:textColor="@color/white" />
+
+            <ImageButton
+                android:id="@+id/more_button"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_more"
+                android:background="@android:color/transparent"/>
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/goals_recycler_view"

@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.FragmentRoleTabBinding
+import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.usecase.role.AddRoleUseCase
+import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
+import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.RoleAdapter
 import com.example.greatweek.presentation.viewmodel.RoleTabViewModel
@@ -32,18 +34,22 @@ class RoleTabFragment : Fragment() {
     // use cases
     private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository) }
     private val addRoleUseCase by lazy { AddRoleUseCase(roleRepository) }
-
-    // binding
-    private var _binding: FragmentRoleTabBinding? = null
-    private val binding get() = _binding!!
+    private val deleteRoleUseCase by lazy { DeleteRoleUseCase(roleRepository) }
+    private val renameRoleUseCase by lazy { RenameRoleUseCase(roleRepository) }
 
     // viewModel
     private val viewModel: RoleTabViewModel by activityViewModels {
         RoleTabViewModelFactory(
             getRolesUseCase = getRolesUseCase,
-            addRoleUseCase = addRoleUseCase
+            addRoleUseCase = addRoleUseCase,
+            deleteRoleUseCase = deleteRoleUseCase,
+            renameRoleUseCase = renameRoleUseCase
         )
     }
+
+    // binding
+    private var _binding: FragmentRoleTabBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,21 +67,24 @@ class RoleTabFragment : Fragment() {
         binding.apply {
             roleTabFragment = this@RoleTabFragment
         }
-
-        val roleAdapter = RoleAdapter()
+        val roleAdapter = RoleAdapter(
+            { role -> openRenameRoleDialog(role) },
+            { roleId -> deleteRole(roleId) }
+        )
         binding.rolesRecyclerView.adapter = roleAdapter
         lifecycle.coroutineScope.launch {
             viewModel.getRoles().collect() {
                 roleAdapter.submitList(it)
             }
         }
+        registerForContextMenu(binding.rolesRecyclerView)
     }
 
     private fun setupRoleDialogFragmentListeners() {
-        val listener: RoleDialogListener = { requestKey, role ->
+        val listener: RoleDialogListener = { requestKey, roleId, roleName ->
             when (requestKey) {
-                KEY_ADD_ROLE_REQUEST_KEY -> addRole(role)
-                KEY_EDIT_ROLE_REQUEST_KEY -> editRole()
+                KEY_ADD_ROLE_REQUEST_KEY -> addRole(roleName)
+                KEY_RENAME_ROLE_REQUEST_KEY -> renameRole(roleId, roleName)
             }
         }
         RoleDialogFragment.setupListener(
@@ -87,25 +96,41 @@ class RoleTabFragment : Fragment() {
         RoleDialogFragment.setupListener(
             parentFragmentManager,
             this,
-            KEY_EDIT_ROLE_REQUEST_KEY,
+            KEY_RENAME_ROLE_REQUEST_KEY,
             listener
         )
     }
 
-    fun openAddRoleDialog() {
-        RoleDialogFragment.show(parentFragmentManager, "", KEY_ADD_ROLE_REQUEST_KEY)
-    }
-
-    private fun addRole(name: String) {
-        Toast.makeText(context, "Role Added", Toast.LENGTH_SHORT).show()
+    private fun deleteRole(roleId: Int) {
         GlobalScope.launch(Dispatchers.IO) {
-            viewModel.addRole(name = name)
-
+            viewModel.deleteRole(roleId = roleId)
         }
     }
 
-    private fun editRole() {
-        // TODO() запустить редактирование роли
+    private fun addRole(name: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.addRole(name = name)
+        }
+    }
+
+    private fun renameRole(roleId: Int, newName: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.renameRole(roleId = roleId, newName = newName)
+        }
+    }
+
+    private fun openRenameRoleDialog(role: Role) {
+        RoleDialogFragment.show(
+            manager = parentFragmentManager,
+            roleId = role.id,
+            roleName = role.name,
+            requestKey = KEY_RENAME_ROLE_REQUEST_KEY)
+    }
+
+    fun openAddRoleDialog() {
+        RoleDialogFragment.show(
+            manager = parentFragmentManager,
+            requestKey = KEY_ADD_ROLE_REQUEST_KEY)
     }
 
     companion object {
@@ -113,6 +138,6 @@ class RoleTabFragment : Fragment() {
         private val KEY_ADD_ROLE_REQUEST_KEY = "KEY_ADD_ROLE_REQUEST_KEY"
 
         @JvmStatic
-        private val KEY_EDIT_ROLE_REQUEST_KEY = "KEY_EDIT_ROLE_REQUEST_KEY"
+        private val KEY_RENAME_ROLE_REQUEST_KEY = "KEY_RENAME_ROLE_REQUEST_KEY"
     }
 }

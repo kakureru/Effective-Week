@@ -1,6 +1,5 @@
 package com.example.greatweek.data.repository
 
-import androidx.lifecycle.Transformations.map
 import com.example.greatweek.data.storage.RoleDao
 import com.example.greatweek.data.storage.model.Roles
 import com.example.greatweek.domain.model.Role
@@ -16,7 +15,17 @@ class RoleRepositoryImpl(private val roleDao: RoleDao) : RoleRepository {
 
     override fun getRoles(): Flow<List<Role>> {
         return roleDao.getRoles().map { inRoles ->
-            inRoles.map { role -> Role(role.name) }
+            inRoles.map { role -> Role(
+                role.id,
+                role.name) }
         }
+    }
+
+    override fun deleteRole(roleId: Int) {
+        roleDao.deleteRole(roleId)
+    }
+
+    override fun renameRole(roleId: Int, newName: String) {
+        roleDao.renameRole(roleId = roleId, newName = newName)
     }
 }

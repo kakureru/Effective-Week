@@ -1,9 +1,6 @@
 package com.example.greatweek.data.storage
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.greatweek.data.storage.model.Roles
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +11,10 @@ interface RoleDao {
 
     @Query("SELECT * FROM roles")
     fun getRoles(): Flow<List<Roles>>
+
+    @Query("DELETE FROM roles WHERE id = :roleId")
+    fun deleteRole(roleId: Int)
+
+    @Query("UPDATE roles SET name = :newName WHERE id = :roleId")
+    fun renameRole(roleId: Int, newName: String)
 }
