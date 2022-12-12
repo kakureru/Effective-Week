@@ -10,18 +10,14 @@ import java.lang.IllegalArgumentException
 
 class RoleTabViewModelFactory(
     private val getRolesUseCase: GetRolesUseCase,
-    private val addRoleUseCase: AddRoleUseCase,
     private val deleteRoleUseCase: DeleteRoleUseCase,
-    private val renameRoleUseCase: RenameRoleUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RoleTabViewModel::class.java)) {
             return RoleTabViewModel(
                 getRolesUseCase,
-                addRoleUseCase,
                 deleteRoleUseCase,
-                renameRoleUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

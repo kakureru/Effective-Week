@@ -7,13 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
+import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.FragmentRoleTabBinding
+import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
+import com.example.greatweek.domain.usecase.goal.AddGoalForTheRoleUseCase
 import com.example.greatweek.domain.usecase.role.AddRoleUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
+import com.example.greatweek.presentation.Constants
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.RoleAdapter
 import com.example.greatweek.presentation.viewmodel.RoleTabViewModel
@@ -33,18 +37,13 @@ class RoleTabFragment : Fragment() {
 
     // use cases
     private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository) }
-    private val addRoleUseCase by lazy { AddRoleUseCase(roleRepository) }
     private val deleteRoleUseCase by lazy { DeleteRoleUseCase(roleRepository) }
-    private val renameRoleUseCase by lazy { RenameRoleUseCase(roleRepository) }
 
     // viewModel
     private val viewModel: RoleTabViewModel by activityViewModels {
         RoleTabViewModelFactory(
             getRolesUseCase = getRolesUseCase,
-            addRoleUseCase = addRoleUseCase,
-            deleteRoleUseCase = deleteRoleUseCase,
-            renameRoleUseCase = renameRoleUseCase
-        )
+            deleteRoleUseCase = deleteRoleUseCase)
     }
 
     // binding
@@ -56,7 +55,6 @@ class RoleTabFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setupRoleDialogFragmentListeners()
         _binding = FragmentRoleTabBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -80,42 +78,9 @@ class RoleTabFragment : Fragment() {
         registerForContextMenu(binding.rolesRecyclerView)
     }
 
-    private fun setupRoleDialogFragmentListeners() {
-        val listener: RoleDialogListener = { requestKey, roleId, roleName ->
-            when (requestKey) {
-                KEY_ADD_ROLE_REQUEST_KEY -> addRole(roleName)
-                KEY_RENAME_ROLE_REQUEST_KEY -> renameRole(roleId, roleName)
-            }
-        }
-        RoleDialogFragment.setupListener(
-            parentFragmentManager,
-            this,
-            KEY_ADD_ROLE_REQUEST_KEY,
-            listener
-        )
-        RoleDialogFragment.setupListener(
-            parentFragmentManager,
-            this,
-            KEY_RENAME_ROLE_REQUEST_KEY,
-            listener
-        )
-    }
-
     private fun deleteRole(roleId: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             viewModel.deleteRole(roleId = roleId)
-        }
-    }
-
-    private fun addRole(name: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.addRole(name = name)
-        }
-    }
-
-    private fun renameRole(roleId: Int, newName: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.renameRole(roleId = roleId, newName = newName)
         }
     }
 
@@ -124,20 +89,14 @@ class RoleTabFragment : Fragment() {
             manager = parentFragmentManager,
             roleId = role.id,
             roleName = role.name,
-            requestKey = KEY_RENAME_ROLE_REQUEST_KEY)
+            requestKey = Constants.KEY_RENAME_ROLE_REQUEST_KEY
+        )
     }
 
     fun openAddRoleDialog() {
         RoleDialogFragment.show(
             manager = parentFragmentManager,
-            requestKey = KEY_ADD_ROLE_REQUEST_KEY)
-    }
-
-    companion object {
-        @JvmStatic
-        private val KEY_ADD_ROLE_REQUEST_KEY = "KEY_ADD_ROLE_REQUEST_KEY"
-
-        @JvmStatic
-        private val KEY_RENAME_ROLE_REQUEST_KEY = "KEY_RENAME_ROLE_REQUEST_KEY"
+            requestKey = Constants.KEY_ADD_ROLE_REQUEST_KEY
+        )
     }
 }

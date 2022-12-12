@@ -11,15 +11,54 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentResultListener
-import androidx.lifecycle.LifecycleOwner
+import androidx.fragment.app.activityViewModels
 import com.example.greatweek.R
+import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
+import com.example.greatweek.domain.usecase.role.AddRoleUseCase
+import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
+import com.example.greatweek.presentation.Constants
+import com.example.greatweek.presentation.GreatWeekApplication
+import com.example.greatweek.presentation.viewmodel.RoleDialogFragmentViewModel
+import com.example.greatweek.presentation.viewmodel.RoleDialogFragmentViewModelFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-
-typealias RoleDialogListener = (requestKey: String, roleId: Int, roleName: String) -> Unit
+typealias RoleDialogListener = (requestKey: String, roleName: String) -> Unit
 
 class RoleDialogFragment : DialogFragment() {
+
+    // repository
+    private val roleRepository by lazy {
+        RoleRepositoryImpl(
+            (activity?.application as GreatWeekApplication).database.RoleDao()
+        )
+    }
+
+    // use cases
+    private val addRoleUseCase by lazy { AddRoleUseCase(roleRepository) }
+    private val renameRoleUseCase by lazy { RenameRoleUseCase(roleRepository) }
+
+    // viewModel
+    private val viewModel: RoleDialogFragmentViewModel by activityViewModels {
+        RoleDialogFragmentViewModelFactory(
+            addRoleUseCase = addRoleUseCase,
+            renameRoleUseCase = renameRoleUseCase
+        )
+    }
+
+    private fun addRole(name: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.addRole(name = name)
+        }
+    }
+
+    private fun renameRole(roleId: Int, newName: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.renameRole(roleId = roleId, newName = newName)
+        }
+    }
 
     private val roleId: Int
         get() = requireArguments().getInt(ARG_ROLE_ID)
@@ -37,7 +76,6 @@ class RoleDialogFragment : DialogFragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogBinding.root)
             .create()
-
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         dialogBinding.confirmButton.setOnClickListener {
@@ -46,12 +84,10 @@ class RoleDialogFragment : DialogFragment() {
                 dialogBinding.roleEditText.error = getString(R.string.empty_value)
                 return@setOnClickListener
             }
-            parentFragmentManager.setFragmentResult(
-                requestKey, bundleOf(
-                    KEY_ROLE_ID_RESPONSE to roleId,
-                    KEY_ROLE_NAME_RESPONSE to enteredText
-                )
-            )
+            when (requestKey) {
+                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> renameRole(roleId, enteredText)
+                Constants.KEY_ADD_ROLE_REQUEST_KEY -> addRole(enteredText)
+            }
             dismiss()
         }
 
@@ -89,12 +125,6 @@ class RoleDialogFragment : DialogFragment() {
         private val TAG = RoleDialogFragment::class.java.simpleName
 
         @JvmStatic
-        private val KEY_ROLE_NAME_RESPONSE = "KEY_ROLE_NAME_RESPONSE"
-
-        @JvmStatic
-        private val KEY_ROLE_ID_RESPONSE = "KEY_ROLE_ID_RESPONSE"
-
-        @JvmStatic
         private val ARG_ROLE_NAME = "ARG_ROLE_NAME"
 
         @JvmStatic
@@ -117,24 +147,5 @@ class RoleDialogFragment : DialogFragment() {
             )
             dialogFragment.show(manager, TAG)
         }
-
-        fun setupListener(
-            manager: FragmentManager,
-            lifecycleOwner: LifecycleOwner,
-            requestKey: String,
-            listener: RoleDialogListener
-        ) {
-            manager.setFragmentResultListener(
-                requestKey,
-                lifecycleOwner,
-                FragmentResultListener { key, result ->
-                    listener.invoke(
-                        key,
-                        result.getInt(KEY_ROLE_ID_RESPONSE),
-                        result.getString(KEY_ROLE_NAME_RESPONSE).toString()
-                    )
-                })
-        }
-
     }
 }
