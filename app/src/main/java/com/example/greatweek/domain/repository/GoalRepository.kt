@@ -10,4 +10,6 @@ interface GoalRepository {
     fun getGoals(): Flow<List<Goal>>
 
     fun addGoal(goal: Goal)
+
+    fun completeGoal(goalId: Int)
 }

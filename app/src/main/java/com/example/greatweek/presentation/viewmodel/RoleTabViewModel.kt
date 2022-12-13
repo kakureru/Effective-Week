@@ -3,6 +3,7 @@ package com.example.greatweek.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.greatweek.domain.model.Role
+import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.role.AddRoleUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
@@ -12,7 +13,8 @@ import java.lang.IllegalArgumentException
 
 class RoleTabViewModel(
     private val getRolesUseCase: GetRolesUseCase,
-    private val deleteRoleUseCase: DeleteRoleUseCase
+    private val deleteRoleUseCase: DeleteRoleUseCase,
+    private val completeGoalUseCase: CompleteGoalUseCase
 ): ViewModel() {
 
     fun getRoles(): Flow<List<Role>> {
@@ -22,11 +24,16 @@ class RoleTabViewModel(
     fun deleteRole(roleId: Int) {
         deleteRoleUseCase.execute(roleId = roleId)
     }
+
+    fun completeGoal(goalId: Int) {
+        completeGoalUseCase.execute(goalId = goalId)
+    }
 }
 
 class RoleTabViewModelFactory(
     private val getRolesUseCase: GetRolesUseCase,
     private val deleteRoleUseCase: DeleteRoleUseCase,
+    private val completeGoalUseCase: CompleteGoalUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -34,6 +41,7 @@ class RoleTabViewModelFactory(
             return RoleTabViewModel(
                 getRolesUseCase,
                 deleteRoleUseCase,
+                completeGoalUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

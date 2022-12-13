@@ -8,13 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.databinding.GoalLayoutBinding
 import com.example.greatweek.domain.model.Goal
 
-class GoalAdapter()
+class GoalAdapter(
+    private val role: String,
+    private val completeGoal: (goalId: Int) -> Unit
+    )
     : ListAdapter<Goal, GoalAdapter.GoalViewHolder>(DiffCallback) {
 
-    class GoalViewHolder(private val binding: GoalLayoutBinding) :
+    inner class GoalViewHolder(private val binding: GoalLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(goal: Goal) {
             binding.goalTextView.text = goal.title
+            binding.roleTextView.text = role
+            binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
         }
     }
 

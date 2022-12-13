@@ -1,6 +1,7 @@
 package com.example.greatweek.data.storage
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.greatweek.data.storage.model.Goals
@@ -18,4 +19,7 @@ interface GoalDao {
 
     @Insert
     fun addGoal(goal: Goals)
+
+    @Query("DELETE FROM goals WHERE id = :goalId")
+    fun completeGoal(goalId: Int)
 }

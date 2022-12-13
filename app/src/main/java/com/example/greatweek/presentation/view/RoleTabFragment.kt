@@ -11,6 +11,7 @@ import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.model.Role
+import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import com.example.greatweek.presentation.Constants
@@ -40,12 +41,14 @@ class RoleTabFragment : Fragment() {
     // use cases
     private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository, goalRepository) }
     private val deleteRoleUseCase by lazy { DeleteRoleUseCase(roleRepository) }
+    private val completeGoalUseCase by lazy { CompleteGoalUseCase(goalRepository) }
 
     // viewModel
     private val viewModel: RoleTabViewModel by activityViewModels {
         RoleTabViewModelFactory(
             getRolesUseCase = getRolesUseCase,
-            deleteRoleUseCase = deleteRoleUseCase)
+            deleteRoleUseCase = deleteRoleUseCase,
+            completeGoalUseCase = completeGoalUseCase)
     }
 
     // binding
@@ -70,7 +73,8 @@ class RoleTabFragment : Fragment() {
         val roleAdapter = RoleAdapter(
             { role -> openRenameRoleDialog(role) },
             { roleId -> deleteRole(roleId) },
-            { roleId -> openAddGoalDialog(roleId) }
+            { roleId -> openAddGoalDialog(roleId) },
+            { goalId -> completeGoal(goalId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         lifecycle.coroutineScope.launch {
@@ -80,6 +84,12 @@ class RoleTabFragment : Fragment() {
             }
         }
         registerForContextMenu(binding.rolesRecyclerView)
+    }
+
+    private fun completeGoal(goalId: Int) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.completeGoal(goalId = goalId)
+        }
     }
 
     private fun deleteRole(roleId: Int) {

@@ -45,4 +45,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
             )
         )
     }
+
+    override fun completeGoal(goalId: Int) {
+        goalDao.completeGoal(goalId = goalId)
+    }
 }

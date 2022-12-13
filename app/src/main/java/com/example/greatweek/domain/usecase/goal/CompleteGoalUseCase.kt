@@ -1,4 +1,9 @@
 package com.example.greatweek.domain.usecase.goal
 
-class CompleteGoalUseCase {
+import com.example.greatweek.data.repository.GoalRepositoryImpl
+
+class CompleteGoalUseCase(private val goalRepository: GoalRepositoryImpl) {
+    fun execute(goalId: Int) {
+        goalRepository.completeGoal(goalId = goalId)
+    }
 }

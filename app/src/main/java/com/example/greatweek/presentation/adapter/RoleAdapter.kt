@@ -16,10 +16,9 @@ import com.example.greatweek.domain.model.Role
 class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
     private val deleteRole: (roleId: Int) -> Unit,
-    private val addGoal: (roleId: Int) -> Unit
+    private val addGoal: (roleId: Int) -> Unit,
+    private val completeGoal: (goalId: Int) -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
-
-//    private val viewPool = RecycledViewPool()
 
     inner class RoleViewHolder(
         private val context: Context,
@@ -28,15 +27,10 @@ class RoleAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(role: Role) {
             binding.roleTextView.text = role.name
-//            val layoutManager = LinearLayoutManager(
-//                binding.goalsRecyclerView.context,
-//                LinearLayoutManager.VERTICAL,
-//                false
-//            )
-//            layoutManager.initialPrefetchItemCount = role.goals.size;
-//            binding.goalsRecyclerView.layoutManager = layoutManager
-//            binding.goalsRecyclerView.setRecycledViewPool(viewPool)
-            val goalAdapter = GoalAdapter()
+            val goalAdapter = GoalAdapter(
+                completeGoal = completeGoal,
+                role = role.name
+            )
             binding.goalsRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(role.goals)
 
@@ -56,7 +50,11 @@ class RoleAdapter(
                 }
                 R.id.delete -> {
                     if (role.goals.isNotEmpty())
-                        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Can't delete role with active goals",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     else
                         deleteRole(role.id)
                     true
