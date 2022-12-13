@@ -10,13 +10,9 @@ import androidx.lifecycle.coroutineScope
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.FragmentRoleTabBinding
-import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
-import com.example.greatweek.domain.usecase.goal.AddGoalForTheRoleUseCase
-import com.example.greatweek.domain.usecase.role.AddRoleUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
-import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
 import com.example.greatweek.presentation.Constants
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.RoleAdapter
@@ -29,14 +25,20 @@ import kotlinx.coroutines.launch
 class RoleTabFragment : Fragment() {
 
     // repository
+    private val goalRepository by lazy {
+        GoalRepositoryImpl(
+            (activity?.application as GreatWeekApplication).database.GoalDao()
+        )
+    }
+
     private val roleRepository by lazy {
         RoleRepositoryImpl(
-            (activity?.application as GreatWeekApplication).database.RoleDao()
+            roleDao = (activity?.application as GreatWeekApplication).database.RoleDao()
         )
     }
 
     // use cases
-    private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository) }
+    private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository, goalRepository) }
     private val deleteRoleUseCase by lazy { DeleteRoleUseCase(roleRepository) }
 
     // viewModel
@@ -67,12 +69,14 @@ class RoleTabFragment : Fragment() {
         }
         val roleAdapter = RoleAdapter(
             { role -> openRenameRoleDialog(role) },
-            { roleId -> deleteRole(roleId) }
+            { roleId -> deleteRole(roleId) },
+            { roleId -> openAddGoalDialog(roleId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         lifecycle.coroutineScope.launch {
-            viewModel.getRoles().collect() {
+            viewModel.getRoles().collect {
                 roleAdapter.submitList(it)
+                roleAdapter.notifyDataSetChanged()
             }
         }
         registerForContextMenu(binding.rolesRecyclerView)
@@ -82,6 +86,14 @@ class RoleTabFragment : Fragment() {
         GlobalScope.launch(Dispatchers.IO) {
             viewModel.deleteRole(roleId = roleId)
         }
+    }
+
+    private fun openAddGoalDialog(roleId: Int) {
+        GoalDialogFragment.show(
+            manager = parentFragmentManager,
+            roleId = roleId,
+            requestKey = Constants.KEY_ADD_GOAL_REQUEST_KEY
+        )
     }
 
     private fun openRenameRoleDialog(role: Role) {

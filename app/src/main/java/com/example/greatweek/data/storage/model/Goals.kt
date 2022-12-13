@@ -18,7 +18,7 @@ data class Goals(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @NonNull val title: String,
     val description: String,
-    @ColumnInfo(name = "role_id") val roleId: String,
+    @ColumnInfo(name = "role_id") val roleId: Int,
     val day: Int,
     val type: String
 )

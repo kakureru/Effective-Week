@@ -47,6 +47,7 @@
             tools:itemCount="2"/>
 
         <Button
+            android:id="@+id/add_goal_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/add_goal_button"

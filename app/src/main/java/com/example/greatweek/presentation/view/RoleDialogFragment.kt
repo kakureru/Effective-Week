@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import com.example.greatweek.R
+import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
 import com.example.greatweek.domain.usecase.role.AddRoleUseCase
@@ -30,9 +31,10 @@ typealias RoleDialogListener = (requestKey: String, roleName: String) -> Unit
 class RoleDialogFragment : DialogFragment() {
 
     // repository
+
     private val roleRepository by lazy {
         RoleRepositoryImpl(
-            (activity?.application as GreatWeekApplication).database.RoleDao()
+            roleDao = (activity?.application as GreatWeekApplication).database.RoleDao()
         )
     }
 

@@ -6,16 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.example.greatweek.R
 import com.example.greatweek.databinding.RoleCardLayoutBinding
 import com.example.greatweek.domain.model.Role
+import kotlinx.coroutines.flow.collect
 
 class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
-    private val deleteRole: (roleId: Int) -> Unit
+    private val deleteRole: (roleId: Int) -> Unit,
+    private val addGoal: (roleId: Int) -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
+
+//    private val viewPool = RecycledViewPool()
 
     inner class RoleViewHolder(
         private val context: Context,
@@ -24,10 +30,20 @@ class RoleAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(role: Role) {
             binding.roleTextView.text = role.name
+//            val layoutManager = LinearLayoutManager(
+//                binding.goalsRecyclerView.context,
+//                LinearLayoutManager.VERTICAL,
+//                false
+//            )
+//            layoutManager.initialPrefetchItemCount = role.goals.size;
+//            binding.goalsRecyclerView.layoutManager = layoutManager
+//            binding.goalsRecyclerView.setRecycledViewPool(viewPool)
             val goalAdapter = GoalAdapter()
             binding.goalsRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(role.goals)
+
             binding.moreButton.setOnClickListener { popupMenus(it, context, role) }
+            binding.addGoalButton.setOnClickListener { addGoal(role.id) }
         }
     }
 
@@ -56,7 +72,7 @@ class RoleAdapter(
             .invoke(menu, true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoleAdapter.RoleViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoleViewHolder {
         return RoleViewHolder(
             parent.context,
             RoleCardLayoutBinding.inflate(
@@ -67,7 +83,7 @@ class RoleAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: RoleAdapter.RoleViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RoleViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 

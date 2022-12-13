@@ -8,17 +8,41 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
+
     override fun getGoalsByDay(dayId: Int): Flow<List<Goal>> {
         return goalDao.getGoalsByDay(dayId = dayId).map { inGoals ->
-            inGoals.map { goal ->
-                Goal(
-                    goal.title,
-                    goal.description,
-                    goal.roleId,
-                    goal.day,
-                    goal.type
-                )
-            }
+            mapDataGoal(inGoals = inGoals)
         }
+    }
+
+    override fun getGoals(): Flow<List<Goal>> {
+        return goalDao.getGoals().map { inGoals ->
+            mapDataGoal(inGoals = inGoals)
+        }
+    }
+
+    private fun mapDataGoal(inGoals: List<Goals>): List<Goal> {
+        return inGoals.map { goal ->
+            Goal(
+                goal.id,
+                goal.title,
+                goal.description,
+                goal.roleId,
+                goal.day,
+                goal.type
+            )
+        }
+    }
+
+    override fun addGoal(goal: Goal) {
+        goalDao.addGoal(
+            Goals(
+                title = goal.title,
+                description = goal.description,
+                roleId = goal.roleId,
+                day = goal.weekday,
+                type = goal.type
+            )
+        )
     }
 }
