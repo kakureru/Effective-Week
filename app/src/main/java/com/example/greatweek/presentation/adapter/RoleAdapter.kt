@@ -5,15 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.example.greatweek.R
 import com.example.greatweek.databinding.RoleCardLayoutBinding
 import com.example.greatweek.domain.model.Role
-import kotlinx.coroutines.flow.collect
 
 class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
@@ -57,7 +55,10 @@ class RoleAdapter(
                     true
                 }
                 R.id.delete -> {
-                    deleteRole(role.id)
+                    if (role.goals.isNotEmpty())
+                        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
+                    else
+                        deleteRole(role.id)
                     true
                 }
                 else -> true
