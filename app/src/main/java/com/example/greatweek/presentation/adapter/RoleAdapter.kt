@@ -89,7 +89,7 @@ class RoleAdapter(
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Role>() {
             override fun areItemsTheSame(oldItem: Role, newItem: Role): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItem: Role, newItem: Role): Boolean {

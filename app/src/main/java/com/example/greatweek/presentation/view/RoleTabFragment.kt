@@ -71,10 +71,10 @@ class RoleTabFragment : Fragment() {
             roleTabFragment = this@RoleTabFragment
         }
         val roleAdapter = RoleAdapter(
-            { role -> openRenameRoleDialog(role) },
-            { roleId -> deleteRole(roleId) },
-            { roleId -> openAddGoalDialog(roleId) },
-            { goalId -> completeGoal(goalId) }
+            renameRole = { role -> openRenameRoleDialog(role) },
+            deleteRole = { roleId -> deleteRole(roleId) },
+            addGoal = { roleId -> openAddGoalDialog(roleId) },
+            completeGoal = { goalId -> completeGoal(goalId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         lifecycle.coroutineScope.launch {
