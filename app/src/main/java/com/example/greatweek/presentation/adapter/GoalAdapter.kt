@@ -9,7 +9,7 @@ import com.example.greatweek.databinding.GoalLayoutBinding
 import com.example.greatweek.domain.model.Goal
 
 class GoalAdapter(
-    private val role: String,
+    private val role: String = "",
     private val completeGoal: (goalId: Int) -> Unit
     )
     : ListAdapter<Goal, GoalAdapter.GoalViewHolder>(DiffCallback) {

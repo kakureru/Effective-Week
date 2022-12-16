@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.greatweek.R
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.databinding.FragmentScheduleBinding
+import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
+import com.example.greatweek.presentation.Constants
 import com.example.greatweek.presentation.GreatWeekApplication
 import com.example.greatweek.presentation.adapter.WeekAdapter
 import com.example.greatweek.presentation.viewmodel.ScheduleViewModel
@@ -34,6 +36,7 @@ class ScheduleFragment : Fragment() {
 
     // use cases
     private val getWeekUseCase by lazy { GetWeekUseCase(goalRepository = goalRepository) }
+    private val completeGoalUseCase by lazy { CompleteGoalUseCase(goalRepository) }
 
     // binding
     private var _binding: FragmentScheduleBinding? = null
@@ -42,7 +45,8 @@ class ScheduleFragment : Fragment() {
     // viewModel
     private val viewModel: ScheduleViewModel by activityViewModels {
         ScheduleViewModelFactory(
-            getWeekUseCase
+            getWeekUseCase,
+            completeGoalUseCase
         )
     }
 
@@ -63,13 +67,30 @@ class ScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val weekAdapter = WeekAdapter()
+        val weekAdapter = WeekAdapter(
+            addGoal = { openAddGoalDialog() },
+            completeGoal = { goalId -> completeGoal(goalId) }
+        )
         binding.week.adapter = weekAdapter
         lifecycle.coroutineScope.launch {
             viewModel.getWeek().collect() {
                 weekAdapter.submitList(it)
             }
         }
+    }
+
+    private fun completeGoal(goalId: Int) {
+        GlobalScope.launch(Dispatchers.IO) {
+            viewModel.completeGoal(goalId = goalId)
+        }
+    }
+
+
+    private fun openAddGoalDialog() {
+        GoalDialogFragment.show(
+            manager = parentFragmentManager,
+            requestKey = Constants.KEY_ADD_GOAL_REQUEST_KEY
+        )
     }
 
 }

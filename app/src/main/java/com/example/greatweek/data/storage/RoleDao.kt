@@ -17,4 +17,7 @@ interface RoleDao {
 
     @Query("UPDATE roles SET name = :newName WHERE id = :roleId")
     fun renameRole(roleId: Int, newName: String)
+
+    @Query("SELECT * FROM roles WHERE id = :roleId")
+    fun getRole(roleId: Int): Roles
 }

@@ -16,7 +16,7 @@ class RoleRepositoryImpl(
     }
 
     override fun getRoles(): Flow<List<Role>> {
-        val roles = roleDao.getRoles().map {
+        return roleDao.getRoles().map {
             it.map { role ->
                 Role(
                     id = role.id,
@@ -24,7 +24,14 @@ class RoleRepositoryImpl(
                 )
             }
         }
-        return roles
+    }
+
+    override fun getRoleById(roleId: Int): Role {
+        val role = roleDao.getRole(roleId = roleId)
+        return Role(
+            id = role.id,
+            name = role.name
+        )
     }
 
     override fun deleteRole(roleId: Int) {

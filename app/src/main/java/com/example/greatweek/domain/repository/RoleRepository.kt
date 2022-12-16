@@ -12,4 +12,6 @@ interface RoleRepository {
     fun deleteRole(roleId: Int)
 
     fun renameRole(roleId: Int, newName: String)
+
+    fun getRoleById(roleId: Int): Role
 }
