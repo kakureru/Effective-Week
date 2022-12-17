@@ -42,7 +42,8 @@ class RoleTabFragment : Fragment() {
             renameRole = { role -> openRenameRoleDialog(role) },
             deleteRole = { roleId -> deleteRole(roleId) },
             addGoal = { roleId -> openAddGoalDialog(roleId) },
-            completeGoal = { goalId -> completeGoal(goalId) }
+            completeGoal = { goalId -> completeGoal(goalId) },
+            editGoal = { goalId -> openEditGoalDialog(goalId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         lifecycle.coroutineScope.launch {
@@ -66,11 +67,19 @@ class RoleTabFragment : Fragment() {
         }
     }
 
+    private fun openEditGoalDialog(goalId: Int) {
+        GoalDialogFragment.show(
+            manager = parentFragmentManager,
+            argument = goalId,
+            requestKey = Constants.KEY_EDIT_GOAL_REQUEST_KEY
+        )
+    }
+
     private fun openAddGoalDialog(roleId: Int) {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
-            roleId = roleId,
-            requestKey = Constants.KEY_ADD_GOAL_REQUEST_KEY
+            argument = roleId,
+            requestKey = Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
         )
     }
 

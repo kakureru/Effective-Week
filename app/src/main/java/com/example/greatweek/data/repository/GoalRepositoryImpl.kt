@@ -11,21 +11,12 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
 
     override fun getGoals(): Flow<List<Goal>> {
         return goalDao.getGoals().map { inGoals ->
-            mapDataGoal(inGoals = inGoals)
+            mapToDomain(goals = inGoals)
         }
     }
 
-    private fun mapDataGoal(inGoals: List<Goals>): List<Goal> {
-        return inGoals.map { goal ->
-            Goal(
-                goal.id,
-                goal.title,
-                goal.description,
-                goal.roleId,
-                goal.day,
-                goal.commitment
-            )
-        }
+    override fun getGoal(goalId: Int): Goal {
+        return mapToDomain(goalDao.getGoalById(goalId = goalId))
     }
 
     override fun addGoal(goal: Goal) {
@@ -42,5 +33,41 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
 
     override fun completeGoal(goalId: Int) {
         goalDao.completeGoal(goalId = goalId)
+    }
+
+    override fun editGoal(goal: Goal) {
+        val g = Goals(
+            id = goal.id,
+            title = goal.title,
+            description = goal.description,
+            roleId = goal.roleId,
+            day = goal.weekday,
+            commitment = goal.commitment
+        )
+        goalDao.editGoal(
+            g.id,
+            g.title,
+            g.description,
+            g.roleId,
+            g.day,
+            g.commitment
+        )
+    }
+
+    private fun mapToDomain(goals: List<Goals>): List<Goal> {
+        return goals.map { goal ->
+            mapToDomain(goal)
+        }
+    }
+
+    private fun mapToDomain(goal: Goals): Goal {
+        return Goal(
+            id = goal.id,
+            title = goal.title,
+            description = goal.description,
+            roleId = goal.roleId,
+            weekday = goal.day,
+            commitment = goal.commitment
+        )
     }
 }

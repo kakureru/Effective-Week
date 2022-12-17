@@ -8,7 +8,11 @@ interface GoalRepository {
 
     fun getGoals(): Flow<List<Goal>>
 
+    fun getGoal(goalId: Int): Goal
+
     fun addGoal(goal: Goal)
 
     fun completeGoal(goalId: Int)
+
+    fun editGoal(goal: Goal)
 }

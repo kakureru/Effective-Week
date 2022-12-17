@@ -10,7 +10,8 @@ import com.example.greatweek.domain.model.Goal
 
 class GoalAdapter(
     private val role: String = "",
-    private val completeGoal: (goalId: Int) -> Unit
+    private val completeGoal: (goalId: Int) -> Unit,
+    private val editGoal: (goalId: Int) -> Unit
     )
     : ListAdapter<Goal, GoalAdapter.GoalViewHolder>(DiffCallback) {
 
@@ -20,6 +21,7 @@ class GoalAdapter(
             binding.goalTextView.text = goal.title
             binding.roleTextView.text = role
             binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
+            binding.root.setOnClickListener { editGoal(goal.id) }
         }
     }
 

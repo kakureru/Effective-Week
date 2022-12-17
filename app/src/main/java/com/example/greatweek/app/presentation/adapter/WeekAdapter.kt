@@ -6,11 +6,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
+import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.WeekDay
 
 class WeekAdapter(
     private val addGoal: (weekDay: Int) -> Unit,
-    private val completeGoal: (goalId: Int) -> Unit
+    private val completeGoal: (goalId: Int) -> Unit,
+    private val editGoal: (goalId: Int) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
@@ -19,14 +21,20 @@ class WeekAdapter(
             binding.weekDayName.text = weekDay.name
 
             // goal adapter
-            val goalAdapter = GoalAdapter(completeGoal = completeGoal)
+            val goalAdapter = GoalAdapter(
+                completeGoal = completeGoal,
+                editGoal = editGoal
+            )
             binding.prioritiesRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(weekDay.goals.filter { goal ->
                 !goal.commitment
             })
 
             // commitment adapter
-            val commitmentAdapter = GoalAdapter(completeGoal = completeGoal)
+            val commitmentAdapter = GoalAdapter(
+                completeGoal = completeGoal,
+                editGoal = editGoal
+            )
             binding.commitmentsRecyclerView.adapter = commitmentAdapter
             commitmentAdapter.submitList(weekDay.goals.filter { goal ->
                 goal.commitment

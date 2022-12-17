@@ -1,8 +1,6 @@
 package com.example.greatweek.app.di
 
-import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
-import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
-import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
+import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
 import org.koin.dsl.module
 
@@ -38,5 +36,13 @@ val domainModule = module {
 
     factory<RenameRoleUseCase> {
         RenameRoleUseCase(roleRepository = get())
+    }
+
+    factory<EditGoalUseCase> {
+        EditGoalUseCase(goalRepository = get())
+    }
+
+    factory<GetGoalUseCase> {
+        GetGoalUseCase(goalRepository = get())
     }
 }

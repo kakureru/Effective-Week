@@ -34,6 +34,7 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <!--    -->
     <style name="card" parent="@style/Widget.MaterialComponents.CardView">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialCardView.Cut
         </item>
@@ -47,6 +48,7 @@
         <item name="cornerSizeBottomLeft">@dimen/card_radius</item>
     </style>
 
+    <!--    -->
     <style name="title">
         <item name="android:paddingBottom">8dp</item>
         <item name="android:textSize">16sp</item>

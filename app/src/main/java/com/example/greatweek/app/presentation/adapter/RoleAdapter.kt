@@ -17,7 +17,8 @@ class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
     private val deleteRole: (roleId: Int) -> Unit,
     private val addGoal: (roleId: Int) -> Unit,
-    private val completeGoal: (goalId: Int) -> Unit
+    private val completeGoal: (goalId: Int) -> Unit,
+    private val editGoal: (goalId: Int) -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
 
     inner class RoleViewHolder(
@@ -29,7 +30,8 @@ class RoleAdapter(
             binding.roleTextView.text = role.name
             val goalAdapter = GoalAdapter(
                 completeGoal = completeGoal,
-                role = role.name
+                role = role.name,
+                editGoal = editGoal
             )
             binding.goalsRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(role.goals.filter { it.weekday == 0 })

@@ -1,12 +1,10 @@
 package com.example.greatweek.data.storage
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.greatweek.data.storage.model.Goals
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 @Dao
 interface GoalDao {
@@ -22,4 +20,23 @@ interface GoalDao {
 
     @Query("DELETE FROM goals WHERE id = :goalId")
     fun completeGoal(goalId: Int)
+
+    @Query("UPDATE goals SET " +
+            "title = :title, " +
+            "description = :description, " +
+            "role_id = :roleId, " +
+            "day = :day, " +
+            "commitment = :commitment " +
+            "WHERE id = :id")
+    fun editGoal(
+        id: Int,
+        title: String,
+        description: String,
+        roleId: Int,
+        day: Int,
+        commitment: Boolean
+    )
+
+    @Query("SELECT * FROM goals WHERE id = :goalId")
+    fun getGoalById(goalId: Int): Goals
 }
