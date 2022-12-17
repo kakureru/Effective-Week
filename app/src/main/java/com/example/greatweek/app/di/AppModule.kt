@@ -1,0 +1,42 @@
+package com.example.greatweek.app.di
+
+import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
+import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
+import com.example.greatweek.app.presentation.viewmodel.RoleTabViewModel
+import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
+
+val appModule = module {
+
+    viewModel<ScheduleViewModel> {
+        ScheduleViewModel(
+            getWeekUseCase = get(),
+            completeGoalUseCase = get()
+        )
+    }
+
+    viewModel<RoleTabViewModel> {
+        RoleTabViewModel(
+            getRolesUseCase = get(),
+            deleteRoleUseCase = get(),
+            completeGoalUseCase = get()
+        )
+    }
+
+    viewModel<RoleDialogFragmentViewModel> {
+        RoleDialogFragmentViewModel(
+            addRoleUseCase = get(),
+            renameRoleUseCase = get()
+        )
+    }
+
+    viewModel<GoalDialogFragmentViewModel> {
+        GoalDialogFragmentViewModel(
+            addGoalUseCase = get(),
+            getRoleUseCase = get(),
+            getRolesUseCase = get()
+        )
+    }
+
+}

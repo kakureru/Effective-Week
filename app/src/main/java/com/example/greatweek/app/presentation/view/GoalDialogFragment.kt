@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.view
+package com.example.greatweek.app.presentation.view
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -9,55 +9,24 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.coroutineScope
 import com.example.greatweek.R
-import com.example.greatweek.data.repository.GoalRepositoryImpl
-import com.example.greatweek.data.repository.RoleRepositoryImpl
+import com.example.greatweek.app.Constants
+import com.example.greatweek.app.presentation.adapter.RoleBottomSheetDialogAdapter
+import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
 import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
-import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
-import com.example.greatweek.domain.usecase.role.GetRoleUseCase
-import com.example.greatweek.domain.usecase.role.GetRolesUseCase
-import com.example.greatweek.presentation.Constants
-import com.example.greatweek.presentation.GreatWeekApplication
-import com.example.greatweek.presentation.adapter.RoleBottomSheetDialogAdapter
-import com.example.greatweek.presentation.viewmodel.GoalDialogFragmentViewModel
-import com.example.greatweek.presentation.viewmodel.GoalDialogFragmentViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class GoalDialogFragment : DialogFragment() {
 
-    // repository
-    private val goalRepository by lazy {
-        GoalRepositoryImpl(
-            (activity?.application as GreatWeekApplication).database.GoalDao()
-        )
-    }
-    private val roleRepository by lazy {
-        RoleRepositoryImpl(
-            (activity?.application as GreatWeekApplication).database.RoleDao()
-        )
-    }
-
-    // use cases
-    private val addGoalUseCase by lazy { AddGoalUseCase(goalRepository) }
-    private val getRoleUseCase by lazy { GetRoleUseCase(roleRepository) }
-    private val getRolesUseCase by lazy { GetRolesUseCase(roleRepository, goalRepository) }
-
-    // viewModel
-    private val viewModel: GoalDialogFragmentViewModel by activityViewModels {
-        GoalDialogFragmentViewModelFactory(
-            addGoalUseCase,
-            getRoleUseCase,
-            getRolesUseCase
-        )
-    }
+    private val viewModel by viewModel<GoalDialogFragmentViewModel>()
 
     private var paramRoleId: Int? = null
 

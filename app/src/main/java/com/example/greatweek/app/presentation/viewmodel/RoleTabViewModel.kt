@@ -1,13 +1,11 @@
-package com.example.greatweek.presentation.viewmodel
+package com.example.greatweek.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
-import com.example.greatweek.domain.usecase.role.AddRoleUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
-import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
 import kotlinx.coroutines.flow.Flow
 import java.lang.IllegalArgumentException
 

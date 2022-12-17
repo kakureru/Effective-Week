@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.viewmodel
+package com.example.greatweek.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.view
+package com.example.greatweek.app.presentation.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,41 +14,24 @@ import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
-import com.example.greatweek.presentation.Constants
-import com.example.greatweek.presentation.GreatWeekApplication
-import com.example.greatweek.presentation.adapter.WeekAdapter
-import com.example.greatweek.presentation.viewmodel.ScheduleViewModel
-import com.example.greatweek.presentation.viewmodel.ScheduleViewModelFactory
+import com.example.greatweek.app.Constants
+import com.example.greatweek.app.GreatWeekApplication
+import com.example.greatweek.app.presentation.adapter.WeekAdapter
+import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
+import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val TAG = "ScheduleFragment"
 
 class ScheduleFragment : Fragment() {
 
-    // repository
-    private val goalRepository by lazy {
-        GoalRepositoryImpl(
-            (activity?.application as GreatWeekApplication).database.GoalDao()
-        )
-    }
+    private val viewModel by viewModel<ScheduleViewModel>()
 
-    // use cases
-    private val getWeekUseCase by lazy { GetWeekUseCase(goalRepository = goalRepository) }
-    private val completeGoalUseCase by lazy { CompleteGoalUseCase(goalRepository) }
-
-    // binding
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
-
-    // viewModel
-    private val viewModel: ScheduleViewModel by activityViewModels {
-        ScheduleViewModelFactory(
-            getWeekUseCase,
-            completeGoalUseCase
-        )
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,6 +1,5 @@
-package com.example.greatweek.presentation.adapter
+package com.example.greatweek.app.presentation.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil

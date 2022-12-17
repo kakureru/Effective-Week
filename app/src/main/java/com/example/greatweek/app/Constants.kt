@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation
+package com.example.greatweek.app
 
 object Constants {
     const val KEY_ADD_ROLE_REQUEST_KEY = "KEY_ADD_ROLE_REQUEST_KEY"

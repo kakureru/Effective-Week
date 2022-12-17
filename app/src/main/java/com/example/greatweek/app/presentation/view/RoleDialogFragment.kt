@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.view
+package com.example.greatweek.app.presentation.view
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -11,44 +11,18 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
 import com.example.greatweek.R
-import com.example.greatweek.data.repository.GoalRepositoryImpl
-import com.example.greatweek.data.repository.RoleRepositoryImpl
+import com.example.greatweek.app.Constants
+import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
-import com.example.greatweek.domain.usecase.role.AddRoleUseCase
-import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
-import com.example.greatweek.presentation.Constants
-import com.example.greatweek.presentation.GreatWeekApplication
-import com.example.greatweek.presentation.viewmodel.RoleDialogFragmentViewModel
-import com.example.greatweek.presentation.viewmodel.RoleDialogFragmentViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
-typealias RoleDialogListener = (requestKey: String, roleName: String) -> Unit
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RoleDialogFragment : DialogFragment() {
 
-    // repository
-
-    private val roleRepository by lazy {
-        RoleRepositoryImpl(
-            roleDao = (activity?.application as GreatWeekApplication).database.RoleDao()
-        )
-    }
-
-    // use cases
-    private val addRoleUseCase by lazy { AddRoleUseCase(roleRepository) }
-    private val renameRoleUseCase by lazy { RenameRoleUseCase(roleRepository) }
-
-    // viewModel
-    private val viewModel: RoleDialogFragmentViewModel by activityViewModels {
-        RoleDialogFragmentViewModelFactory(
-            addRoleUseCase = addRoleUseCase,
-            renameRoleUseCase = renameRoleUseCase
-        )
-    }
+    private val viewModel by viewModel<RoleDialogFragmentViewModel>()
 
     private fun addRole(name: String) {
         GlobalScope.launch(Dispatchers.IO) {

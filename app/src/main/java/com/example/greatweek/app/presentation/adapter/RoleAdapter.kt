@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.adapter
+package com.example.greatweek.app.presentation.adapter
 
 import android.content.Context
 import android.view.LayoutInflater

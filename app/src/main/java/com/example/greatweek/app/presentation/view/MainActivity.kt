@@ -1,4 +1,4 @@
-package com.example.greatweek.presentation.view
+package com.example.greatweek.app.presentation.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

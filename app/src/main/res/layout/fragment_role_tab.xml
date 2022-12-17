@@ -6,7 +6,7 @@
     <data>
         <variable
             name="roleTabFragment"
-            type="com.example.greatweek.presentation.view.RoleTabFragment" />
+            type="com.example.greatweek.app.presentation.view.RoleTabFragment" />
     </data>
 
     <LinearLayout
