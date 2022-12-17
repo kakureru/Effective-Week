@@ -27,21 +27,3 @@ class RoleTabViewModel(
         completeGoalUseCase.execute(goalId = goalId)
     }
 }
-
-class RoleTabViewModelFactory(
-    private val getRolesUseCase: GetRolesUseCase,
-    private val deleteRoleUseCase: DeleteRoleUseCase,
-    private val completeGoalUseCase: CompleteGoalUseCase
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RoleTabViewModel::class.java)) {
-            return RoleTabViewModel(
-                getRolesUseCase,
-                deleteRoleUseCase,
-                completeGoalUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

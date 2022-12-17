@@ -28,21 +28,3 @@ class GoalDialogFragmentViewModel(
         return getRolesUseCase.execute()
     }
 }
-
-class GoalDialogFragmentViewModelFactory(
-    private val addGoalUseCase: AddGoalUseCase,
-    private val getRoleUseCase: GetRoleUseCase,
-    private val getRolesUseCase: GetRolesUseCase
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GoalDialogFragmentViewModel::class.java)) {
-            return GoalDialogFragmentViewModel(
-                addGoalUseCase,
-                getRoleUseCase,
-                getRolesUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

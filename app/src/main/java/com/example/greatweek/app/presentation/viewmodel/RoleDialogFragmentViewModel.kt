@@ -19,19 +19,3 @@ class RoleDialogFragmentViewModel(
         addRoleUseCase.execute(name = name)
     }
 }
-
-class RoleDialogFragmentViewModelFactory(
-    private val addRoleUseCase: AddRoleUseCase,
-    private val renameRoleUseCase: RenameRoleUseCase
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RoleDialogFragmentViewModel::class.java)) {
-            return RoleDialogFragmentViewModel(
-                addRoleUseCase,
-                renameRoleUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
