@@ -23,7 +23,7 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
                 goal.description,
                 goal.roleId,
                 goal.day,
-                goal.type
+                goal.commitment
             )
         }
     }
@@ -35,7 +35,7 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
                 description = goal.description,
                 roleId = goal.roleId,
                 day = goal.weekday,
-                type = goal.type
+                commitment = goal.commitment
             )
         )
     }

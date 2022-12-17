@@ -59,7 +59,10 @@ class GoalDialogFragment : DialogFragment() {
         )
     }
 
-    private var roleId: Int? = null
+    private var paramRoleId: Int? = null
+
+    private val paramWeekDay: Int
+        get() = requireArguments().getInt(ARG_WEEK_DAY)
 
     private val requestKey: String
         get() = requireArguments().getString(ARG_REQUEST_KEY)!!
@@ -68,8 +71,8 @@ class GoalDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = GoalDialogLayoutBinding.inflate(layoutInflater)
-        roleId = requireArguments().get(ARG_ROLE_ID) as Int?
-        roleId?.let { setRole(roleId!!) }
+        paramRoleId = requireArguments().get(ARG_ROLE_ID) as Int?
+        paramRoleId?.let { setRole(paramRoleId!!) }
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(binding.root)
@@ -81,14 +84,15 @@ class GoalDialogFragment : DialogFragment() {
         }
 
         binding.confirmButton.setOnClickListener {
-            val newTitle = binding.titleEditText.text.toString()
-            val newDescription = binding.descriptionEditText.text.toString()
+            val paramTitle = binding.titleEditText.text.toString()
+            val paramDescription = binding.descriptionEditText.text.toString()
+            val paramCommitment = binding.commitmentCheckBox.isChecked
 
-            if (newTitle.isBlank()) {
+            if (paramTitle.isBlank()) {
                 binding.titleEditText.error = getString(R.string.empty_value)
                 return@setOnClickListener
             }
-            if (roleId == null) {
+            if (paramRoleId == null) {
                 Toast.makeText(requireContext(), "Choose role", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -96,9 +100,11 @@ class GoalDialogFragment : DialogFragment() {
             when (requestKey) {
                 Constants.KEY_ADD_GOAL_REQUEST_KEY -> addGoal(
                     Goal(
-                        title = newTitle,
-                        description = newDescription,
-                        roleId = roleId!!
+                        title = paramTitle,
+                        description = paramDescription,
+                        roleId = paramRoleId!!,
+                        weekday = paramWeekDay,
+                        commitment = paramCommitment
                     )
                 )
                 //Constants.KEY_EDIT_GOAL_REQUEST_KEY ->
@@ -126,7 +132,7 @@ class GoalDialogFragment : DialogFragment() {
     }
 
     private fun setRole(role: Role) {
-        roleId = role.id
+        paramRoleId = role.id
         binding.roleButton.text = role.name
     }
 
@@ -154,6 +160,9 @@ class GoalDialogFragment : DialogFragment() {
         private val TAG = GoalDialogFragment::class.java.simpleName
 
         @JvmStatic
+        private val ARG_WEEK_DAY = "ARG_WEEK_DAY"
+
+        @JvmStatic
         private val ARG_ROLE_ID = "ARG_ROLE_ID"
 
         @JvmStatic
@@ -161,11 +170,13 @@ class GoalDialogFragment : DialogFragment() {
 
         fun show(
             manager: FragmentManager,
+            weekDay: Int = 0,
             roleId: Int? = null,
             requestKey: String
         ) {
             val dialogFragment = GoalDialogFragment()
             dialogFragment.arguments = bundleOf(
+                ARG_WEEK_DAY to weekDay,
                 ARG_ROLE_ID to roleId,
                 ARG_REQUEST_KEY to requestKey
             )

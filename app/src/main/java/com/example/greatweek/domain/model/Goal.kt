@@ -6,5 +6,5 @@ data class Goal(
     val description: String = "",
     val roleId: Int = -1,
     val weekday: Int = 0,
-    val type: String = ""
+    val commitment: Boolean = false
 )

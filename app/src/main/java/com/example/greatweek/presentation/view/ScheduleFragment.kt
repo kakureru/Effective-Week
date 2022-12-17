@@ -68,7 +68,7 @@ class ScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val weekAdapter = WeekAdapter(
-            addGoal = { openAddGoalDialog() },
+            addGoal = { weekDay -> openAddGoalDialog(weekDay) },
             completeGoal = { goalId -> completeGoal(goalId) }
         )
         binding.week.adapter = weekAdapter
@@ -86,9 +86,10 @@ class ScheduleFragment : Fragment() {
     }
 
 
-    private fun openAddGoalDialog() {
+    private fun openAddGoalDialog(weekDay: Int) {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
+            weekDay = weekDay,
             requestKey = Constants.KEY_ADD_GOAL_REQUEST_KEY
         )
     }

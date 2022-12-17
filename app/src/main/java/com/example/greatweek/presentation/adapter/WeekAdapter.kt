@@ -9,7 +9,7 @@ import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
 
 class WeekAdapter(
-    private val addGoal: () -> Unit,
+    private val addGoal: (weekDay: Int) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
 
@@ -22,18 +22,18 @@ class WeekAdapter(
             val goalAdapter = GoalAdapter(completeGoal = completeGoal)
             binding.prioritiesRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(weekDay.goals.filter { goal ->
-                goal.type == "goal"
+                !goal.commitment
             })
 
             // commitment adapter
             val commitmentAdapter = GoalAdapter(completeGoal = completeGoal)
             binding.commitmentsRecyclerView.adapter = commitmentAdapter
             commitmentAdapter.submitList(weekDay.goals.filter { goal ->
-                goal.type == "commitment"
+                goal.commitment
             })
 
             binding.addGoalButton.setOnClickListener {
-                addGoal()
+                addGoal(weekDay.id)
             }
         }
     }

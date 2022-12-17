@@ -32,7 +32,7 @@ class RoleAdapter(
                 role = role.name
             )
             binding.goalsRecyclerView.adapter = goalAdapter
-            goalAdapter.submitList(role.goals)
+            goalAdapter.submitList(role.goals.filter { it.weekday == 0 })
 
             binding.moreButton.setOnClickListener { popupMenus(it, context, role) }
             binding.addGoalButton.setOnClickListener { addGoal(role.id) }

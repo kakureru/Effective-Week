@@ -20,5 +20,5 @@ data class Goals(
     val description: String,
     @ColumnInfo(name = "role_id") val roleId: Int,
     val day: Int,
-    val type: String
+    val commitment: Boolean
 )
