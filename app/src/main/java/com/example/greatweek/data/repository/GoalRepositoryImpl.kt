@@ -36,21 +36,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
     }
 
     override fun editGoal(goal: Goal) {
-        val g = Goals(
-            id = goal.id,
-            title = goal.title,
-            description = goal.description,
-            roleId = goal.roleId,
-            day = goal.weekday,
-            commitment = goal.commitment
-        )
-        goalDao.editGoal(
-            g.id,
-            g.title,
-            g.description,
-            g.roleId,
-            g.day,
-            g.commitment
+        goalDao.updateGoal(
+            mapToData(goal)
         )
     }
 
@@ -67,6 +54,17 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
             description = goal.description,
             roleId = goal.roleId,
             weekday = goal.day,
+            commitment = goal.commitment
+        )
+    }
+
+    private fun mapToData(goal: Goal): Goals {
+        return Goals(
+            id = goal.id,
+            title = goal.title,
+            description = goal.description,
+            roleId = goal.roleId,
+            day = goal.weekday,
             commitment = goal.commitment
         )
     }

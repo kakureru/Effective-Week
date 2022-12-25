@@ -39,6 +39,8 @@ class RoleRepositoryImpl(
     }
 
     override fun renameRole(roleId: Int, newName: String) {
-        roleDao.renameRole(roleId = roleId, newName = newName)
+        roleDao.updateRole(
+            Roles(roleId, newName)
+        )
     }
 }

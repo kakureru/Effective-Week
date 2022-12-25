@@ -15,8 +15,8 @@ interface RoleDao {
     @Query("DELETE FROM roles WHERE id = :roleId")
     fun deleteRole(roleId: Int)
 
-    @Query("UPDATE roles SET name = :newName WHERE id = :roleId")
-    fun renameRole(roleId: Int, newName: String)
+    @Update
+    fun updateRole(role: Roles)
 
     @Query("SELECT * FROM roles WHERE id = :roleId")
     fun getRole(roleId: Int): Roles
