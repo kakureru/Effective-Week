@@ -18,7 +18,7 @@ val appModule = module {
 
     viewModel<RoleTabViewModel> {
         RoleTabViewModel(
-            getRolesUseCase = get(),
+            getRolesWithGoalsUseCase = get(),
             deleteRoleUseCase = get(),
             completeGoalUseCase = get()
         )

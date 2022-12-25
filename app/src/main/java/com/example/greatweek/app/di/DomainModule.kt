@@ -26,8 +26,12 @@ val domainModule = module {
         GetWeekUseCase(goalRepository = get())
     }
 
+    factory<GetRolesWithGoalsUseCase> {
+        GetRolesWithGoalsUseCase(roleRepository = get(), goalRepository = get())
+    }
+
     factory<GetRolesUseCase> {
-        GetRolesUseCase(roleRepository = get(), goalRepository = get())
+        GetRolesUseCase(roleRepository = get())
     }
 
     factory<GetRoleUseCase> {

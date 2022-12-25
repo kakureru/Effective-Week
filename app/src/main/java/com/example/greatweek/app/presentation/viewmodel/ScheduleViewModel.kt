@@ -1,8 +1,6 @@
 package com.example.greatweek.app.presentation.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
@@ -14,9 +12,7 @@ class ScheduleViewModel(
     private val completeGoalUseCase: CompleteGoalUseCase
 ): ViewModel() {
 
-    fun getWeek(): Flow<List<WeekDay>> {
-        return getWeekUseCase.execute()
-    }
+    val week: LiveData<List<WeekDay>> = getWeekUseCase.execute().asLiveData()
 
     fun completeGoal(goalId: Int) = viewModelScope.launch {
         completeGoalUseCase.execute(goalId = goalId)

@@ -5,15 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.coroutineScope
 import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.RoleAdapter
 import com.example.greatweek.app.presentation.viewmodel.RoleTabViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RoleTabFragment : Fragment() {
@@ -46,11 +42,8 @@ class RoleTabFragment : Fragment() {
             editGoal = { goalId -> openEditGoalDialog(goalId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
-        lifecycle.coroutineScope.launch {
-            viewModel.getRoles().collect {
-                roleAdapter.submitList(it)
-                roleAdapter.notifyDataSetChanged()
-            }
+        viewModel.allRoles.observe(viewLifecycleOwner) { roles ->
+            roles?.let { roleAdapter.submitList(roles) }
         }
         registerForContextMenu(binding.rolesRecyclerView)
     }

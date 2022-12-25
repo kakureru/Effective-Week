@@ -6,17 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.greatweek.R
-import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.WeekAdapter
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
-import com.example.greatweek.domain.model.Goal
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.example.greatweek.databinding.FragmentScheduleBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val TAG = "ScheduleFragment"
@@ -51,10 +46,8 @@ class ScheduleFragment : Fragment() {
             editGoal = { goalId -> openEditGoalDialog(goalId) }
         )
         binding.week.adapter = weekAdapter
-        lifecycle.coroutineScope.launch {
-            viewModel.getWeek().collect() {
-                weekAdapter.submitList(it)
-            }
+        viewModel.week.observe(viewLifecycleOwner) {
+            weekAdapter.submitList(it)
         }
     }
 
