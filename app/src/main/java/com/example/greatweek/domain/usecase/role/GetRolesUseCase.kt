@@ -11,10 +11,15 @@ class GetRolesUseCase(
     private val goalRepository: GoalRepository
 ) {
     fun execute(): Flow<List<Role>> {
-        return roleRepository.getRoles()
-            .combine(goalRepository.getGoals()) { roleList, goalList ->
-                roleList.forEach { it.goals = goalList.filter { goal -> goal.roleId == it.id } }
-                roleList
+        val roleFlow = roleRepository.getRoles()
+        val goalFlow = goalRepository.getGoals()
+        return roleFlow.combine(goalFlow) { roleList, goalList ->
+            roleList.forEach { role ->
+                role.goals = goalList.filter { goal ->
+                    goal.roleId == role.id
+                }
             }
+            roleList
+        }
     }
 }
