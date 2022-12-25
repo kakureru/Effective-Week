@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.example.greatweek.R
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.RoleBottomSheetDialogAdapter
@@ -19,7 +20,6 @@ import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -47,7 +47,7 @@ class GoalDialogFragment : DialogFragment() {
         when (requestKey) {
             Constants.KEY_EDIT_GOAL_REQUEST_KEY -> {
                 viewModel.setId(argument)
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getGoal()
                     bind()
                 }
@@ -57,7 +57,7 @@ class GoalDialogFragment : DialogFragment() {
             }
             Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
                 viewModel.setRoleId(argument)
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getRole()
                     bind()
                 }
@@ -79,8 +79,8 @@ class GoalDialogFragment : DialogFragment() {
                 binding.commitmentCheckBox.isChecked
             )
             when (requestKey) {
-                Constants.KEY_EDIT_GOAL_REQUEST_KEY -> editGoal()
-                else -> addGoal()
+                Constants.KEY_EDIT_GOAL_REQUEST_KEY -> viewModel.editGoal()
+                else -> viewModel.addGoal()
             }
             dismiss()
         }
@@ -98,18 +98,6 @@ class GoalDialogFragment : DialogFragment() {
             descriptionEditText.setText(viewModel.description)
             roleButton.text = viewModel.roleName
             commitmentCheckBox.isChecked = viewModel.commitment
-        }
-    }
-
-    private fun addGoal() {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.addGoal()
-        }
-    }
-
-    private fun editGoal() {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.editGoal()
         }
     }
 

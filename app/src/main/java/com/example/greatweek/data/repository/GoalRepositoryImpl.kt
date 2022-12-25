@@ -4,22 +4,19 @@ import com.example.greatweek.data.storage.GoalDao
 import com.example.greatweek.data.storage.model.Goals
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
 
-    override fun getGoals(): Flow<List<Goal>> {
-        return goalDao.getGoals().map { inGoals ->
-            mapToDomain(goals = inGoals)
-        }
+    override val allGoals = goalDao.getGoals().map {
+        mapToDomain(it)
     }
 
-    override fun getGoal(goalId: Int): Goal {
+    override suspend fun getGoal(goalId: Int): Goal {
         return mapToDomain(goalDao.getGoalById(goalId = goalId))
     }
 
-    override fun addGoal(goal: Goal) {
+    override suspend fun addGoal(goal: Goal) {
         goalDao.addGoal(
             Goals(
                 title = goal.title,
@@ -31,11 +28,11 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
         )
     }
 
-    override fun completeGoal(goalId: Int) {
+    override suspend fun completeGoal(goalId: Int) {
         goalDao.completeGoal(goalId = goalId)
     }
 
-    override fun editGoal(goal: Goal) {
+    override suspend fun editGoal(goal: Goal) {
         goalDao.updateGoal(
             mapToData(goal)
         )

@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface RoleRepository {
 
-    fun addRole(name: String)
+    val allRoles: Flow<List<Role>>
 
-    fun getRoles(): Flow<List<Role>>
+    suspend fun addRole(name: String)
 
-    fun deleteRole(roleId: Int)
+    suspend fun deleteRole(roleId: Int)
 
-    fun renameRole(roleId: Int, newName: String)
+    suspend fun renameRole(roleId: Int, newName: String)
 
-    fun getRoleById(roleId: Int): Role
+    suspend fun getRoleById(roleId: Int): Role
 }

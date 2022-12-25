@@ -10,18 +10,17 @@ import kotlinx.coroutines.flow.map
 class RoleRepositoryImpl(
     private val roleDao: RoleDao
 ) : RoleRepository {
-    override fun addRole(name: String) {
+
+    override val allRoles = roleDao.getRoles().map {
+        mapToDomain(it)
+    }
+
+    override suspend fun addRole(name: String) {
         val role = Roles(name = name)
         roleDao.addRole(role)
     }
 
-    override fun getRoles(): Flow<List<Role>> {
-        return roleDao.getRoles().map { inRoles ->
-            mapToDomain(roles = inRoles)
-        }
-    }
-
-    override fun getRoleById(roleId: Int): Role {
+    override suspend fun getRoleById(roleId: Int): Role {
         val role = roleDao.getRole(roleId = roleId)
         return Role(
             id = role.id,
@@ -29,11 +28,11 @@ class RoleRepositoryImpl(
         )
     }
 
-    override fun deleteRole(roleId: Int) {
+    override suspend fun deleteRole(roleId: Int) {
         roleDao.deleteRole(roleId)
     }
 
-    override fun renameRole(roleId: Int, newName: String) {
+    override suspend fun renameRole(roleId: Int, newName: String) {
         roleDao.updateRole(
             Roles(roleId, newName)
         )

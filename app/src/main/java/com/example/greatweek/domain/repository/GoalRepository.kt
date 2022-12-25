@@ -6,13 +6,13 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface GoalRepository {
 
-    fun getGoals(): Flow<List<Goal>>
+    val allGoals: Flow<List<Goal>>
 
-    fun getGoal(goalId: Int): Goal
+    suspend fun getGoal(goalId: Int): Goal
 
-    fun addGoal(goal: Goal)
+    suspend fun addGoal(goal: Goal)
 
-    fun completeGoal(goalId: Int)
+    suspend fun completeGoal(goalId: Int)
 
-    fun editGoal(goal: Goal)
+    suspend fun editGoal(goal: Goal)
 }

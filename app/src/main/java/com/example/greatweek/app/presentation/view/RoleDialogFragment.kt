@@ -24,18 +24,6 @@ class RoleDialogFragment : DialogFragment() {
 
     private val viewModel by viewModel<RoleDialogFragmentViewModel>()
 
-    private fun addRole(name: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.addRole(name = name)
-        }
-    }
-
-    private fun renameRole(roleId: Int, newName: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.renameRole(roleId = roleId, newName = newName)
-        }
-    }
-
     private val roleId: Int
         get() = requireArguments().getInt(ARG_ROLE_ID)
 
@@ -61,8 +49,8 @@ class RoleDialogFragment : DialogFragment() {
                 return@setOnClickListener
             }
             when (requestKey) {
-                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> renameRole(roleId, enteredText)
-                Constants.KEY_ADD_ROLE_REQUEST_KEY -> addRole(enteredText)
+                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(roleId = roleId, newName = enteredText)
+                Constants.KEY_ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
             }
             dismiss()
         }

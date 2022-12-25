@@ -40,9 +40,9 @@ class RoleTabFragment : Fragment() {
         }
         val roleAdapter = RoleAdapter(
             renameRole = { role -> openRenameRoleDialog(role) },
-            deleteRole = { roleId -> deleteRole(roleId) },
+            deleteRole = { roleId -> viewModel.deleteRole(roleId = roleId) },
             addGoal = { roleId -> openAddGoalDialog(roleId) },
-            completeGoal = { goalId -> completeGoal(goalId) },
+            completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
@@ -53,18 +53,6 @@ class RoleTabFragment : Fragment() {
             }
         }
         registerForContextMenu(binding.rolesRecyclerView)
-    }
-
-    private fun completeGoal(goalId: Int) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.completeGoal(goalId = goalId)
-        }
-    }
-
-    private fun deleteRole(roleId: Int) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.deleteRole(roleId = roleId)
-        }
     }
 
     private fun openEditGoalDialog(goalId: Int) {

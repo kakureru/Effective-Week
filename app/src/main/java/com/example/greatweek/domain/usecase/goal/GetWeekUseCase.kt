@@ -9,7 +9,7 @@ class GetWeekUseCase(
     private val goalRepository: GoalRepository
 ) {
     fun execute(): Flow<List<WeekDay>> {
-        return goalRepository.getGoals().map { goals ->
+        return goalRepository.allGoals.map { goals ->
             listOf(
                 WeekDay(1, "Sunday",    goals.filter { it.weekday == 1 }),
                 WeekDay(2, "Monday",    goals.filter { it.weekday == 2 }),

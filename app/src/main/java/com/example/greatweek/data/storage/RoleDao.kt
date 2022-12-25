@@ -6,18 +6,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RoleDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addRole(role: Roles)
 
     @Query("SELECT * FROM roles")
     fun getRoles(): Flow<List<Roles>>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun addRole(role: Roles)
+
     @Query("DELETE FROM roles WHERE id = :roleId")
-    fun deleteRole(roleId: Int)
+    suspend fun deleteRole(roleId: Int)
 
     @Update
-    fun updateRole(role: Roles)
+    suspend fun updateRole(role: Roles)
 
     @Query("SELECT * FROM roles WHERE id = :roleId")
-    fun getRole(roleId: Int): Roles
+    suspend fun getRole(roleId: Int): Roles
 }

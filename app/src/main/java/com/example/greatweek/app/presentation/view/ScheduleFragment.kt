@@ -47,7 +47,7 @@ class ScheduleFragment : Fragment() {
 
         val weekAdapter = WeekAdapter(
             addGoal = { weekDay -> openAddGoalDialog(weekDay) },
-            completeGoal = { goalId -> completeGoal(goalId) },
+            completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) }
         )
         binding.week.adapter = weekAdapter
@@ -55,12 +55,6 @@ class ScheduleFragment : Fragment() {
             viewModel.getWeek().collect() {
                 weekAdapter.submitList(it)
             }
-        }
-    }
-
-    private fun completeGoal(goalId: Int) {
-        GlobalScope.launch(Dispatchers.IO) {
-            viewModel.completeGoal(goalId = goalId)
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.greatweek.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
@@ -9,6 +10,7 @@ import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
 import com.example.greatweek.domain.usecase.role.GetRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class GoalDialogFragmentViewModel(
     private val addGoalUseCase: AddGoalUseCase,
@@ -39,7 +41,7 @@ class GoalDialogFragmentViewModel(
     private var _commitment: Boolean = false
     val commitment: Boolean get() = _commitment
 
-    fun getGoal() {
+    suspend fun getGoal() {
         val goal = getGoalUseCase.execute(goalId = _id)
         _title = goal.title
         _description = goal.description
@@ -49,7 +51,7 @@ class GoalDialogFragmentViewModel(
         getRole()
     }
 
-    fun getRole() {
+    suspend fun getRole() {
         _roleName = getRoleUseCase.execute(roleId = _roleId!!).name
     }
 
@@ -57,7 +59,7 @@ class GoalDialogFragmentViewModel(
         return getRolesUseCase.execute()
     }
 
-    fun editGoal() {
+    fun editGoal() = viewModelScope.launch {
         editGoalUseCase.execute(
             Goal(
                 id = id,
@@ -70,7 +72,7 @@ class GoalDialogFragmentViewModel(
         )
     }
 
-    fun addGoal() {
+    fun addGoal() = viewModelScope.launch {
         addGoalUseCase.execute(
             Goal(
                 title = title,
