@@ -37,7 +37,6 @@ class RoleAdapter(
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     view.setBackgroundColor(Color.GRAY)
-                    view.invalidate()
                     true
                 }
                 DragEvent.ACTION_DRAG_LOCATION -> {
@@ -45,23 +44,20 @@ class RoleAdapter(
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
                     view.setBackgroundColor(Color.TRANSPARENT)
-                    view.invalidate()
                     true
                 }
                 DragEvent.ACTION_DROP -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
                     val item = event.clipData.getItemAt(0)
-                    view.invalidate()
-                    val v = event.localState as View
-                    v.visibility = View.VISIBLE
-
                     val goalId = item.text.toString().toInt()
                     val roleId = getItem(adapterPosition).id
                     dropGoal(goalId, roleId)
                     true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    view.invalidate()
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    val v = event.localState as View
+                    v.visibility = View.VISIBLE
+                    //view.invalidate()
                     true
                 }
                 else -> false
@@ -70,6 +66,7 @@ class RoleAdapter(
 
         fun bind(role: Role) {
             binding.roleTextView.text = role.name
+
             val goalAdapter = GoalAdapter(
                 completeGoal = completeGoal,
                 role = role.name,

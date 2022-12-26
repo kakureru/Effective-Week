@@ -31,7 +31,6 @@ class WeekAdapter(
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     view.setBackgroundColor(Color.GRAY)
-                    view.invalidate()
                     true
                 }
                 DragEvent.ACTION_DRAG_LOCATION -> {
@@ -39,22 +38,15 @@ class WeekAdapter(
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
                     view.setBackgroundColor(Color.TRANSPARENT)
-                    view.invalidate()
                     true
                 }
                 DragEvent.ACTION_DROP -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    val item = event.clipData.getItemAt(0)
-                    view.invalidate()
-                    val v = event.localState as View
-
-//                    val owner = view as ViewGroup
+//                    val v = event.localState as View
+//                    val owner = v.parent as ViewGroup
 //                    owner.removeView(v)
 //                    val destination = view as RecyclerView
 //                    destination.addView(v)
-
-                    v.visibility = View.VISIBLE
-
+                    val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val weekDay = adapterPosition + 1
                     val isCommitment = view != binding.prioritiesRecyclerView
@@ -62,7 +54,10 @@ class WeekAdapter(
                     true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    view.invalidate()
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    val v = event.localState as View
+                    v.visibility = View.VISIBLE
+                    //view.invalidate()
                     true
                 }
                 else -> false
@@ -94,9 +89,7 @@ class WeekAdapter(
             })
             binding.commitmentsRecyclerView.setOnDragListener(dragListener)
 
-            binding.addGoalButton.setOnClickListener {
-                addGoal(weekDay.id)
-            }
+            binding.addGoalButton.setOnClickListener { addGoal(weekDay.id) }
         }
     }
 
