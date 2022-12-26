@@ -12,7 +12,8 @@ val appModule = module {
     viewModel<ScheduleViewModel> {
         ScheduleViewModel(
             getWeekUseCase = get(),
-            completeGoalUseCase = get()
+            completeGoalUseCase = get(),
+            dropGoalToWeekUseCase = get()
         )
     }
 
@@ -20,7 +21,8 @@ val appModule = module {
         RoleTabViewModel(
             getRolesWithGoalsUseCase = get(),
             deleteRoleUseCase = get(),
-            completeGoalUseCase = get()
+            completeGoalUseCase = get(),
+            dropGoalToRoleUseCase = get()
         )
     }
 

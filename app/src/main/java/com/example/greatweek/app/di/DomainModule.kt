@@ -22,6 +22,14 @@ val domainModule = module {
         DeleteRoleUseCase(roleRepository = get())
     }
 
+    factory<DropGoalToRoleUseCase> {
+        DropGoalToRoleUseCase(goalRepository = get())
+    }
+
+    factory<DropGoalToWeekUseCase> {
+        DropGoalToWeekUseCase(goalRepository = get())
+    }
+
     factory<GetWeekUseCase> {
         GetWeekUseCase(goalRepository = get())
     }

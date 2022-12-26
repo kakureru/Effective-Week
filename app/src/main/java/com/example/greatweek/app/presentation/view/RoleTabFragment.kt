@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.model.Role
@@ -39,11 +40,13 @@ class RoleTabFragment : Fragment() {
             deleteRole = { roleId -> viewModel.deleteRole(roleId = roleId) },
             addGoal = { roleId -> openAddGoalDialog(roleId) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
-            editGoal = { goalId -> openEditGoalDialog(goalId) }
+            editGoal = { goalId -> openEditGoalDialog(goalId) },
+            dropGoal = { goalId, roleId -> viewModel.dropGoal(goalId, roleId) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         viewModel.allRoles.observe(viewLifecycleOwner) { roles ->
             roles?.let { roleAdapter.submitList(roles) }
+            roleAdapter.notifyDataSetChanged()
         }
         registerForContextMenu(binding.rolesRecyclerView)
     }

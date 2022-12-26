@@ -1,6 +1,9 @@
 package com.example.greatweek.app.presentation.adapter
 
+import android.content.ClipDescription
 import android.content.Context
+import android.graphics.Color
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,14 +21,53 @@ class RoleAdapter(
     private val deleteRole: (roleId: Int) -> Unit,
     private val addGoal: (roleId: Int) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
-    private val editGoal: (goalId: Int) -> Unit
+    private val editGoal: (goalId: Int) -> Unit,
+    private val dropGoal: (goalId: Int, roleId: Int) -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
 
     inner class RoleViewHolder(
         private val context: Context,
         private val binding: RoleCardLayoutBinding
-    ) :
-        RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        private val dragListener = View.OnDragListener { view, event ->
+            when (event.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    view.setBackgroundColor(Color.GRAY)
+                    view.invalidate()
+                    true
+                }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    true
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    view.invalidate()
+                    true
+                }
+                DragEvent.ACTION_DROP -> {
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    val item = event.clipData.getItemAt(0)
+                    view.invalidate()
+                    val v = event.localState as View
+                    v.visibility = View.VISIBLE
+
+                    val goalId = item.text.toString().toInt()
+                    val roleId = getItem(adapterPosition).id
+                    dropGoal(goalId, roleId)
+                    true
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    view.invalidate()
+                    true
+                }
+                else -> false
+            }
+        }
+
         fun bind(role: Role) {
             binding.roleTextView.text = role.name
             val goalAdapter = GoalAdapter(
@@ -35,6 +77,7 @@ class RoleAdapter(
             )
             binding.goalsRecyclerView.adapter = goalAdapter
             goalAdapter.submitList(role.goals.filter { it.weekday == 0 })
+            binding.goalsRecyclerView.setOnDragListener(dragListener)
 
             binding.moreButton.setOnClickListener { popupMenus(it, context, role) }
             binding.addGoalButton.setOnClickListener { addGoal(role.id) }

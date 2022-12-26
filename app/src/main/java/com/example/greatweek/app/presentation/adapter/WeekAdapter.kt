@@ -1,6 +1,10 @@
 package com.example.greatweek.app.presentation.adapter
 
+import android.content.ClipDescription
+import android.graphics.Color
+import android.view.DragEvent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,11 +16,59 @@ import com.example.greatweek.domain.model.WeekDay
 class WeekAdapter(
     private val addGoal: (weekDay: Int) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
-    private val editGoal: (goalId: Int) -> Unit
+    private val editGoal: (goalId: Int) -> Unit,
+    private val dropGoal: (goalId: Int, weekDay: Int, isCommitment: Boolean) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
+
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        private val dragListener = View.OnDragListener { view, event ->
+            when (event.action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    view.setBackgroundColor(Color.GRAY)
+                    view.invalidate()
+                    true
+                }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    true
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    view.invalidate()
+                    true
+                }
+                DragEvent.ACTION_DROP -> {
+                    view.setBackgroundColor(Color.TRANSPARENT)
+                    val item = event.clipData.getItemAt(0)
+                    view.invalidate()
+                    val v = event.localState as View
+
+//                    val owner = view as ViewGroup
+//                    owner.removeView(v)
+//                    val destination = view as RecyclerView
+//                    destination.addView(v)
+
+                    v.visibility = View.VISIBLE
+
+                    val goalId = item.text.toString().toInt()
+                    val weekDay = adapterPosition + 1
+                    val isCommitment = view != binding.prioritiesRecyclerView
+                    dropGoal(goalId, weekDay, isCommitment)
+                    true
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    view.invalidate()
+                    true
+                }
+                else -> false
+            }
+        }
+
         fun bind(weekDay: WeekDay) {
             binding.weekDayName.text = weekDay.name
 
@@ -29,6 +81,7 @@ class WeekAdapter(
             goalAdapter.submitList(weekDay.goals.filter { goal ->
                 !goal.commitment
             })
+            binding.prioritiesRecyclerView.setOnDragListener(dragListener)
 
             // commitment adapter
             val commitmentAdapter = GoalAdapter(
@@ -39,6 +92,7 @@ class WeekAdapter(
             commitmentAdapter.submitList(weekDay.goals.filter { goal ->
                 goal.commitment
             })
+            binding.commitmentsRecyclerView.setOnDragListener(dragListener)
 
             binding.addGoalButton.setOnClickListener {
                 addGoal(weekDay.id)
