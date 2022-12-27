@@ -11,7 +11,7 @@ class DropGoalToWeekUseCase(private val goalRepository: GoalRepository) {
                 id = goalId,
                 title = goal.title,
                 description = goal.description,
-                roleId = goal.roleId,
+                role = goal.role,
                 weekday = weekDay,
                 commitment = isCommitment
             )

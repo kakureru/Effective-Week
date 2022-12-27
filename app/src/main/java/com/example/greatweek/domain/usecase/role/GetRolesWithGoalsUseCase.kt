@@ -16,7 +16,7 @@ class GetRolesWithGoalsUseCase(
         return roleFlow.combine(goalFlow) { roleList, goalList ->
             roleList.forEach { role ->
                 role.goals = goalList.filter { goal ->
-                    goal.roleId == role.id
+                    goal.role == role.name
                 }
             }
             roleList

@@ -18,11 +18,11 @@ import com.example.greatweek.domain.model.Role
 
 class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
-    private val deleteRole: (roleId: Int) -> Unit,
-    private val addGoal: (roleId: Int) -> Unit,
+    private val deleteRole: (role: String) -> Unit,
+    private val addGoal: (role: String) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
-    private val dropGoal: (goalId: Int, roleId: Int) -> Unit
+    private val dropGoal: (goalId: Int, role: String) -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
 
     inner class RoleViewHolder(
@@ -49,7 +49,7 @@ class RoleAdapter(
                 DragEvent.ACTION_DROP -> {
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
-                    val roleId = getItem(adapterPosition).id
+                    val roleId = getItem(adapterPosition).name
                     dropGoal(goalId, roleId)
                     true
                 }
@@ -80,7 +80,7 @@ class RoleAdapter(
                 goalDropTarget.setOnDragListener(dragListener)
                 // On click listener
                 moreButton.setOnClickListener { popupMenus(it, context, role) }
-                addGoalButton.setOnClickListener { addGoal(role.id) }
+                addGoalButton.setOnClickListener { addGoal(role.name) }
             }
 
             goalAdapter.submitList(goalList)
@@ -104,7 +104,7 @@ class RoleAdapter(
                             Toast.LENGTH_SHORT
                         ).show()
                     else
-                        deleteRole(role.id)
+                        deleteRole(role.name)
                     true
                 }
                 else -> true
@@ -137,7 +137,7 @@ class RoleAdapter(
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Role>() {
             override fun areItemsTheSame(oldItem: Role, newItem: Role): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.name == newItem.name
             }
 
             override fun areContentsTheSame(oldItem: Role, newItem: Role): Boolean {

@@ -39,7 +39,7 @@ class RoleBottomSheetDialogAdapter(
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Role>() {
             override fun areItemsTheSame(oldItem: Role, newItem: Role): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.name == newItem.name
             }
 
             override fun areContentsTheSame(oldItem: Role, newItem: Role): Boolean {

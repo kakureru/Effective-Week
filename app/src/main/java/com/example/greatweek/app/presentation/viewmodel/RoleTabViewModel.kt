@@ -17,15 +17,15 @@ class RoleTabViewModel(
 
     val allRoles: LiveData<List<Role>> = getRolesWithGoalsUseCase.execute().asLiveData()
 
-    fun deleteRole(roleId: Int) = viewModelScope.launch {
-        deleteRoleUseCase.execute(roleId = roleId)
+    fun deleteRole(name: String) = viewModelScope.launch {
+        deleteRoleUseCase.execute(name = name)
     }
 
     fun completeGoal(goalId: Int) = viewModelScope.launch {
         completeGoalUseCase.execute(goalId = goalId)
     }
 
-    fun dropGoal(goalId: Int, roleId: Int) = viewModelScope.launch {
-        dropGoalToRoleUseCase.execute(goalId, roleId)
+    fun dropGoal(goalId: Int, role: String) = viewModelScope.launch {
+        dropGoalToRoleUseCase.execute(goalId, role)
     }
 }

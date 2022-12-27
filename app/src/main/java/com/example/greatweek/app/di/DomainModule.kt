@@ -42,10 +42,6 @@ val domainModule = module {
         GetRolesUseCase(roleRepository = get())
     }
 
-    factory<GetRoleUseCase> {
-        GetRoleUseCase(roleRepository = get())
-    }
-
     factory<RenameRoleUseCase> {
         RenameRoleUseCase(roleRepository = get())
     }

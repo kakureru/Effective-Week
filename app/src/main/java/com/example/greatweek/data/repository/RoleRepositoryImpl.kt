@@ -4,7 +4,6 @@ import com.example.greatweek.data.storage.RoleDao
 import com.example.greatweek.data.storage.model.Roles
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.repository.RoleRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class RoleRepositoryImpl(
@@ -20,22 +19,12 @@ class RoleRepositoryImpl(
         roleDao.addRole(role)
     }
 
-    override suspend fun getRoleById(roleId: Int): Role {
-        val role = roleDao.getRole(roleId = roleId)
-        return Role(
-            id = role.id,
-            name = role.name
-        )
+    override suspend fun deleteRole(name: String) {
+        roleDao.deleteRole(name)
     }
 
-    override suspend fun deleteRole(roleId: Int) {
-        roleDao.deleteRole(roleId)
-    }
-
-    override suspend fun renameRole(roleId: Int, newName: String) {
-        roleDao.updateRole(
-            Roles(roleId, newName)
-        )
+    override suspend fun renameRole(oldName: String, newName: String) {
+        roleDao.updateRole(oldName, newName)
     }
 
     private fun mapToDomain(roles: List<Roles>): List<Role> {
@@ -45,9 +34,6 @@ class RoleRepositoryImpl(
     }
 
     private fun mapToDomain(role: Roles): Role {
-        return Role(
-            id = role.id,
-            name = role.name
-        )
+        return Role(name = role.name)
     }
 }

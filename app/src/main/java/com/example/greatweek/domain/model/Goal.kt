@@ -4,7 +4,7 @@ data class Goal(
     val id: Int = -1,
     val title: String,
     val description: String = "",
-    val roleId: Int = -1,
+    val role: String = "",
     val weekday: Int = 0,
     val commitment: Boolean = false
 )

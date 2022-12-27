@@ -9,9 +9,7 @@ interface RoleRepository {
 
     suspend fun addRole(name: String)
 
-    suspend fun deleteRole(roleId: Int)
+    suspend fun deleteRole(name: String)
 
-    suspend fun renameRole(roleId: Int, newName: String)
-
-    suspend fun getRoleById(roleId: Int): Role
+    suspend fun renameRole(oldName: String, newName: String)
 }

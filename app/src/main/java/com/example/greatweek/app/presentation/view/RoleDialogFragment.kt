@@ -15,17 +15,11 @@ import com.example.greatweek.R
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RoleDialogFragment : DialogFragment() {
 
     private val viewModel by viewModel<RoleDialogFragmentViewModel>()
-
-    private val roleId: Int
-        get() = requireArguments().getInt(ARG_ROLE_ID)
 
     private val roleName: String
         get() = requireArguments().getString(ARG_ROLE_NAME).toString()
@@ -49,7 +43,7 @@ class RoleDialogFragment : DialogFragment() {
                 return@setOnClickListener
             }
             when (requestKey) {
-                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(roleId = roleId, newName = enteredText)
+                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(oldName = roleName, newName = enteredText)
                 Constants.KEY_ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
             }
             dismiss()
@@ -92,20 +86,15 @@ class RoleDialogFragment : DialogFragment() {
         private val ARG_ROLE_NAME = "ARG_ROLE_NAME"
 
         @JvmStatic
-        private val ARG_ROLE_ID = "ARG_ROLE_ID"
-
-        @JvmStatic
         private val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
 
         fun show(
             manager: FragmentManager,
-            roleId: Int = -1,
             roleName: String = "",
             requestKey: String
         ) {
             val dialogFragment = RoleDialogFragment()
             dialogFragment.arguments = bundleOf(
-                ARG_ROLE_ID to roleId,
                 ARG_ROLE_NAME to roleName,
                 ARG_REQUEST_KEY to requestKey
             )

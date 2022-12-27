@@ -37,11 +37,11 @@ class RoleTabFragment : Fragment() {
         }
         val roleAdapter = RoleAdapter(
             renameRole = { role -> openRenameRoleDialog(role) },
-            deleteRole = { roleId -> viewModel.deleteRole(roleId = roleId) },
-            addGoal = { roleId -> openAddGoalDialog(roleId) },
+            deleteRole = { name -> viewModel.deleteRole(name = name) },
+            addGoal = { role -> openAddGoalDialog(role) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },
-            dropGoal = { goalId, roleId -> viewModel.dropGoal(goalId, roleId) }
+            dropGoal = { goalId, role -> viewModel.dropGoal(goalId, role) }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
         viewModel.allRoles.observe(viewLifecycleOwner) { roles ->
@@ -59,10 +59,10 @@ class RoleTabFragment : Fragment() {
         )
     }
 
-    private fun openAddGoalDialog(roleId: Int) {
+    private fun openAddGoalDialog(role: String) {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
-            argument = roleId,
+            argument = role,
             requestKey = Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
         )
     }
@@ -70,7 +70,6 @@ class RoleTabFragment : Fragment() {
     private fun openRenameRoleDialog(role: Role) {
         RoleDialogFragment.show(
             manager = parentFragmentManager,
-            roleId = role.id,
             roleName = role.name,
             requestKey = Constants.KEY_RENAME_ROLE_REQUEST_KEY
         )

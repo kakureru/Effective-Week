@@ -7,14 +7,12 @@ import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
 import com.example.greatweek.domain.usecase.goal.EditGoalUseCase
 import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
-import com.example.greatweek.domain.usecase.role.GetRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class GoalDialogFragmentViewModel(
     private val addGoalUseCase: AddGoalUseCase,
-    private val getRoleUseCase: GetRoleUseCase,
     private val getRolesUseCase: GetRolesUseCase,
     private val editGoalUseCase: EditGoalUseCase,
     private val getGoalUseCase: GetGoalUseCase
@@ -29,11 +27,8 @@ class GoalDialogFragmentViewModel(
     private var _description: String = ""
     val description: String get() = _description
 
-    private var _roleId: Int? = null
-    val roleId: Int? get() = _roleId
-
-    private var _roleName: String = ""
-    val roleName: String get() = _roleName
+    private var _role: String? = null
+    val role: String? get() = _role
 
     private var _weekday: Int = 0
     val weekday: Int get() = _weekday
@@ -45,14 +40,9 @@ class GoalDialogFragmentViewModel(
         val goal = getGoalUseCase.execute(goalId = _id)
         _title = goal.title
         _description = goal.description
-        _roleId = goal.roleId
+        _role = goal.role
         _weekday = goal.weekday
         _commitment = goal.commitment
-        getRole()
-    }
-
-    suspend fun getRole() {
-        _roleName = getRoleUseCase.execute(roleId = _roleId!!).name
     }
 
     fun getRoles(): Flow<List<Role>> {
@@ -65,7 +55,7 @@ class GoalDialogFragmentViewModel(
                 id = id,
                 title = title,
                 description = description,
-                roleId = roleId!!,
+                role = role!!,
                 weekday = weekday,
                 commitment = commitment
             )
@@ -77,7 +67,7 @@ class GoalDialogFragmentViewModel(
             Goal(
                 title = title,
                 description = description,
-                roleId = roleId!!,
+                role = role!!,
                 weekday = weekday,
                 commitment = commitment
             )
@@ -88,16 +78,12 @@ class GoalDialogFragmentViewModel(
         _id = goalId
     }
 
-    fun setRoleId(roleId: Int) {
-        _roleId = roleId
+    fun setRole(role: String) {
+        _role = role
     }
 
     fun setWeekDay(weekDay: Int) {
         _weekday = weekDay
-    }
-
-    fun setRoleName(roleName: String) {
-        _roleName = roleName
     }
 
     fun setGoal(title: String, description: String, commitment: Boolean) {

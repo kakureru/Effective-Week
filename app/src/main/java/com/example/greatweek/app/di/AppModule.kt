@@ -36,7 +36,6 @@ val appModule = module {
     viewModel<GoalDialogFragmentViewModel> {
         GoalDialogFragmentViewModel(
             addGoalUseCase = get(),
-            getRoleUseCase = get(),
             getRolesUseCase = get(),
             getGoalUseCase = get(),
             editGoalUseCase = get()

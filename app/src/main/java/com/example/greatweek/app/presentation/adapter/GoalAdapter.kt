@@ -21,7 +21,7 @@ class GoalAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(goal: Goal) {
             binding.goalTextView.text = goal.title
-            binding.roleTextView.text = "role"
+            binding.roleTextView.text = goal.role
             binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
             binding.root.setOnClickListener { editGoal(goal.id) }
             binding.root.setOnLongClickListener {

@@ -43,24 +43,20 @@ class GoalDialogFragment : DialogFragment() {
             .create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val argument = requireArguments().getInt(ARG_ARGUMENT)
         when (requestKey) {
             Constants.KEY_EDIT_GOAL_REQUEST_KEY -> {
-                viewModel.setId(argument)
+                viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getGoal()
                     bind()
                 }
             }
             Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
-                viewModel.setWeekDay(argument)
+                viewModel.setWeekDay(requireArguments().getInt(ARG_ARGUMENT))
             }
             Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
-                viewModel.setRoleId(argument)
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.getRole()
-                    bind()
-                }
+                viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
+                bind()
             }
         }
 
@@ -69,7 +65,7 @@ class GoalDialogFragment : DialogFragment() {
                 binding.titleEditText.error = getString(R.string.empty_value)
                 return@setOnClickListener
             }
-            if (viewModel.roleId == null) {
+            if (viewModel.role == null) {
                 Toast.makeText(requireContext(), "Choose role", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -96,7 +92,7 @@ class GoalDialogFragment : DialogFragment() {
         binding.apply {
             titleEditText.setText(viewModel.title)
             descriptionEditText.setText(viewModel.description)
-            roleButton.text = viewModel.roleName
+            roleButton.text = viewModel.role
             commitmentCheckBox.isChecked = viewModel.commitment
         }
     }
@@ -107,9 +103,8 @@ class GoalDialogFragment : DialogFragment() {
         bottomSheetDialog.setContentView(dialogBinding.root)
 
         val roleAdapter = RoleBottomSheetDialogAdapter { role ->
-            viewModel.setRoleId(role.id)
-            viewModel.setRoleName(role.name)
-            binding.roleButton.text = viewModel.roleName
+            viewModel.setRole(role.name)
+            binding.roleButton.text = viewModel.role
             bottomSheetDialog.dismiss()
         }
         dialogBinding.roleRecyclerView.adapter = roleAdapter
@@ -135,6 +130,19 @@ class GoalDialogFragment : DialogFragment() {
         fun show(
             manager: FragmentManager,
             argument: Int,
+            requestKey: String
+        ) {
+            val dialogFragment = GoalDialogFragment()
+            dialogFragment.arguments = bundleOf(
+                ARG_ARGUMENT to argument,
+                ARG_REQUEST_KEY to requestKey
+            )
+            dialogFragment.show(manager, TAG)
+        }
+
+        fun show(
+            manager: FragmentManager,
+            argument: String, //!!!!!!!!!!!
             requestKey: String
         ) {
             val dialogFragment = GoalDialogFragment()

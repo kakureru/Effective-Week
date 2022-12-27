@@ -13,12 +13,12 @@ interface RoleDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addRole(role: Roles)
 
-    @Query("DELETE FROM roles WHERE id = :roleId")
-    suspend fun deleteRole(roleId: Int)
+    @Query("DELETE FROM roles WHERE name = :name")
+    suspend fun deleteRole(name: String)
 
-    @Update
-    suspend fun updateRole(role: Roles)
+    @Query("UPDATE roles SET name = :newName WHERE name = :oldName")
+    suspend fun updateRole(oldName: String, newName: String)
 
-    @Query("SELECT * FROM roles WHERE id = :roleId")
-    suspend fun getRole(roleId: Int): Roles
+    @Query("SELECT * FROM roles WHERE name = :name")
+    suspend fun getRole(name: String): Roles
 }
