@@ -12,7 +12,6 @@ import com.example.greatweek.databinding.GoalLayoutBinding
 import com.example.greatweek.domain.model.Goal
 
 class GoalAdapter(
-    private val role: String = "",
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit
     )
@@ -22,7 +21,7 @@ class GoalAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(goal: Goal) {
             binding.goalTextView.text = goal.title
-            binding.roleTextView.text = role
+            binding.roleTextView.text = "role"
             binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
             binding.root.setOnClickListener { editGoal(goal.id) }
             binding.root.setOnLongClickListener {

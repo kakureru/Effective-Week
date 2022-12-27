@@ -65,19 +65,25 @@ class RoleAdapter(
         }
 
         fun bind(role: Role) {
-            binding.roleTextView.text = role.name
+            val goalList = role.goals.filter { it.weekday == 0 }
 
-            val goalAdapter = GoalAdapter(
-                completeGoal = completeGoal,
-                role = role.name,
-                editGoal = editGoal
-            )
-            binding.goalsRecyclerView.adapter = goalAdapter
-            goalAdapter.submitList(role.goals.filter { it.weekday == 0 })
-            binding.goalsRecyclerView.setOnDragListener(dragListener)
+            val goalAdapter = GoalAdapter(completeGoal, editGoal)
 
-            binding.moreButton.setOnClickListener { popupMenus(it, context, role) }
-            binding.addGoalButton.setOnClickListener { addGoal(role.id) }
+            binding.apply {
+                // View
+                roleTextView.text = role.name
+                goalDropTarget.visibility = if (goalList.isEmpty()) View.VISIBLE else View.GONE
+                // Adapter
+                goalsRecyclerView.adapter = goalAdapter
+                // On drag listener
+                goalsRecyclerView.setOnDragListener(dragListener)
+                goalDropTarget.setOnDragListener(dragListener)
+                // On click listener
+                moreButton.setOnClickListener { popupMenus(it, context, role) }
+                addGoalButton.setOnClickListener { addGoal(role.id) }
+            }
+
+            goalAdapter.submitList(goalList)
         }
     }
 

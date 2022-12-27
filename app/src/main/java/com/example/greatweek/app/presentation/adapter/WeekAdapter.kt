@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
-import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.WeekDay
 
 class WeekAdapter(
@@ -49,7 +48,8 @@ class WeekAdapter(
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val weekDay = adapterPosition + 1
-                    val isCommitment = view != binding.prioritiesRecyclerView
+                    val isCommitment =
+                        view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
                     dropGoal(goalId, weekDay, isCommitment)
                     true
                 }
@@ -65,31 +65,33 @@ class WeekAdapter(
         }
 
         fun bind(weekDay: WeekDay) {
-            binding.weekDayName.text = weekDay.name
+            val prioritiesList = weekDay.goals.filter { !it.commitment }
+            val commitmentList = weekDay.goals.filter { it.commitment }
 
-            // goal adapter
-            val goalAdapter = GoalAdapter(
-                completeGoal = completeGoal,
-                editGoal = editGoal
-            )
-            binding.prioritiesRecyclerView.adapter = goalAdapter
-            goalAdapter.submitList(weekDay.goals.filter { goal ->
-                !goal.commitment
-            })
-            binding.prioritiesRecyclerView.setOnDragListener(dragListener)
+            val prioritiesAdapter = GoalAdapter(completeGoal, editGoal)
+            val commitmentAdapter = GoalAdapter(completeGoal, editGoal)
 
-            // commitment adapter
-            val commitmentAdapter = GoalAdapter(
-                completeGoal = completeGoal,
-                editGoal = editGoal
-            )
-            binding.commitmentsRecyclerView.adapter = commitmentAdapter
-            commitmentAdapter.submitList(weekDay.goals.filter { goal ->
-                goal.commitment
-            })
-            binding.commitmentsRecyclerView.setOnDragListener(dragListener)
+            binding.apply {
+                // View
+                weekDayName.text = weekDay.name
+                prioritiesDropTarget.visibility =
+                    if (prioritiesList.isEmpty()) View.VISIBLE else View.GONE
+                commitmentsDropTarget.visibility =
+                    if (commitmentList.isEmpty()) View.VISIBLE else View.GONE
+                // Adapter
+                prioritiesRecyclerView.adapter = prioritiesAdapter
+                commitmentsRecyclerView.adapter = commitmentAdapter
+                // On drag listener
+                prioritiesRecyclerView.setOnDragListener(dragListener)
+                commitmentsRecyclerView.setOnDragListener(dragListener)
+                prioritiesDropTarget.setOnDragListener(dragListener)
+                commitmentsDropTarget.setOnDragListener(dragListener)
+                // On click listener
+                addGoalButton.setOnClickListener { addGoal(weekDay.id) }
+            }
 
-            binding.addGoalButton.setOnClickListener { addGoal(weekDay.id) }
+            prioritiesAdapter.submitList(prioritiesList)
+            commitmentAdapter.submitList(commitmentList)
         }
     }
 

@@ -46,6 +46,11 @@
             tools:listitem="@layout/goal_layout"
             tools:itemCount="2"/>
 
+        <TextView
+            android:id="@+id/goal_drop_target"
+            style="@style/drop_area"
+            tools:visibility="visible" />
+
         <Button
             android:id="@+id/add_goal_button"
             android:layout_width="match_parent"
