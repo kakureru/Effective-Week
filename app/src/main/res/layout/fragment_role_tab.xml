@@ -20,13 +20,14 @@
             android:layout_width="match_parent"
             android:layout_height="62dp"
             android:orientation="vertical"
+            android:layout_marginBottom="14dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:layout_width="70dp"
-                android:layout_height="wrap_content"
+                android:layout_height="18dp"
                 android:layout_gravity="center|top"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/ic_handle" />

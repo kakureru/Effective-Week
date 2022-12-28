@@ -45,6 +45,7 @@ class ScheduleFragment : Fragment() {
         binding.week.adapter = weekAdapter
         viewModel.week.observe(viewLifecycleOwner) {
             weekAdapter.submitList(it)
+            weekAdapter.notifyDataSetChanged()
         }
     }
 
