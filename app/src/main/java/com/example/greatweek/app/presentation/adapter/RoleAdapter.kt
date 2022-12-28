@@ -57,9 +57,8 @@ class RoleAdapter(
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
                     view.setBackgroundColor(Color.TRANSPARENT)
-                    val v = event.localState as View
-                    v.visibility = View.VISIBLE
-                    //view.invalidate()
+                    if (!event.result)
+                        (event.localState as View).visibility = View.VISIBLE
                     true
                 }
                 else -> false
