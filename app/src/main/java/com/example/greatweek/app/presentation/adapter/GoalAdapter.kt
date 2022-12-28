@@ -25,12 +25,14 @@ class GoalAdapter(
             binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
             binding.root.setOnClickListener { editGoal(goal.id) }
             binding.root.setOnLongClickListener {
-                val clipText = goal.id.toString()
-                val item = ClipData.Item(clipText)
-                val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                val data = ClipData(clipText, mimeTypes, item)
+                val itemId = ClipData.Item(goal.id.toString())
+                val weekDay = goal.weekday.toString()
+                val dragData = ClipData(
+                    weekDay,
+                    arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                    itemId)
                 val dragShadowBuilder = View.DragShadowBuilder(it)
-                it.startDragAndDrop(data, dragShadowBuilder, it, 0)
+                it.startDragAndDrop(dragData, dragShadowBuilder, it, 0)
                 it.visibility = View.INVISIBLE
                 true
             }

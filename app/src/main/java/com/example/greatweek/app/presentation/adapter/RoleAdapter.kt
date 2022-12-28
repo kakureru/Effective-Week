@@ -22,7 +22,8 @@ class RoleAdapter(
     private val addGoal: (role: String) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
-    private val dropGoal: (goalId: Int, role: String) -> Unit
+    private val dropGoal: (goalId: Int, role: String) -> Unit,
+    private val expandBottomSheet: () -> Unit
 ) : ListAdapter<Role, RoleAdapter.RoleViewHolder>(DiffCallback) {
 
     inner class RoleViewHolder(
@@ -36,6 +37,7 @@ class RoleAdapter(
                     event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
+                    expandBottomSheet()
                     view.setBackgroundColor(Color.GRAY)
                     true
                 }

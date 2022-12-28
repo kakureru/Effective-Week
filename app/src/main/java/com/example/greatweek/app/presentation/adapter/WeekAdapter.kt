@@ -19,7 +19,6 @@ class WeekAdapter(
     private val dropGoal: (goalId: Int, weekDay: Int, isCommitment: Boolean) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
 
-
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -32,19 +31,11 @@ class WeekAdapter(
                     view.setBackgroundColor(Color.GRAY)
                     true
                 }
-                DragEvent.ACTION_DRAG_LOCATION -> {
-                    true
-                }
                 DragEvent.ACTION_DRAG_EXITED -> {
                     view.setBackgroundColor(Color.TRANSPARENT)
                     true
                 }
                 DragEvent.ACTION_DROP -> {
-//                    val v = event.localState as View
-//                    val owner = v.parent as ViewGroup
-//                    owner.removeView(v)
-//                    val destination = view as RecyclerView
-//                    destination.addView(v)
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val weekDay = adapterPosition + 1
@@ -57,7 +48,6 @@ class WeekAdapter(
                     view.setBackgroundColor(Color.TRANSPARENT)
                     val v = event.localState as View
                     v.visibility = View.VISIBLE
-                    //view.invalidate()
                     true
                 }
                 else -> false

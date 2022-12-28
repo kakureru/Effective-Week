@@ -2,7 +2,6 @@ package com.example.greatweek.app.di
 
 import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
 import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
-import com.example.greatweek.app.presentation.viewmodel.RoleTabViewModel
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -13,15 +12,9 @@ val appModule = module {
         ScheduleViewModel(
             getWeekUseCase = get(),
             completeGoalUseCase = get(),
-            dropGoalToWeekUseCase = get()
-        )
-    }
-
-    viewModel<RoleTabViewModel> {
-        RoleTabViewModel(
-            getRolesWithGoalsUseCase = get(),
+            dropGoalToWeekUseCase = get(),
             deleteRoleUseCase = get(),
-            completeGoalUseCase = get(),
+            getRolesWithGoalsUseCase = get(),
             dropGoalToRoleUseCase = get()
         )
     }

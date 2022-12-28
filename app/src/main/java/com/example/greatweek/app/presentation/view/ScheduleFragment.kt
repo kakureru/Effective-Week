@@ -12,16 +12,14 @@ import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.WeekAdapter
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentScheduleBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
-
-const val TAG = "ScheduleFragment"
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class ScheduleFragment : Fragment() {
 
-    private val viewModel by viewModel<ScheduleViewModel>()
+    private val viewModel by activityViewModel<ScheduleViewModel>()
 
     private var _binding: FragmentScheduleBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,9 +27,7 @@ class ScheduleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
-
         PagerSnapHelper().attachToRecyclerView(binding.week)
-
         val fm: FragmentManager = childFragmentManager
         fm.beginTransaction().replace(R.id.bottom_sheet_layout, RoleTabFragment()).commit()
         return binding.root
@@ -52,6 +48,10 @@ class ScheduleFragment : Fragment() {
         }
     }
 
+    /**
+     * Show dialog
+     */
+
     private fun openEditGoalDialog(goalId: Int) {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
@@ -67,5 +67,4 @@ class ScheduleFragment : Fragment() {
             requestKey = Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
         )
     }
-
 }
