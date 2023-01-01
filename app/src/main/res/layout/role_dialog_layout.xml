@@ -17,10 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:inputType="textCapSentences"
             android:background="@null"
-            android:hint="Role..."
+            android:hint="Role"
             android:textColor="?attr/colorOnPrimary"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/half_white" />
 
         <LinearLayout
             android:layout_width="wrap_content"
