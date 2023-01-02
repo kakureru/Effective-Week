@@ -10,6 +10,7 @@ import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.util.*
 
 class GoalDialogFragmentViewModel(
     private val addGoalUseCase: AddGoalUseCase,
@@ -29,6 +30,8 @@ class GoalDialogFragmentViewModel(
 
     private var _role: String? = null
     val role: String? get() = _role
+
+    val calendar: Calendar = Calendar.getInstance()
 
     private var _weekday: Int = 0
     val weekday: Int get() = _weekday
@@ -90,5 +93,16 @@ class GoalDialogFragmentViewModel(
         _title = title
         _description = description
         _commitment = commitment
+    }
+
+    fun setTime(h: Int, m: Int) {
+        calendar.set(Calendar.HOUR_OF_DAY, h)
+        calendar.set(Calendar.MINUTE, m)
+    }
+
+    fun setDate(y: Int, m: Int, d: Int) {
+        calendar.set(Calendar.YEAR, y)
+        calendar.set(Calendar.MONTH, m)
+        calendar.set(Calendar.DAY_OF_MONTH, d)
     }
 }

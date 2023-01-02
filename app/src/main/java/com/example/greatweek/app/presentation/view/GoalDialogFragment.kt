@@ -1,9 +1,14 @@
 package com.example.greatweek.app.presentation.view
 
+import android.app.DatePickerDialog
+import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
+import android.app.TimePickerDialog
+import android.app.TimePickerDialog.OnTimeSetListener
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -22,6 +27,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
+
 
 class GoalDialogFragment : DialogFragment() {
 
@@ -44,22 +51,35 @@ class GoalDialogFragment : DialogFragment() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         when (requestKey) {
+            /**
+             * Диалог открыт для редактирования цели
+             */
             Constants.KEY_EDIT_GOAL_REQUEST_KEY -> {
                 viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getGoal()
-                    bind()
                 }
             }
+
+            /**
+             * Диалог открыт для добавления цели из расписания
+             */
             Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
                 viewModel.setWeekDay(requireArguments().getInt(ARG_ARGUMENT))
             }
+
+            /**
+             * Диалог открыт для добавления цели из роли
+             */
             Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
                 viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
-                bind()
             }
         }
+        bind()
 
+        /**
+         * Confirm
+         */
         binding.confirmButton.setOnClickListener {
             if (binding.titleEditText.text.toString().isBlank()) {
                 binding.titleEditText.error = getString(R.string.empty_value)
@@ -81,6 +101,9 @@ class GoalDialogFragment : DialogFragment() {
             dismiss()
         }
 
+        /**
+         * Dismiss
+         */
         binding.dismissButton.setOnClickListener {
             dismiss()
         }
@@ -88,16 +111,32 @@ class GoalDialogFragment : DialogFragment() {
         return dialog
     }
 
+    /**
+     * Обновить содержимое диалога
+     */
     private fun bind() {
         binding.apply {
             titleEditText.setText(viewModel.title)
             descriptionEditText.setText(viewModel.description)
-            roleButton.text = viewModel.role
+            dateButton.text = DateUtils.formatDateTime(
+                requireContext(),
+                viewModel.calendar.timeInMillis,
+                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_ABBREV_WEEKDAY
+            )
+            timeButton.text = DateUtils.formatDateTime(
+                requireContext(),
+                viewModel.calendar.timeInMillis,
+                DateUtils.FORMAT_SHOW_TIME
+            )
+            viewModel.role?.let { roleButton.text = viewModel.role }
             commitmentCheckBox.isChecked = viewModel.commitment
         }
     }
 
-    fun showBottomSheetDialog() {
+    /**
+     * Открыть диалог выбора роли
+     */
+    fun showRoleDialog() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val dialogBinding = RoleBottomSheetDialogLayoutBinding.inflate(layoutInflater)
         bottomSheetDialog.setContentView(dialogBinding.root)
@@ -115,6 +154,34 @@ class GoalDialogFragment : DialogFragment() {
         }
 
         bottomSheetDialog.show()
+    }
+
+    private val timeCallBack = OnTimeSetListener { _, h, m ->
+        viewModel.setTime(h, m)
+        bind()
+    }
+
+    private val dateCallBack = OnDateSetListener { _, y, m, d ->
+        viewModel.setDate(y, m, d)
+        bind()
+    }
+
+    fun showTimeDialog() {
+        TimePickerDialog(
+            requireContext(), timeCallBack,
+            viewModel.calendar.get(Calendar.HOUR_OF_DAY),
+            viewModel.calendar.get(Calendar.MINUTE),
+            true
+        ).show()
+    }
+
+    fun showDateDialog() {
+        DatePickerDialog(
+            requireContext(), dateCallBack,
+            viewModel.calendar.get(Calendar.YEAR),
+            viewModel.calendar.get(Calendar.MONTH),
+            viewModel.calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
     companion object {
