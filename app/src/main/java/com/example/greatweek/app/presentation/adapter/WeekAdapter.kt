@@ -16,7 +16,7 @@ class WeekAdapter(
     private val addGoal: (weekDay: Int) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
-    private val dropGoal: (goalId: Int, weekDay: Int, isCommitment: Boolean) -> Unit
+    private val dropGoal: (goalId: Int, date: Int, isCommitment: Boolean) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :

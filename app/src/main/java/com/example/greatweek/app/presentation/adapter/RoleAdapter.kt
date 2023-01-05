@@ -66,7 +66,7 @@ class RoleAdapter(
         }
 
         fun bind(role: Role) {
-            val goalList = role.goals.filter { it.weekday == 0 }
+            val goalList = role.goals.filter { it.date == null }
 
             val goalAdapter = GoalAdapter(completeGoal, editGoal)
 

@@ -12,7 +12,7 @@ class DropGoalToRoleUseCase(private val goalRepository: GoalRepository) {
                 title = goal.title,
                 description = goal.description,
                 role = role,
-                weekday = 0,
+                date = null,
                 commitment = goal.commitment
             )
         )

@@ -10,6 +10,10 @@ import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.util.*
 
 class GoalDialogFragmentViewModel(
@@ -33,8 +37,11 @@ class GoalDialogFragmentViewModel(
 
     val calendar: Calendar = Calendar.getInstance()
 
-    private var _weekday: Int = 0
-    val weekday: Int get() = _weekday
+    private var _date: LocalDate? = null
+    val date: LocalDate? get() = _date
+
+    private var _time: LocalTime? = null
+    val time: LocalTime? get() = _time
 
     private var _commitment: Boolean = false
     val commitment: Boolean get() = _commitment
@@ -44,8 +51,10 @@ class GoalDialogFragmentViewModel(
         _title = goal.title
         _description = goal.description
         _role = goal.role
-        _weekday = goal.weekday
+        _date = goal.date
+        _time = goal.time
         _commitment = goal.commitment
+        calendar.time = getCalendarTime(date, time)
     }
 
     fun getRoles(): Flow<List<Role>> {
@@ -59,7 +68,8 @@ class GoalDialogFragmentViewModel(
                 title = title,
                 description = description,
                 role = role!!,
-                weekday = weekday,
+                date = date,
+                time = time,
                 commitment = commitment
             )
         )
@@ -71,7 +81,8 @@ class GoalDialogFragmentViewModel(
                 title = title,
                 description = description,
                 role = role!!,
-                weekday = weekday,
+                date = date,
+                time = time,
                 commitment = commitment
             )
         )
@@ -85,10 +96,6 @@ class GoalDialogFragmentViewModel(
         _role = role
     }
 
-    fun setWeekDay(weekDay: Int) {
-        _weekday = weekDay
-    }
-
     fun setGoal(title: String, description: String, commitment: Boolean) {
         _title = title
         _description = description
@@ -98,11 +105,31 @@ class GoalDialogFragmentViewModel(
     fun setTime(h: Int, m: Int) {
         calendar.set(Calendar.HOUR_OF_DAY, h)
         calendar.set(Calendar.MINUTE, m)
+        _time = getLocalTime(calendar)
     }
 
     fun setDate(y: Int, m: Int, d: Int) {
         calendar.set(Calendar.YEAR, y)
         calendar.set(Calendar.MONTH, m)
         calendar.set(Calendar.DAY_OF_MONTH, d)
+        _date = getLocalDate(calendar)
+    }
+
+    private fun getLocalDate(calendar: Calendar): LocalDate? {
+        return LocalDateTime.ofInstant(calendar.toInstant(), calendar.timeZone.toZoneId())
+            .toLocalDate()
+    }
+
+    private fun getLocalTime(calendar: Calendar): LocalTime? {
+        return LocalDateTime.ofInstant(calendar.toInstant(), calendar.timeZone.toZoneId())
+            .toLocalTime()
+    }
+
+    private fun getCalendarTime(date: LocalDate?, time: LocalTime?): Date {
+        val calendarDate = date ?: LocalDate.now()
+        val calendarTime = time ?: LocalTime.now()
+        return Date.from(
+            LocalDateTime.of(calendarDate, calendarTime).atZone(ZoneId.systemDefault()).toInstant()
+        )
     }
 }

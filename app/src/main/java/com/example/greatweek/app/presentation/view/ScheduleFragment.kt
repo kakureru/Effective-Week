@@ -40,7 +40,7 @@ class ScheduleFragment : Fragment() {
             addGoal = { weekDay -> openAddGoalDialog(weekDay) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },
-            dropGoal = { goalId, weekDay, isCommitment -> viewModel.dropGoal(goalId, weekDay, isCommitment) }
+            dropGoal = { goalId, date, isCommitment -> viewModel.dropGoal(goalId, date, isCommitment) }
         )
         binding.week.adapter = weekAdapter
         viewModel.week.observe(viewLifecycleOwner) {

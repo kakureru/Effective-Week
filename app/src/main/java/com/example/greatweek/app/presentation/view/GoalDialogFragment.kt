@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
-
 class GoalDialogFragment : DialogFragment() {
 
     private val viewModel by viewModel<GoalDialogFragmentViewModel>()
@@ -58,6 +57,7 @@ class GoalDialogFragment : DialogFragment() {
                 viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getGoal()
+                    bind()
                 }
             }
 
@@ -65,7 +65,8 @@ class GoalDialogFragment : DialogFragment() {
              * Диалог открыт для добавления цели из расписания
              */
             Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
-                viewModel.setWeekDay(requireArguments().getInt(ARG_ARGUMENT))
+                //viewModel.setDate(requireArguments().getInt(ARG_ARGUMENT))
+                bind()
             }
 
             /**
@@ -73,9 +74,9 @@ class GoalDialogFragment : DialogFragment() {
              */
             Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
                 viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
+                bind()
             }
         }
-        bind()
 
         /**
          * Confirm
@@ -116,18 +117,23 @@ class GoalDialogFragment : DialogFragment() {
      */
     private fun bind() {
         binding.apply {
-            titleEditText.setText(viewModel.title)
-            descriptionEditText.setText(viewModel.description)
-            dateButton.text = DateUtils.formatDateTime(
+            if (titleEditText.text.isEmpty())
+                titleEditText.setText(viewModel.title)
+            if (descriptionEditText.text.isEmpty())
+                descriptionEditText.setText(viewModel.description)
+            viewModel.date?.let {
+                dateButton.text = DateUtils.formatDateTime(
                 requireContext(),
                 viewModel.calendar.timeInMillis,
                 DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_ABBREV_WEEKDAY
-            )
-            timeButton.text = DateUtils.formatDateTime(
-                requireContext(),
-                viewModel.calendar.timeInMillis,
-                DateUtils.FORMAT_SHOW_TIME
-            )
+            ) }
+            viewModel.time?.let {
+                timeButton.text = DateUtils.formatDateTime(
+                    requireContext(),
+                    viewModel.calendar.timeInMillis,
+                    DateUtils.FORMAT_SHOW_TIME
+                )
+            }
             viewModel.role?.let { roleButton.text = viewModel.role }
             commitmentCheckBox.isChecked = viewModel.commitment
         }

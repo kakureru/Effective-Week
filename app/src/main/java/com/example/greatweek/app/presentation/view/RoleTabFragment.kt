@@ -65,7 +65,7 @@ class RoleTabFragment : Fragment() {
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     val clipDescription = event.clipDescription.label.toString()
-                    if (clipDescription.toInt() == 0)
+                    if (clipDescription == "null")
                         flag = true
                     viewModel.expandBottomSheet()
                     true

@@ -26,9 +26,9 @@ class GoalAdapter(
             binding.root.setOnClickListener { editGoal(goal.id) }
             binding.root.setOnLongClickListener {
                 val itemId = ClipData.Item(goal.id.toString())
-                val weekDay = goal.weekday.toString()
+                val date = goal.date.toString()
                 val dragData = ClipData(
-                    weekDay,
+                    date,
                     arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
                     itemId)
                 val dragShadowBuilder = View.DragShadowBuilder(it)

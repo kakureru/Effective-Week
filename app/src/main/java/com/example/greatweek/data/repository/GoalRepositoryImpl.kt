@@ -22,7 +22,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
                 title = goal.title,
                 description = goal.description,
                 role = goal.role,
-                day = goal.weekday,
+                date = goal.date,
+                time = goal.time,
                 commitment = goal.commitment
             )
         )
@@ -50,7 +51,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
             title = goal.title,
             description = goal.description,
             role = goal.role,
-            weekday = goal.day,
+            date = goal.date,
+            time = goal.time,
             commitment = goal.commitment
         )
     }
@@ -61,7 +63,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
             title = goal.title,
             description = goal.description,
             role = goal.role,
-            day = goal.weekday,
+            date = goal.date,
+            time = goal.time,
             commitment = goal.commitment
         )
     }

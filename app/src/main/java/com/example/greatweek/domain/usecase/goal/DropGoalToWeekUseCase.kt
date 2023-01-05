@@ -4,7 +4,7 @@ import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
 
 class DropGoalToWeekUseCase(private val goalRepository: GoalRepository) {
-    suspend fun execute(goalId: Int, weekDay: Int, isCommitment: Boolean) {
+    suspend fun execute(goalId: Int, date: Int, isCommitment: Boolean) {
         val goal = goalRepository.getGoal(goalId = goalId)
         goalRepository.editGoal(
             Goal(
@@ -12,7 +12,8 @@ class DropGoalToWeekUseCase(private val goalRepository: GoalRepository) {
                 title = goal.title,
                 description = goal.description,
                 role = goal.role,
-                weekday = weekDay,
+                date = goal.date, // TODO assign proper date
+                time = goal.time,
                 commitment = isCommitment
             )
         )
