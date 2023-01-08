@@ -23,7 +23,7 @@ class ScheduleViewModel(
     private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
 ): ViewModel() {
 
-    private val today = LocalDate.now()
+    val today: LocalDate = LocalDate.now()
     private var firstDay = today
     private var lastDay = today
 

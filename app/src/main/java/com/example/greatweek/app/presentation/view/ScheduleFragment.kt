@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.greatweek.R
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.WeekAdapter
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentScheduleBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.time.LocalDate
 
@@ -22,13 +25,15 @@ class ScheduleFragment : Fragment() {
     private var _binding: FragmentScheduleBinding? = null
     val binding get() = _binding!!
 
+    private var snapHelper = PagerSnapHelper()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
-        PagerSnapHelper().attachToRecyclerView(binding.week)
+        snapHelper.attachToRecyclerView(binding.week)
         val fm: FragmentManager = childFragmentManager
         fm.beginTransaction().replace(R.id.bottom_sheet_layout, RoleTabFragment()).commit()
         return binding.root
@@ -36,7 +41,6 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val weekAdapter = WeekAdapter(
             addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
@@ -44,9 +48,16 @@ class ScheduleFragment : Fragment() {
             dropGoal = { goalId, date, isCommitment -> viewModel.dropGoal(goalId, date, isCommitment) }
         )
         binding.week.adapter = weekAdapter
+        var firstShown = true
         viewModel.week.observe(viewLifecycleOwner) {
             weekAdapter.submitList(it)
             weekAdapter.notifyDataSetChanged()
+            if (firstShown) {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    binding.week.smoothScrollToPosition(viewModel.today.dayOfWeek.value - 1)
+                    firstShown = false
+                }
+            }
         }
     }
 
