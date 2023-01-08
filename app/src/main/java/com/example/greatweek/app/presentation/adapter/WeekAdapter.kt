@@ -18,45 +18,44 @@ class WeekAdapter(
     private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
-    private val dropGoal: (goalId: Int, date: Int, isCommitment: Boolean) -> Unit
+    private val dropGoal: (goalId: Int, date: LocalDate, isCommitment: Boolean) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val dragListener = View.OnDragListener { view, event ->
-            when (event.action) {
-                DragEvent.ACTION_DRAG_STARTED -> {
-                    event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                }
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    view.setBackgroundColor(Color.GRAY)
-                    true
-                }
-                DragEvent.ACTION_DRAG_EXITED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    true
-                }
-                DragEvent.ACTION_DROP -> {
-                    val item = event.clipData.getItemAt(0)
-                    val goalId = item.text.toString().toInt()
-                    val weekDay = adapterPosition + 1
-                    val isCommitment =
-                        view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
-                    dropGoal(goalId, weekDay, isCommitment)
-                    true
-                }
-                DragEvent.ACTION_DRAG_ENDED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    if (!event.result)
-                        (event.localState as View).visibility = View.VISIBLE
-                    true
-                }
-                else -> false
-            }
-        }
-
         fun bind(weekDay: WeekDay) {
+            val dragListener = View.OnDragListener { view, event ->
+                when (event.action) {
+                    DragEvent.ACTION_DRAG_STARTED -> {
+                        event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                    }
+                    DragEvent.ACTION_DRAG_ENTERED -> {
+                        view.setBackgroundColor(Color.GRAY)
+                        true
+                    }
+                    DragEvent.ACTION_DRAG_EXITED -> {
+                        view.setBackgroundColor(Color.TRANSPARENT)
+                        true
+                    }
+                    DragEvent.ACTION_DROP -> {
+                        val item = event.clipData.getItemAt(0)
+                        val goalId = item.text.toString().toInt()
+                        val isCommitment =
+                            view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
+                        dropGoal(goalId, weekDay.date, isCommitment)
+                        true
+                    }
+                    DragEvent.ACTION_DRAG_ENDED -> {
+                        view.setBackgroundColor(Color.TRANSPARENT)
+                        if (!event.result)
+                            (event.localState as View).visibility = View.VISIBLE
+                        true
+                    }
+                    else -> false
+                }
+            }
+
             val prioritiesList = weekDay.goals.filter { !it.commitment }
             val commitmentList = weekDay.goals.filter { it.commitment }
 

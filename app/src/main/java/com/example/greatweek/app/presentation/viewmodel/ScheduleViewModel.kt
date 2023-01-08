@@ -53,7 +53,7 @@ class ScheduleViewModel(
         completeGoalUseCase.execute(goalId = goalId)
     }
 
-    fun dropGoal(goalId: Int, date: Int, isCommitment: Boolean) = viewModelScope.launch {
+    fun dropGoal(goalId: Int, date: LocalDate, isCommitment: Boolean) = viewModelScope.launch {
         dropGoalToWeekUseCase.execute(goalId, date, isCommitment)
     }
 
