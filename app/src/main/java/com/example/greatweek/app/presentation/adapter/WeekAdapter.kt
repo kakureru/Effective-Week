@@ -66,7 +66,9 @@ class WeekAdapter(
             binding.apply {
                 // View
                 weekDayName.text = DateTimeFormatter.ofPattern("EEEE").format(weekDay.date)
+                    .replaceFirstChar { it.uppercase() }
                 dateTextView.text = DateTimeFormatter.ofPattern("MMM d").format(weekDay.date)
+                    .replaceFirstChar { it.uppercase() }
                 prioritiesDropTarget.visibility =
                     if (prioritiesList.isEmpty()) View.VISIBLE else View.GONE
                 commitmentsDropTarget.visibility =

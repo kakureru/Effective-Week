@@ -4,7 +4,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="half_white">#40FFFFFF</color>
+    <color name="half_white">#80FFFFFF</color>
+    <color name="quarter_white">#40FFFFFF</color>
 
     <color name="grey_double_dark">#020507</color>
     <color name="grey_dark">#181819</color>
