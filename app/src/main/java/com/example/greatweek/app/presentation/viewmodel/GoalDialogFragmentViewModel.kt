@@ -115,6 +115,11 @@ class GoalDialogFragmentViewModel(
         _date = getLocalDate(calendar)
     }
 
+    fun setDate(date: LocalDate) {
+        _date = date
+        calendar.time = getCalendarTime(date, time)
+    }
+
     private fun getLocalDate(calendar: Calendar): LocalDate? {
         return LocalDateTime.ofInstant(calendar.toInstant(), calendar.timeZone.toZoneId())
             .toLocalDate()

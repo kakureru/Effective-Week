@@ -13,6 +13,7 @@ import com.example.greatweek.app.presentation.adapter.WeekAdapter
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentScheduleBinding
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.time.LocalDate
 
 class ScheduleFragment : Fragment() {
 
@@ -37,7 +38,7 @@ class ScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val weekAdapter = WeekAdapter(
-            addGoal = { weekDay -> openAddGoalDialog(weekDay) },
+            addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },
             dropGoal = { goalId, date, isCommitment -> viewModel.dropGoal(goalId, date, isCommitment) }
@@ -61,10 +62,10 @@ class ScheduleFragment : Fragment() {
         )
     }
 
-    private fun openAddGoalDialog(weekDay: Int) {
+    private fun openAddGoalDialog(date: LocalDate) {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
-            argument = weekDay,
+            argument = date,
             requestKey = Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
         )
     }

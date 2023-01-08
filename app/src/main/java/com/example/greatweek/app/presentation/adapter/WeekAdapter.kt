@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class WeekAdapter(
-    private val addGoal: (weekDay: Int) -> Unit,
+    private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
     private val dropGoal: (goalId: Int, date: Int, isCommitment: Boolean) -> Unit
@@ -63,7 +65,8 @@ class WeekAdapter(
 
             binding.apply {
                 // View
-                weekDayName.text = weekDay.name
+                weekDayName.text = DateTimeFormatter.ofPattern("EEEE").format(weekDay.date)
+                dateTextView.text = DateTimeFormatter.ofPattern("MMM d").format(weekDay.date)
                 prioritiesDropTarget.visibility =
                     if (prioritiesList.isEmpty()) View.VISIBLE else View.GONE
                 commitmentsDropTarget.visibility =
@@ -77,7 +80,7 @@ class WeekAdapter(
                 prioritiesDropTarget.setOnDragListener(dragListener)
                 commitmentsDropTarget.setOnDragListener(dragListener)
                 // On click listener
-                addGoalButton.setOnClickListener { addGoal(weekDay.id) }
+                addGoalButton.setOnClickListener { addGoal(weekDay.date) }
             }
 
             prioritiesAdapter.submitList(prioritiesList)
@@ -102,7 +105,7 @@ class WeekAdapter(
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<WeekDay>() {
             override fun areItemsTheSame(oldItem: WeekDay, newItem: WeekDay): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.date == newItem.date
             }
 
             override fun areContentsTheSame(oldItem: WeekDay, newItem: WeekDay): Boolean {

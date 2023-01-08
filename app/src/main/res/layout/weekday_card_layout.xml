@@ -14,16 +14,32 @@
         android:orientation="vertical"
         android:layout_margin="@dimen/card_margin">
 
-        <TextView
-            android:id="@+id/week_day_name"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textSize="18sp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="10dp"
-            tools:text="Weekday" />
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/week_day_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/date_text_view"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="Weekday" />
+
+            <TextView
+                android:id="@+id/date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="Jan 1" />
+
+        </RelativeLayout>
 
         <TextView
             style="@style/title"

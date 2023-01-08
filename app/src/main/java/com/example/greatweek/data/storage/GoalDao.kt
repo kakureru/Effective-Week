@@ -1,17 +1,19 @@
 package com.example.greatweek.data.storage
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.greatweek.data.storage.model.Goals
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface GoalDao {
 
     @Query("SELECT * FROM goals")
-    fun getGoals(): Flow<List<Goals>>
+    fun getAll(): Flow<List<Goals>>
+
+    @Query("SELECT * FROM goals WHERE date BETWEEN :firstDay AND :lastDay")
+    @TypeConverters(Converters::class)
+    fun getWeekGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goals>>
 
     @Insert
     suspend fun addGoal(goal: Goals)

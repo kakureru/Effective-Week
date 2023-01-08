@@ -27,6 +27,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class GoalDialogFragment : DialogFragment() {
@@ -65,7 +67,7 @@ class GoalDialogFragment : DialogFragment() {
              * Диалог открыт для добавления цели из расписания
              */
             Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
-                //viewModel.setDate(requireArguments().getInt(ARG_ARGUMENT))
+                viewModel.setDate(requireArguments().get(ARG_ARGUMENT) as LocalDate)
                 bind()
             }
 
@@ -122,11 +124,8 @@ class GoalDialogFragment : DialogFragment() {
             if (descriptionEditText.text.isEmpty())
                 descriptionEditText.setText(viewModel.description)
             viewModel.date?.let {
-                dateButton.text = DateUtils.formatDateTime(
-                requireContext(),
-                viewModel.calendar.timeInMillis,
-                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_ABBREV_WEEKDAY
-            ) }
+                dateButton.text = DateTimeFormatter.ofPattern("MMM d").format(viewModel.date)
+            }
             viewModel.time?.let {
                 timeButton.text = DateUtils.formatDateTime(
                     requireContext(),
@@ -203,6 +202,19 @@ class GoalDialogFragment : DialogFragment() {
         fun show(
             manager: FragmentManager,
             argument: Int,
+            requestKey: String
+        ) {
+            val dialogFragment = GoalDialogFragment()
+            dialogFragment.arguments = bundleOf(
+                ARG_ARGUMENT to argument,
+                ARG_REQUEST_KEY to requestKey
+            )
+            dialogFragment.show(manager, TAG)
+        }
+
+        fun show(
+            manager: FragmentManager,
+            argument: LocalDate,
             requestKey: String
         ) {
             val dialogFragment = GoalDialogFragment()

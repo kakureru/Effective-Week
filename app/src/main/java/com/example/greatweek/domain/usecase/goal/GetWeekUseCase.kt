@@ -1,21 +1,26 @@
 package com.example.greatweek.domain.usecase.goal
 
-import com.example.greatweek.domain.Constants
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.time.DayOfWeek
+import java.time.LocalDate
 
 class GetWeekUseCase(
     private val goalRepository: GoalRepository
 ) {
-    fun execute(): Flow<List<WeekDay>> {
-        return goalRepository.allGoals.map { goals ->
-            for ((i, v) in DayOfWeek.values().withIndex()) {
-                Constants.week[i].goals = goals.filter { it.date?.dayOfWeek == v }
+    fun execute(startDate: LocalDate, endDate: LocalDate): Flow<List<WeekDay>> {
+        return goalRepository.getWeekGoals(startDate, endDate).map { goals ->
+            val week = mutableListOf<WeekDay>()
+            for (i in 0..6) {
+                val date = startDate.plusDays(i.toLong())
+                week.add(
+                    WeekDay(
+                        date = date,
+                        goals = goals.filter { it.date == date })
+                )
             }
-            Constants.week
+            week
         }
     }
 }
