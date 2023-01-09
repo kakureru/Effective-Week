@@ -42,6 +42,7 @@ class ScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val weekAdapter = WeekAdapter(
+            context = requireContext(),
             addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },

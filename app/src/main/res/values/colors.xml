@@ -15,5 +15,6 @@
     <color name="metallic_dark">#2d3539</color>
 
     <color name="accent">#61bd50</color>
+    <color name="highlight">#FFE0B2</color>
 
 </resources>

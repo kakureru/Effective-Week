@@ -1,20 +1,25 @@
 package com.example.greatweek.app.presentation.adapter
 
 import android.content.ClipDescription
+import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.greatweek.R
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class WeekAdapter(
+    private val context: Context,
     private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
@@ -66,6 +71,8 @@ class WeekAdapter(
                 // View
                 weekDayName.text = DateTimeFormatter.ofPattern("EEEE").format(weekDay.date)
                     .replaceFirstChar { it.uppercase() }
+                if (weekDay.date == LocalDate.now())
+                    weekDayName.setTextColor(ContextCompat.getColor(context, R.color.highlight))
                 dateTextView.text = DateTimeFormatter.ofPattern("MMM d").format(weekDay.date)
                     .replaceFirstChar { it.uppercase() }
                 prioritiesDropTarget.visibility =
