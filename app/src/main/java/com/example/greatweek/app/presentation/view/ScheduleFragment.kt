@@ -81,7 +81,6 @@ class ScheduleFragment : Fragment() {
 
         val weekAdapter = WeekAdapter(
             context = requireContext(),
-            today = viewModel.today,
             addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },

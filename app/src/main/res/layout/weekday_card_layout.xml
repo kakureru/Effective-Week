@@ -22,7 +22,7 @@
             android:layout_marginBottom="10dp">
 
             <TextView
-                android:id="@+id/week_day_name"
+                android:id="@+id/week_day_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 

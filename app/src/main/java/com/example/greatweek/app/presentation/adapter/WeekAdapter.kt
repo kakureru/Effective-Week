@@ -19,12 +19,13 @@ import java.time.format.DateTimeFormatter
 
 class WeekAdapter(
     private val context: Context,
-    private val today: LocalDate,
     private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
     private val dropGoal: (goalId: Int, date: LocalDate, isCommitment: Boolean) -> Unit
 ) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
+
+    private val today = LocalDate.now()
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -77,24 +78,29 @@ class WeekAdapter(
             }
         }
 
-        fun bind(weekDay: WeekDay) {
-            val prioritiesList = weekDay.goals.filter { !it.commitment }
-            val commitmentList = weekDay.goals.filter { it.commitment }
+        fun bind(day: WeekDay) {
+            val priorities = day.goals.filter { !it.commitment }
+            val commitments = day.goals.filter { it.commitment }
 
-            prioritiesAdapter.submitList(prioritiesList)
-            commitmentAdapter.submitList(commitmentList)
+            prioritiesAdapter.submitList(priorities)
+            commitmentAdapter.submitList(commitments)
+
+            val weekDay = DateTimeFormatter.ofPattern("EEEE").format(day.date)
+                .replaceFirstChar { it.uppercase() }
+            val weekDayColor =
+                if (day.date == today) ContextCompat.getColor(context, R.color.highlight)
+                else Color.WHITE
+            val date = DateTimeFormatter.ofPattern("MMM d").format(day.date)
+                .replaceFirstChar { it.uppercase() }
 
             binding.apply {
-                weekDayName.text = DateTimeFormatter.ofPattern("EEEE").format(weekDay.date)
-                    .replaceFirstChar { it.uppercase() }
-                if (weekDay.date == today)
-                    weekDayName.setTextColor(ContextCompat.getColor(context, R.color.highlight))
-                dateTextView.text = DateTimeFormatter.ofPattern("MMM d").format(weekDay.date)
-                    .replaceFirstChar { it.uppercase() }
+                weekDayTextView.text = weekDay
+                weekDayTextView.setTextColor(weekDayColor)
+                dateTextView.text = date
                 prioritiesDropTarget.visibility =
-                    if (prioritiesList.isEmpty()) View.VISIBLE else View.GONE
+                    if (priorities.isEmpty()) View.VISIBLE else View.GONE
                 commitmentsDropTarget.visibility =
-                    if (commitmentList.isEmpty()) View.VISIBLE else View.GONE
+                    if (commitments.isEmpty()) View.VISIBLE else View.GONE
             }
         }
     }
