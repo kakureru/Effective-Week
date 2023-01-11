@@ -10,7 +10,7 @@ val appModule = module {
 
     viewModel<ScheduleViewModel> {
         ScheduleViewModel(
-            getWeekUseCase = get(),
+            getScheduleUseCase = get(),
             completeGoalUseCase = get(),
             dropGoalToWeekUseCase = get(),
             deleteRoleUseCase = get(),

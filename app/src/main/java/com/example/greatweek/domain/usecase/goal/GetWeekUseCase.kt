@@ -5,6 +5,7 @@ import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit.DAYS
 
 class GetWeekUseCase(
     private val goalRepository: GoalRepository
@@ -12,8 +13,8 @@ class GetWeekUseCase(
     fun execute(startDate: LocalDate, endDate: LocalDate): Flow<List<WeekDay>> {
         return goalRepository.getWeekGoals(startDate, endDate).map { goals ->
             val week = mutableListOf<WeekDay>()
-            for (i in 0..6) {
-                val date = startDate.plusDays(i.toLong())
+            for (i in 0..DAYS.between(startDate, endDate)) {
+                val date = startDate.plusDays(i)
                 week.add(
                     WeekDay(
                         date = date,

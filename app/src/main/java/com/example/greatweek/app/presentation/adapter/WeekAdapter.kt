@@ -27,6 +27,10 @@ class WeekAdapter(
 
     private val today = LocalDate.now()
 
+    fun getItemAt(position: Int): WeekDay? {
+        return if (position in 0..7) getItem(position) else null
+    }
+
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

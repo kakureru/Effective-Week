@@ -15,27 +15,27 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 class ScheduleViewModel(
-    private val getWeekUseCase: GetWeekUseCase,
+    private val getScheduleUseCase: GetWeekUseCase,
     private val completeGoalUseCase: CompleteGoalUseCase,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
     private val deleteRoleUseCase: DeleteRoleUseCase,
     private val getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
     private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
-): ViewModel() {
+) : ViewModel() {
 
     val today: LocalDate = LocalDate.now()
     private var firstDay = today
-    private var lastDay = today
+    private val lastDay: LocalDate get() = firstDay.plusDays(6)
 
     init {
         // Go backward to get Monday
         while (firstDay.dayOfWeek != DayOfWeek.MONDAY) {
-            firstDay  = firstDay.minusDays(1)
+            firstDay = firstDay.minusDays(1)
         }
-        lastDay = firstDay.plusDays(6)
     }
 
-    val week: LiveData<List<WeekDay>> = getWeekUseCase.execute(firstDay , lastDay).asLiveData()
+    val schedule: LiveData<List<WeekDay>> = getScheduleUseCase.execute(firstDay, lastDay).asLiveData()
+
     val allRoles: LiveData<List<Role>> = getRolesWithGoalsUseCase.execute().asLiveData()
 
     private var _tabExpanded = MutableLiveData(BottomSheetBehavior.STATE_COLLAPSED)

@@ -75,4 +75,8 @@ dependencies {
     androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
+    implementation 'com.github.rubensousa:gravitysnaphelper:2.2.2'
+
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 }

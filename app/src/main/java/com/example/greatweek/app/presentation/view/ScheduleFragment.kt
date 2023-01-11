@@ -2,28 +2,28 @@ package com.example.greatweek.app.presentation.view
 
 import android.content.ClipDescription
 import android.os.Bundle
-import android.view.DragEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
 import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.WeekAdapter
+import com.example.greatweek.app.presentation.view.utils.OnSnapPositionChangeListener
+import com.example.greatweek.app.presentation.view.utils.SnapOnScrollListener
+import com.example.greatweek.app.presentation.view.utils.SnapOnScrollListener.Behavior
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentScheduleBinding
+import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.time.DayOfWeek
 import java.time.LocalDate
-
 
 class ScheduleFragment : Fragment() {
 
@@ -32,8 +32,12 @@ class ScheduleFragment : Fragment() {
     private var _binding: FragmentScheduleBinding? = null
     val binding get() = _binding!!
 
+    private var firstShown = true
+
+    private lateinit var weekAdapter: WeekAdapter
+
     private val weekLayoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-    private var snapHelper = PagerSnapHelper()
+    private var snapHelper = GravitySnapHelper(Gravity.CENTER)
     private var scrollDirection = MutableLiveData(0)
 
     private val dragListener = View.OnDragListener { view, event ->
@@ -42,10 +46,7 @@ class ScheduleFragment : Fragment() {
                 event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
             }
             DragEvent.ACTION_DRAG_ENTERED -> {
-                if (view == binding.dragZoneRight)
-                    scrollDirection.value = 1
-                else
-                    scrollDirection.value = -1
+                scrollDirection.value = if (view == binding.dragZoneRight) 1 else -1
                 true
             }
             DragEvent.ACTION_DRAG_EXITED -> {
@@ -60,6 +61,40 @@ class ScheduleFragment : Fragment() {
         }
     }
 
+    private val onSnapPositionChangeListener: OnSnapPositionChangeListener =
+        object : OnSnapPositionChangeListener {
+            override fun onSnapPositionChange(position: Int) {
+                val day = weekAdapter.getItemAt(position)?.date?.dayOfWeek
+                if (day != DayOfWeek.MONDAY && day != DayOfWeek.SUNDAY) {
+                    snapHelper.gravity = Gravity.CENTER
+                }
+            }
+        }
+
+    private val onIdleSnapPositionChangeListener: OnSnapPositionChangeListener =
+        object : OnSnapPositionChangeListener {
+            override fun onSnapPositionChange(position: Int) {
+                val day = weekAdapter.getItemAt(position)?.date?.dayOfWeek
+                if (day == DayOfWeek.MONDAY) {
+                    snapHelper.gravity = Gravity.START
+                } else if (day == DayOfWeek.SUNDAY) {
+                    snapHelper.gravity = Gravity.END
+                }
+            }
+        }
+
+    private val onSnapScrollListener = SnapOnScrollListener(
+        snapHelper,
+        Behavior.NOTIFY_ON_SCROLL,
+        onSnapPositionChangeListener
+    )
+
+    private val onIdleSnapScrollListener = SnapOnScrollListener(
+        snapHelper,
+        Behavior.NOTIFY_ON_SCROLL_STATE_IDLE,
+        onIdleSnapPositionChangeListener
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -67,7 +102,14 @@ class ScheduleFragment : Fragment() {
     ): View? {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
         binding.week.layoutManager = weekLayoutManager
+        // Configure snap helper
         snapHelper.attachToRecyclerView(binding.week)
+        snapHelper.maxFlingSizeFraction = 0.5f
+        binding.week.apply {
+            addOnScrollListener(onSnapScrollListener)
+            addOnScrollListener(onIdleSnapScrollListener)
+        }
+        // Attach role tab fragment
         val fm: FragmentManager = childFragmentManager
         fm.beginTransaction().replace(R.id.bottom_sheet_layout, RoleTabFragment()).commit()
         return binding.root
@@ -75,11 +117,8 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.dragZoneRight.setOnDragListener(dragListener)
-        binding.dragZoneLeft.setOnDragListener(dragListener)
-
-        val weekAdapter = WeekAdapter(
+        // Week adapter
+        weekAdapter = WeekAdapter(
             context = requireContext(),
             addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
@@ -87,13 +126,17 @@ class ScheduleFragment : Fragment() {
             dropGoal = { goalId, date, isCommitment -> viewModel.dropGoal(goalId, date, isCommitment) }
         )
         binding.week.adapter = weekAdapter
-        var firstShown = true
-        viewModel.week.observe(viewLifecycleOwner) {
+
+        binding.dragZoneRight.setOnDragListener(dragListener)
+        binding.dragZoneLeft.setOnDragListener(dragListener)
+
+        viewModel.schedule.observe(viewLifecycleOwner) {
             weekAdapter.submitList(it)
             weekAdapter.notifyDataSetChanged()
             if (firstShown) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    binding.week.smoothScrollToPosition(viewModel.today.dayOfWeek.value - 1)
+                    val todayPosition = viewModel.today.dayOfWeek.value - 1
+                    binding.week.smoothScrollToPosition(todayPosition)
                     firstShown = false
                 }
             }
