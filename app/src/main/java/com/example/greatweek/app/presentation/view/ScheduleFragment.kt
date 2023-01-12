@@ -134,11 +134,12 @@ class ScheduleFragment : Fragment() {
             weekAdapter.submitList(it)
             weekAdapter.notifyDataSetChanged()
             if (firstShown) {
+                val todayPosition = viewModel.preloadDays.toInt()
+                binding.week.scrollToPosition(todayPosition - 1)
                 lifecycleScope.launch(Dispatchers.Main) {
-                    val todayPosition = viewModel.today.dayOfWeek.value - 1
                     binding.week.smoothScrollToPosition(todayPosition)
-                    firstShown = false
                 }
+                firstShown = false
             }
         }
 
@@ -153,7 +154,7 @@ class ScheduleFragment : Fragment() {
         snapHelper.findSnapView(weekLayoutManager)?.let { snapView ->
             val snapPosition = weekLayoutManager.getPosition(snapView)
             val newPosition = snapPosition + scrollDirection.value!!
-            if (scrollDirection.value != 0 && newPosition in 0..7) {
+            if (scrollDirection.value != 0) {
                 binding.week.smoothScrollToPosition(newPosition)
                 delay(Constants.SCROLL_DELAY_MS)
                 if (scrollDirection.value != 0)

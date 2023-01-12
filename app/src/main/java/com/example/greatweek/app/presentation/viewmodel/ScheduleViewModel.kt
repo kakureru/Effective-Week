@@ -11,7 +11,6 @@ import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesWithGoalsUseCase
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 class ScheduleViewModel(
@@ -23,16 +22,10 @@ class ScheduleViewModel(
     private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
 ) : ViewModel() {
 
-    val today: LocalDate = LocalDate.now()
-    private var firstDay = today
-    private val lastDay: LocalDate get() = firstDay.plusDays(6)
-
-    init {
-        // Go backward to get Monday
-        while (firstDay.dayOfWeek != DayOfWeek.MONDAY) {
-            firstDay = firstDay.minusDays(1)
-        }
-    }
+    val preloadDays = 30L
+    private val today: LocalDate = LocalDate.now()
+    private var firstDay = today.minusDays(preloadDays)
+    private val lastDay = today.plusDays(preloadDays)
 
     val schedule: LiveData<List<WeekDay>> = getScheduleUseCase.execute(firstDay, lastDay).asLiveData()
 

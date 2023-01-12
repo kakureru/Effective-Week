@@ -18,10 +18,6 @@
         tools:itemCount="2"
         tools:listitem="@layout/weekday_card_layout" />
 
-    <include
-        android:id="@+id/bottom_sheet_layout"
-        layout="@layout/bottom_sheet_tab_layout" />
-
     <FrameLayout
         android:id="@+id/drag_zone_left"
         android:layout_width="@dimen/drag_zone"
@@ -37,5 +33,9 @@
         android:layout_gravity="right"
         android:visibility="visible"
         tools:ignore="RtlHardcoded" />
+
+    <include
+        android:id="@+id/bottom_sheet_layout"
+        layout="@layout/bottom_sheet_tab_layout" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
