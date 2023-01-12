@@ -14,17 +14,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
-import java.lang.IndexOutOfBoundsException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class WeekAdapter(
+class ScheduleAdapter(
     private val context: Context,
     private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
     private val dropGoal: (goalId: Int, date: LocalDate, isCommitment: Boolean) -> Unit
-) : ListAdapter<WeekDay, WeekAdapter.WeekDayViewHolder>(DiffCallback) {
+) : ListAdapter<WeekDay, ScheduleAdapter.WeekDayViewHolder>(DiffCallback) {
 
     private val today = LocalDate.now()
 
@@ -60,7 +59,7 @@ class WeekAdapter(
                     val goalId = item.text.toString().toInt()
                     val isCommitment =
                         view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
-                    dropGoal(goalId, getItem(adapterPosition).date, isCommitment)
+                    dropGoal(goalId, getItem(absoluteAdapterPosition).date, isCommitment)
                     true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
@@ -80,7 +79,7 @@ class WeekAdapter(
                 prioritiesDropTarget.setOnDragListener(dragListener)
                 commitmentsDropTarget.setOnDragListener(dragListener)
                 // On click
-                addGoalButton.setOnClickListener { addGoal(getItem(adapterPosition).date) }
+                addGoalButton.setOnClickListener { addGoal(getItem(absoluteAdapterPosition).date) }
                 // Adapter
                 prioritiesRecyclerView.adapter = prioritiesAdapter
                 commitmentsRecyclerView.adapter = commitmentAdapter
@@ -94,18 +93,10 @@ class WeekAdapter(
             prioritiesAdapter.submitList(priorities)
             commitmentAdapter.submitList(commitments)
 
-            val weekDay = DateTimeFormatter.ofPattern("EEEE").format(day.date)
-                .replaceFirstChar { it.uppercase() }
-            val weekDayColor =
-                if (day.date == today) ContextCompat.getColor(context, R.color.highlight)
-                else Color.WHITE
-            val date = DateTimeFormatter.ofPattern("MMM d").format(day.date)
-                .replaceFirstChar { it.uppercase() }
-
             binding.apply {
-                weekDayTextView.text = weekDay
-                weekDayTextView.setTextColor(weekDayColor)
-                dateTextView.text = date
+                weekDayTextView.text = getDayOfWeek(date = day.date)
+                weekDayTextView.setTextColor(getDayColor(date = day.date))
+                dateTextView.text = getDate(date = day.date)
                 prioritiesDropTarget.visibility =
                     if (priorities.isEmpty()) View.VISIBLE else View.GONE
                 commitmentsDropTarget.visibility =
@@ -135,8 +126,25 @@ class WeekAdapter(
             }
 
             override fun areContentsTheSame(oldItem: WeekDay, newItem: WeekDay): Boolean {
-                return oldItem == newItem
+                return oldItem.goals == newItem.goals
             }
+        }
+    }
+
+    private fun getDayOfWeek(date: LocalDate): String {
+        return DateTimeFormatter.ofPattern("EEEE").format(date)
+            .replaceFirstChar { it.uppercase() }
+    }
+
+    private fun getDate(date: LocalDate): CharSequence {
+        return DateTimeFormatter.ofPattern("MMM d").format(date)
+            .replaceFirstChar { it.uppercase() }
+    }
+
+    private fun getDayColor(date: LocalDate): Int {
+        return when (date) {
+            today -> ContextCompat.getColor(context, R.color.highlight)
+            else -> Color.WHITE
         }
     }
 }

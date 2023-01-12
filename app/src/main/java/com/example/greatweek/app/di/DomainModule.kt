@@ -30,8 +30,8 @@ val domainModule = module {
         DropGoalToWeekUseCase(goalRepository = get())
     }
 
-    factory<GetWeekUseCase> {
-        GetWeekUseCase(goalRepository = get())
+    factory<GetGoalsForDatesUseCase> {
+        GetGoalsForDatesUseCase(goalRepository = get())
     }
 
     factory<GetRolesWithGoalsUseCase> {

@@ -9,7 +9,7 @@ interface GoalRepository {
 
     val allGoals: Flow<List<Goal>>
 
-    fun getWeekGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goal>>
+    fun getGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goal>>
 
     suspend fun getGoal(goalId: Int): Goal
 

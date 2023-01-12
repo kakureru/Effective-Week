@@ -12,7 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.example.greatweek.R
-import com.example.greatweek.app.Constants
+import com.example.greatweek.app.presentation.constants.*
 import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,8 +43,8 @@ class RoleDialogFragment : DialogFragment() {
                 return@setOnClickListener
             }
             when (requestKey) {
-                Constants.KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(oldName = roleName, newName = enteredText)
-                Constants.KEY_ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
+                KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(oldName = roleName, newName = enteredText)
+                KEY_ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
             }
             dismiss()
         }

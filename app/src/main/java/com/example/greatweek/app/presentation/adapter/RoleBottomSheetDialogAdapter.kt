@@ -10,8 +10,7 @@ import com.example.greatweek.domain.model.Role
 
 class RoleBottomSheetDialogAdapter(
     private val onItemClick: (role: Role) -> Unit
-) :
-    ListAdapter<Role, RoleBottomSheetDialogAdapter.RoleViewHolder>(DiffCallback) {
+) : ListAdapter<Role, RoleBottomSheetDialogAdapter.RoleViewHolder>(DiffCallback) {
     inner class RoleViewHolder(private val binding: RoleLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(role: Role) {
@@ -43,7 +42,7 @@ class RoleBottomSheetDialogAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Role, newItem: Role): Boolean {
-                return oldItem == newItem
+                return oldItem.goals == newItem.goals
             }
 
         }

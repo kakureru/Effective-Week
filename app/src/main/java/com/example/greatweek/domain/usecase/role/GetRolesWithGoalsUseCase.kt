@@ -14,12 +14,14 @@ class GetRolesWithGoalsUseCase(
         val roleFlow = roleRepository.allRoles
         val goalFlow = goalRepository.allGoals
         return roleFlow.combine(goalFlow) { roleList, goalList ->
-            roleList.forEach { role ->
-                role.goals = goalList.filter { goal ->
-                    goal.role == role.name
-                }
+            roleList.map { role ->
+                Role(
+                    name = role.name,
+                    goals = goalList.filter { goal ->
+                        goal.role == role.name
+                    }
+                )
             }
-            roleList
         }
     }
 }

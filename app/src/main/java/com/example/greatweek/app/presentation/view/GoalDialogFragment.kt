@@ -18,8 +18,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.greatweek.R
-import com.example.greatweek.app.Constants
+import com.example.greatweek.app.presentation.constants.*
 import com.example.greatweek.app.presentation.adapter.RoleBottomSheetDialogAdapter
+import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
 import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
 import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
@@ -55,7 +56,7 @@ class GoalDialogFragment : DialogFragment() {
             /**
              * Диалог открыт для редактирования цели
              */
-            Constants.KEY_EDIT_GOAL_REQUEST_KEY -> {
+            KEY_EDIT_GOAL_REQUEST_KEY -> {
                 viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.getGoal()
@@ -66,7 +67,7 @@ class GoalDialogFragment : DialogFragment() {
             /**
              * Диалог открыт для добавления цели из расписания
              */
-            Constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
+            KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
                 viewModel.setDate(requireArguments().get(ARG_ARGUMENT) as LocalDate)
                 bind()
             }
@@ -74,7 +75,7 @@ class GoalDialogFragment : DialogFragment() {
             /**
              * Диалог открыт для добавления цели из роли
              */
-            Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
+            KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
                 viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
                 bind()
             }
@@ -98,7 +99,7 @@ class GoalDialogFragment : DialogFragment() {
                 binding.commitmentCheckBox.isChecked
             )
             when (requestKey) {
-                Constants.KEY_EDIT_GOAL_REQUEST_KEY -> viewModel.editGoal()
+                KEY_EDIT_GOAL_REQUEST_KEY -> viewModel.editGoal()
                 else -> viewModel.addGoal()
             }
             dismiss()

@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.example.greatweek.app.Constants
 import com.example.greatweek.app.presentation.adapter.RoleAdapter
+import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
+import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
+import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
+import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.model.Role
@@ -23,67 +26,67 @@ class RoleTabFragment : Fragment() {
     private var _binding: FragmentRoleTabBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
+    private val bottomSheetCallback = object : BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            when (newState) {
+                BottomSheetBehavior.STATE_COLLAPSED -> viewModel.collapseBottomSheet()
+                BottomSheetBehavior.STATE_EXPANDED -> viewModel.expandBottomSheet()
+                else -> {}
+            }
+        }
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+    }
+
+    var flag = false
+    private val dragListener = View.OnDragListener { _, event ->
+        when (event.action) {
+            DragEvent.ACTION_DRAG_STARTED -> true
+            DragEvent.ACTION_DRAG_EXITED -> {
+                viewModel.collapseBottomSheet()
+                true
+            }
+            DragEvent.ACTION_DRAG_ENTERED -> {
+                val clipDescription = event.clipDescription.label.toString()
+                if (clipDescription == "null")
+                    flag = true
+                viewModel.expandBottomSheet()
+                true
+            }
+            DragEvent.ACTION_DRAG_ENDED -> {
+                if (flag)
+                    viewModel.expandBottomSheet()
+                flag = false
+                true
+            }
+            else -> false
+        }
+    }
+
+    @Suppress("RedundantNullableReturnType")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentRoleTabBinding.inflate(inflater, container, false)
+        registerForContextMenu(binding.rolesRecyclerView)
+
         bottomSheetBehavior =
             BottomSheetBehavior.from((parentFragment as ScheduleFragment).binding.bottomSheetLayout.root)
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> viewModel.collapseBottomSheet()
-                    BottomSheetBehavior.STATE_EXPANDED -> viewModel.expandBottomSheet()
-                    BottomSheetBehavior.STATE_DRAGGING -> { }
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> { }
-                    BottomSheetBehavior.STATE_HIDDEN -> { }
-                    BottomSheetBehavior.STATE_SETTLING -> { }
-                }
-            }
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // React to dragging events
-            }
-        })
+        binding.root.setOnDragListener(dragListener)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.roleTabFragment = this@RoleTabFragment
 
-        var flag = false
-        val dragListener = View.OnDragListener { _, event ->
-            when (event.action) {
-                DragEvent.ACTION_DRAG_STARTED -> true
-                DragEvent.ACTION_DRAG_EXITED -> {
-                    viewModel.collapseBottomSheet()
-                    true
-                }
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    val clipDescription = event.clipDescription.label.toString()
-                    if (clipDescription == "null")
-                        flag = true
-                    viewModel.expandBottomSheet()
-                    true
-                }
-                DragEvent.ACTION_DRAG_ENDED -> {
-                    if (flag)
-                        viewModel.expandBottomSheet()
-                    flag = false
-                    true
-                }
-                else -> false
-            }
-        }
-        binding.root.setOnDragListener(dragListener)
-
-        binding.apply {
-            roleTabFragment = this@RoleTabFragment
-        }
         val roleAdapter = RoleAdapter(
             renameRole = { role -> openRenameRoleDialog(role) },
             deleteRole = { name -> viewModel.deleteRole(name = name) },
@@ -94,14 +97,14 @@ class RoleTabFragment : Fragment() {
             expandBottomSheet = { viewModel.expandBottomSheet() }
         )
         binding.rolesRecyclerView.adapter = roleAdapter
-        viewModel.allRoles.observe(viewLifecycleOwner) { roles ->
-            roles?.let { roleAdapter.submitList(roles) }
-            roleAdapter.notifyDataSetChanged()
+
+        viewModel.allRoles.observe(viewLifecycleOwner) {
+            roleAdapter.submitList(it)
         }
+
         viewModel.tabExpanded.observe(viewLifecycleOwner) {
             bottomSheetBehavior.state = it
         }
-        registerForContextMenu(binding.rolesRecyclerView)
     }
 
     /**
@@ -112,7 +115,7 @@ class RoleTabFragment : Fragment() {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
             argument = goalId,
-            requestKey = Constants.KEY_EDIT_GOAL_REQUEST_KEY
+            requestKey = KEY_EDIT_GOAL_REQUEST_KEY
         )
     }
 
@@ -120,7 +123,7 @@ class RoleTabFragment : Fragment() {
         GoalDialogFragment.show(
             manager = parentFragmentManager,
             argument = role,
-            requestKey = Constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
+            requestKey = KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
         )
     }
 
@@ -128,14 +131,14 @@ class RoleTabFragment : Fragment() {
         RoleDialogFragment.show(
             manager = parentFragmentManager,
             roleName = role.name,
-            requestKey = Constants.KEY_RENAME_ROLE_REQUEST_KEY
+            requestKey = KEY_RENAME_ROLE_REQUEST_KEY
         )
     }
 
     fun openAddRoleDialog() {
         RoleDialogFragment.show(
             manager = parentFragmentManager,
-            requestKey = Constants.KEY_ADD_ROLE_REQUEST_KEY
+            requestKey = KEY_ADD_ROLE_REQUEST_KEY
         )
     }
 }

@@ -14,8 +14,8 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
         mapToDomain(it)
     }
 
-    override fun getWeekGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goal>> {
-        return goalDao.getWeekGoals(firstDay, lastDay).map {
+    override fun getGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goal>> {
+        return goalDao.getGoals(firstDay, lastDay).map {
             mapToDomain(it)
         }
     }

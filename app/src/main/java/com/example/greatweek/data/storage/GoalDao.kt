@@ -13,7 +13,7 @@ interface GoalDao {
 
     @Query("SELECT * FROM goals WHERE date BETWEEN :firstDay AND :lastDay")
     @TypeConverters(Converters::class)
-    fun getWeekGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goals>>
+    fun getGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goals>>
 
     @Insert
     suspend fun addGoal(goal: Goals)

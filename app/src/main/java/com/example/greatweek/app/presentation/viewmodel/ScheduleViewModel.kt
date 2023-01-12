@@ -6,15 +6,19 @@ import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
 import com.example.greatweek.domain.usecase.goal.DropGoalToRoleUseCase
 import com.example.greatweek.domain.usecase.goal.DropGoalToWeekUseCase
-import com.example.greatweek.domain.usecase.goal.GetWeekUseCase
+import com.example.greatweek.domain.usecase.goal.GetGoalsForDatesUseCase
 import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesWithGoalsUseCase
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
 class ScheduleViewModel(
-    private val getScheduleUseCase: GetWeekUseCase,
+    private val getScheduleUseCase: GetGoalsForDatesUseCase,
     private val completeGoalUseCase: CompleteGoalUseCase,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
     private val deleteRoleUseCase: DeleteRoleUseCase,
@@ -24,10 +28,17 @@ class ScheduleViewModel(
 
     val preloadDays = 30L
     private val today: LocalDate = LocalDate.now()
-    private var firstDay = today.minusDays(preloadDays)
-    private val lastDay = today.plusDays(preloadDays)
+    private var startDate = today.minusDays(preloadDays)
+    private val endDate = today.plusDays(preloadDays)
 
-    val schedule: LiveData<List<WeekDay>> = getScheduleUseCase.execute(firstDay, lastDay).asLiveData()
+    val schedule = getScheduleUseCase.execute(startDate, endDate).map { goals ->
+        getDatesBetween(startDate, endDate).map { date ->
+            WeekDay(
+                date = date,
+                goals = goals.filter { it.date == date }
+            )
+        }
+    }.asLiveData()
 
     val allRoles: LiveData<List<Role>> = getRolesWithGoalsUseCase.execute().asLiveData()
 
@@ -56,5 +67,13 @@ class ScheduleViewModel(
 
     fun deleteRole(name: String) = viewModelScope.launch {
         deleteRoleUseCase.execute(name = name)
+    }
+
+    private fun getDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
+        val numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate)
+        return IntStream.iterate(0) { i -> i + 1 }
+            .limit(numOfDaysBetween)
+            .mapToObj { i -> startDate.plusDays(i.toLong()) }
+            .collect(Collectors.toList())
     }
 }

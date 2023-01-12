@@ -31,6 +31,8 @@ class RoleAdapter(
         private val binding: RoleCardLayoutBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private val goalAdapter = GoalAdapter(completeGoal, editGoal)
+
         private val dragListener = View.OnDragListener { view, event ->
             when (event.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
@@ -41,9 +43,6 @@ class RoleAdapter(
                     view.setBackgroundColor(Color.GRAY)
                     true
                 }
-                DragEvent.ACTION_DRAG_LOCATION -> {
-                    true
-                }
                 DragEvent.ACTION_DRAG_EXITED -> {
                     view.setBackgroundColor(Color.TRANSPARENT)
                     true
@@ -51,7 +50,7 @@ class RoleAdapter(
                 DragEvent.ACTION_DROP -> {
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
-                    val roleId = getItem(adapterPosition).name
+                    val roleId = getItem(absoluteAdapterPosition).name
                     dropGoal(goalId, roleId)
                     true
                 }
@@ -65,59 +64,28 @@ class RoleAdapter(
             }
         }
 
-        fun bind(role: Role) {
-            val goalList = role.goals.filter { it.date == null }
-
-            val goalAdapter = GoalAdapter(completeGoal, editGoal)
-
+        init {
             binding.apply {
-                // View
-                roleTextView.text = role.name
-                goalDropTarget.visibility = if (goalList.isEmpty()) View.VISIBLE else View.GONE
                 // Adapter
                 goalsRecyclerView.adapter = goalAdapter
-                // On drag listener
+                // On drag
                 goalsRecyclerView.setOnDragListener(dragListener)
                 goalDropTarget.setOnDragListener(dragListener)
-                // On click listener
-                moreButton.setOnClickListener { popupMenus(it, context, role) }
-                addGoalButton.setOnClickListener { addGoal(role.name) }
+                // On click
+                moreButton.setOnClickListener { popupMenus(it, context, getItem(absoluteAdapterPosition)) }
+                addGoalButton.setOnClickListener { addGoal(getItem(absoluteAdapterPosition).name) }
             }
+        }
 
+        fun bind(role: Role) {
+            val goalList = role.goals.filter { it.date == null }
             goalAdapter.submitList(goalList)
-        }
-    }
 
-    private fun popupMenus(v: View, context: Context, role: Role) {
-        val popupMenus = PopupMenu(context, v)
-        popupMenus.inflate(R.menu.role_menu)
-        popupMenus.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.edit -> {
-                    renameRole(role)
-                    true
-                }
-                R.id.delete -> {
-                    if (role.goals.isNotEmpty())
-                        Toast.makeText(
-                            context,
-                            "Can't delete role with active goals",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    else
-                        deleteRole(role.name)
-                    true
-                }
-                else -> true
+            binding.apply {
+                roleTextView.text = role.name
+                goalDropTarget.visibility = if (goalList.isEmpty()) View.VISIBLE else View.GONE
             }
-
         }
-        popupMenus.show()
-        val popup = PopupMenu::class.java.getDeclaredField("mPopup")
-        popup.isAccessible = true
-        val menu = popup.get(popupMenus)
-        menu.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-            .invoke(menu, true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoleViewHolder {
@@ -142,9 +110,42 @@ class RoleAdapter(
             }
 
             override fun areContentsTheSame(oldItem: Role, newItem: Role): Boolean {
-                return oldItem == newItem
+                return oldItem.goals == newItem.goals
             }
 
         }
+    }
+
+    private fun popupMenus(v: View, context: Context, role: Role) {
+        val popupMenus = PopupMenu(context, v)
+        popupMenus.inflate(R.menu.role_menu)
+
+        popupMenus.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.edit -> {
+                    renameRole(role)
+                    true
+                }
+                R.id.delete -> {
+                    if (role.goals.isNotEmpty())
+                        showRoleWarning(context)
+                    else
+                        deleteRole(role.name)
+                    true
+                }
+                else -> true
+            }
+        }
+
+        popupMenus.show()
+        val popup = PopupMenu::class.java.getDeclaredField("mPopup")
+        popup.isAccessible = true
+        val menu = popup.get(popupMenus)
+        menu.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+            .invoke(menu, true)
+    }
+
+    private fun showRoleWarning(context: Context) {
+        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
     }
 }
