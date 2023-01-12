@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
+import java.lang.IndexOutOfBoundsException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -28,7 +29,11 @@ class WeekAdapter(
     private val today = LocalDate.now()
 
     fun getItemAt(position: Int): WeekDay? {
-        return if (position in 0..7) getItem(position) else null
+        return try {
+            getItem(position)
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
     }
 
     inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
