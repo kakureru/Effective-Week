@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    style="@style/card"
+    android:layout_margin="12dp"
+    app:cardBackgroundColor="@color/grey_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/card_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/week_day_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Weekday" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="10dp"
+                android:alpha="0.5"
+                android:src="@drawable/ic_circle" />
+
+            <TextView
+                android:id="@+id/date_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/half_white"
+                android:textSize="18sp"
+                tools:text="Jan 1" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Priorities"
+            android:textColor="@color/half_white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/priorities_recycler_view"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:listitem="@layout/goal_layout"
+            tools:itemCount="3"/>
+
+        <TextView
+            android:id="@+id/priorities_drop_target"
+            style="@style/drop_area"
+            tools:visibility="visible" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/divider_margin"
+            android:layout_marginBottom="@dimen/divider_margin"
+            app:dividerColor="?attr/colorPrimaryVariant"
+            app:dividerInsetStart="@dimen/divider_margin"
+            app:dividerInsetEnd="@dimen/divider_margin"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/title"
+            android:text="@string/appointments"
+            android:textColor="@color/half_white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/commitments_recycler_view"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:listitem="@layout/goal_layout"
+            tools:itemCount="2"/>
+
+        <TextView
+            android:id="@+id/commitments_drop_target"
+            style="@style/drop_area"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/add_goal_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/add_goal_button"
+            android:gravity="start|center_vertical" />
+
+    </LinearLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

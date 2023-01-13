@@ -1,0 +1,82 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.example.greatweek"
+        minSdk 26
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+
+    // Kotlin components
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+
+    // UI
+    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
+    implementation "com.google.android.material:material:$material_version"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Room
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
+
+    // Koin
+    implementation "io.insert-koin:koin-core:$koin_version"
+    testImplementation "io.insert-koin:koin-test:$koin_version"
+    implementation "io.insert-koin:koin-android:$koin_android_version"
+
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+
+    // Testing
+    testImplementation "junit:junit:$junit_version"
+    androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
+    androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
+    implementation 'com.github.rubensousa:gravitysnaphelper:2.2.2'
+
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+}

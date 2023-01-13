@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="my_roles_margin">26dp</dimen>
+    <dimen name="card_margin">10dp</dimen>
+    <dimen name="card_radius">10dp</dimen>
+    <dimen name="divider_margin">14dp</dimen>
+    <dimen name="drag_zone">65dp</dimen>
+</resources>

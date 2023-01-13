@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="goalDialogFragment"
+            type="com.example.greatweek.app.presentation.view.GoalDialogFragment" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        app:cardBackgroundColor="@color/grey_dark">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/card_margin"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/title_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:layout_margin="10dp"
+                android:background="@null"
+                android:hint="Goal"
+                android:textColor="?attr/colorOnPrimary"
+                android:textColorHint="@color/quarter_white" />
+
+            <EditText
+                android:id="@+id/description_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="4dp"
+                android:background="@null"
+                android:hint="Description"
+                android:textColor="?attr/colorOnPrimary"
+                android:textColorHint="@color/quarter_white"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/role_button"
+                android:onClick="@{() -> goalDialogFragment.showRoleDialog()}"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="4dp"
+                android:drawableLeft="@drawable/ic_role"
+                android:text="Role"
+                android:textAllCaps="false" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/date_button"
+                    android:onClick="@{() -> goalDialogFragment.showDateDialog()}"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
+                    android:drawableLeft="@drawable/ic_calendar"
+                    android:text="Date"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/time_button"
+                    android:onClick="@{() -> goalDialogFragment.showTimeDialog()}"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:drawablePadding="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_time"
+                    android:text="Time"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/commitment_check_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginHorizontal="8dp"
+                android:text="@string/appointment"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/dismiss_button"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="Cancel"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/confirm_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@color/grey_light"
+                    android:text="Confirm"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>

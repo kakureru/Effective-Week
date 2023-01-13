@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GreatWeek</string>
+
+    <string name="action_confirm">Confirm</string>
+    <string name="empty_value">Value is empty</string>
+    <string name="invalid_value">Invalid value</string>
+    <string name="appointments">Appointments</string>
+    <string name="appointment">Appointment</string>
+</resources>
