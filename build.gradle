@@ -4,8 +4,7 @@ buildscript {
         appcompat_version = "1.5.1"
         kotlin_version = '1.5.31'
         room_version = '2.4.3'
-        koin_version = "3.3.0"
-        koin_android_version= "3.3.1"
+        dagger_version = '2.44.2'
         lifecycle_version = "2.5.1"
         coroutines_version = '1.6.4'
         nav_version = "2.5.3"

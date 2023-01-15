@@ -1,38 +1,62 @@
 package com.example.greatweek.app.di
 
-import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
-import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
-import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import android.content.Context
+import com.example.greatweek.app.presentation.viewmodel.*
+import com.example.greatweek.domain.usecase.goal.*
+import com.example.greatweek.domain.usecase.role.*
+import dagger.Module
+import dagger.Provides
 
-val appModule = module {
+@Module
+class AppModule(val context: Context) {
 
-    viewModel<ScheduleViewModel> {
-        ScheduleViewModel(
-            getScheduleUseCase = get(),
-            completeGoalUseCase = get(),
-            dropGoalToWeekUseCase = get(),
-            deleteRoleUseCase = get(),
-            getRolesWithGoalsUseCase = get(),
-            dropGoalToRoleUseCase = get()
+    @Provides
+    fun provideContext(): Context {
+        return context
+    }
+
+    @Provides
+    fun provideScheduleViewModelFactory(
+        getScheduleUseCase: GetGoalsForDatesUseCase,
+        completeGoalUseCase: CompleteGoalUseCase,
+        dropGoalToWeekUseCase: DropGoalToWeekUseCase,
+        deleteRoleUseCase: DeleteRoleUseCase,
+        getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
+        dropGoalToRoleUseCase: DropGoalToRoleUseCase
+    ): ScheduleViewModelFactory {
+        return ScheduleViewModelFactory (
+            getScheduleUseCase = getScheduleUseCase,
+            completeGoalUseCase = completeGoalUseCase,
+            dropGoalToWeekUseCase = dropGoalToWeekUseCase,
+            deleteRoleUseCase = deleteRoleUseCase,
+            getRolesWithGoalsUseCase = getRolesWithGoalsUseCase,
+            dropGoalToRoleUseCase = dropGoalToRoleUseCase
         )
     }
 
-    viewModel<RoleDialogFragmentViewModel> {
-        RoleDialogFragmentViewModel(
-            addRoleUseCase = get(),
-            renameRoleUseCase = get()
+    @Provides
+    fun provideRoleDialogFragmentViewModelFactory(
+        addRoleUseCase: AddRoleUseCase,
+        renameRoleUseCase: RenameRoleUseCase
+    ): RoleDialogFragmentViewModelFactory {
+        return RoleDialogFragmentViewModelFactory(
+            addRoleUseCase = addRoleUseCase,
+            renameRoleUseCase = renameRoleUseCase
         )
     }
 
-    viewModel<GoalDialogFragmentViewModel> {
-        GoalDialogFragmentViewModel(
-            addGoalUseCase = get(),
-            getRolesUseCase = get(),
-            getGoalUseCase = get(),
-            editGoalUseCase = get()
+    @Provides
+    fun provideGoalDialogFragmentViewModelFactory(
+        addGoalUseCase: AddGoalUseCase,
+        getRolesUseCase: GetRolesUseCase,
+        editGoalUseCase: EditGoalUseCase,
+        getGoalUseCase: GetGoalUseCase
+    ): GoalDialogFragmentViewModelFactory {
+        return GoalDialogFragmentViewModelFactory(
+            addGoalUseCase = addGoalUseCase,
+            getRolesUseCase = getRolesUseCase,
+            editGoalUseCase = editGoalUseCase,
+            getGoalUseCase = getGoalUseCase
         )
     }
-
 }

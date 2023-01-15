@@ -1,13 +1,16 @@
 package com.example.greatweek.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
 import com.example.greatweek.domain.usecase.goal.EditGoalUseCase
 import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
+import com.example.greatweek.domain.usecase.role.AddRoleUseCase
 import com.example.greatweek.domain.usecase.role.GetRolesUseCase
+import com.example.greatweek.domain.usecase.role.RenameRoleUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -136,5 +139,25 @@ class GoalDialogFragmentViewModel(
         return Date.from(
             LocalDateTime.of(calendarDate, calendarTime).atZone(ZoneId.systemDefault()).toInstant()
         )
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+class GoalDialogFragmentViewModelFactory(
+    private val addGoalUseCase: AddGoalUseCase,
+    private val getRolesUseCase: GetRolesUseCase,
+    private val editGoalUseCase: EditGoalUseCase,
+    private val getGoalUseCase: GetGoalUseCase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(GoalDialogFragmentViewModel::class.java)) {
+            return GoalDialogFragmentViewModel(
+                addGoalUseCase = addGoalUseCase,
+                getRolesUseCase = getRolesUseCase,
+                editGoalUseCase = editGoalUseCase,
+                getGoalUseCase = getGoalUseCase
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

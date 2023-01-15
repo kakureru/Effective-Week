@@ -1,29 +1,22 @@
 package com.example.greatweek.app
 
 import android.app.Application
-import com.example.greatweek.app.di.appModule
-import com.example.greatweek.app.di.dataModule
-import com.example.greatweek.app.di.domainModule
-import com.example.greatweek.data.storage.AppDatabase
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import com.example.greatweek.app.di.AppComponent
+import com.example.greatweek.app.di.AppModule
+import com.example.greatweek.app.di.DaggerAppComponent
+import com.example.greatweek.app.di.DataModule
 
 class GreatWeekApplication : Application() {
+
+    lateinit var appComponent: AppComponent
+
     override fun onCreate() {
         super.onCreate()
 
-        startKoin {
-            androidLogger(Level.DEBUG)
-            androidContext(this@GreatWeekApplication)
-            modules(
-                listOf(
-                    appModule,
-                    domainModule,
-                    dataModule
-                )
-            )
-        }
+        appComponent = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(context = this))
+            .dataModule(DataModule(application = this@GreatWeekApplication))
+            .build()
     }
 }

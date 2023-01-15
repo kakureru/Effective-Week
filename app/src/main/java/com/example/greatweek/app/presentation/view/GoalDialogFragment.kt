@@ -15,26 +15,32 @@ import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.greatweek.R
-import com.example.greatweek.app.presentation.constants.*
+import com.example.greatweek.app.GreatWeekApplication
 import com.example.greatweek.app.presentation.adapter.RoleBottomSheetDialogAdapter
+import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
+import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
 import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModel
+import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModelFactory
 import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.inject.Inject
 
 class GoalDialogFragment : DialogFragment() {
 
-    private val viewModel by viewModel<GoalDialogFragmentViewModel>()
+    @Inject
+    lateinit var viewModelFactory: GoalDialogFragmentViewModelFactory
+    private lateinit var viewModel: GoalDialogFragmentViewModel
 
     private val requestKey: String
         get() = requireArguments().getString(ARG_REQUEST_KEY)!!
@@ -42,6 +48,12 @@ class GoalDialogFragment : DialogFragment() {
     private lateinit var binding: GoalDialogLayoutBinding
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        (activity?.applicationContext as GreatWeekApplication).appComponent.inject(this)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            viewModelFactory
+        )[GoalDialogFragmentViewModel::class.java]
+
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.goal_dialog_layout, null, false
         )

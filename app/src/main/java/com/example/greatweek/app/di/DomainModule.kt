@@ -1,56 +1,78 @@
 package com.example.greatweek.app.di
 
+import com.example.greatweek.domain.repository.GoalRepository
+import com.example.greatweek.domain.repository.RoleRepository
 import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
 
-val domainModule = module {
+@Module
+class DomainModule {
 
-    factory<AddRoleUseCase> {
-        AddRoleUseCase(roleRepository = get())
+    @Provides
+    fun provideAddRoleUseCase(roleRepository: RoleRepository): AddRoleUseCase {
+        return AddRoleUseCase(roleRepository = roleRepository)
     }
 
-    factory<AddGoalUseCase> {
-        AddGoalUseCase(goalRepository = get())
+    @Provides
+    fun provideAddGoalUseCase(goalRepository: GoalRepository): AddGoalUseCase {
+        return AddGoalUseCase(goalRepository = goalRepository)
     }
 
-    factory<CompleteGoalUseCase> {
-        CompleteGoalUseCase(goalRepository = get())
+    @Provides
+    fun provideCompleteGoalUseCase(goalRepository: GoalRepository): CompleteGoalUseCase {
+        return CompleteGoalUseCase(goalRepository = goalRepository)
     }
 
-    factory<DeleteRoleUseCase> {
-        DeleteRoleUseCase(roleRepository = get())
+    @Provides
+    fun provideDeleteRoleUseCase(roleRepository: RoleRepository): DeleteRoleUseCase {
+        return DeleteRoleUseCase(roleRepository = roleRepository)
     }
 
-    factory<DropGoalToRoleUseCase> {
-        DropGoalToRoleUseCase(goalRepository = get())
+    @Provides
+    fun provideDropGoalToRoleUseCase(goalRepository: GoalRepository): DropGoalToRoleUseCase {
+        return DropGoalToRoleUseCase(goalRepository = goalRepository)
     }
 
-    factory<DropGoalToWeekUseCase> {
-        DropGoalToWeekUseCase(goalRepository = get())
+    @Provides
+    fun provideDropGoalToWeekUseCase(goalRepository: GoalRepository): DropGoalToWeekUseCase {
+        return DropGoalToWeekUseCase(goalRepository = goalRepository)
     }
 
-    factory<GetGoalsForDatesUseCase> {
-        GetGoalsForDatesUseCase(goalRepository = get())
+    @Provides
+    fun provideGetGoalsForDatesUseCase(goalRepository: GoalRepository): GetGoalsForDatesUseCase {
+        return GetGoalsForDatesUseCase(goalRepository = goalRepository)
     }
 
-    factory<GetRolesWithGoalsUseCase> {
-        GetRolesWithGoalsUseCase(roleRepository = get(), goalRepository = get())
+    @Provides
+    fun provideGetRolesWithGoalsUseCase(
+        roleRepository: RoleRepository,
+        goalRepository: GoalRepository
+    ): GetRolesWithGoalsUseCase {
+        return GetRolesWithGoalsUseCase(
+            roleRepository = roleRepository,
+            goalRepository = goalRepository
+        )
     }
 
-    factory<GetRolesUseCase> {
-        GetRolesUseCase(roleRepository = get())
+    @Provides
+    fun provideGetRolesUseCase(roleRepository: RoleRepository): GetRolesUseCase {
+        return GetRolesUseCase(roleRepository = roleRepository)
     }
 
-    factory<RenameRoleUseCase> {
-        RenameRoleUseCase(roleRepository = get())
+    @Provides
+    fun provideRenameRoleUseCase(roleRepository: RoleRepository): RenameRoleUseCase {
+        return RenameRoleUseCase(roleRepository = roleRepository)
     }
 
-    factory<EditGoalUseCase> {
-        EditGoalUseCase(goalRepository = get())
+    @Provides
+    fun provideEditGoalUseCase(goalRepository: GoalRepository): EditGoalUseCase {
+        return EditGoalUseCase(goalRepository = goalRepository)
     }
 
-    factory<GetGoalUseCase> {
-        GetGoalUseCase(goalRepository = get())
+    @Provides
+    fun provideGetGoalUseCase(goalRepository: GoalRepository): GetGoalUseCase {
+        return GetGoalUseCase(goalRepository = goalRepository)
     }
 }

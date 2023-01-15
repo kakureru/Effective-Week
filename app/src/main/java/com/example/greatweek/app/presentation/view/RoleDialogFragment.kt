@@ -11,15 +11,21 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import com.example.greatweek.R
-import com.example.greatweek.app.presentation.constants.*
+import com.example.greatweek.app.GreatWeekApplication
+import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
+import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModel
+import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModelFactory
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import javax.inject.Inject
 
 class RoleDialogFragment : DialogFragment() {
 
-    private val viewModel by viewModel<RoleDialogFragmentViewModel>()
+    @Inject
+    lateinit var viewModelFactory: RoleDialogFragmentViewModelFactory
+    private lateinit var viewModel: RoleDialogFragmentViewModel
 
     private val roleName: String
         get() = requireArguments().getString(ARG_ROLE_NAME).toString()
@@ -28,6 +34,12 @@ class RoleDialogFragment : DialogFragment() {
         get() = requireArguments().getString(ARG_REQUEST_KEY)!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        (activity?.applicationContext as GreatWeekApplication).appComponent.inject(this)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            viewModelFactory
+        )[RoleDialogFragmentViewModel::class.java]
+
         val dialogBinding = RoleDialogLayoutBinding.inflate(layoutInflater)
         dialogBinding.roleEditText.setText(roleName)
 

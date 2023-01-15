@@ -77,3 +77,27 @@ class ScheduleViewModel(
             .collect(Collectors.toList())
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+class ScheduleViewModelFactory(
+    private val getScheduleUseCase: GetGoalsForDatesUseCase,
+    private val completeGoalUseCase: CompleteGoalUseCase,
+    private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
+    private val deleteRoleUseCase: DeleteRoleUseCase,
+    private val getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
+    private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ScheduleViewModel::class.java)) {
+            return ScheduleViewModel(
+                getScheduleUseCase,
+                completeGoalUseCase,
+                dropGoalToWeekUseCase,
+                deleteRoleUseCase,
+                getRolesWithGoalsUseCase,
+                dropGoalToRoleUseCase
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

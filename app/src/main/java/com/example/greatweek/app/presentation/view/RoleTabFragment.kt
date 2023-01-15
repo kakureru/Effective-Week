@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.greatweek.app.presentation.adapter.RoleAdapter
 import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
@@ -17,11 +18,10 @@ import com.example.greatweek.databinding.FragmentRoleTabBinding
 import com.example.greatweek.domain.model.Role
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class RoleTabFragment : Fragment() {
 
-    private val viewModel by activityViewModel<ScheduleViewModel>()
+    private val viewModel by activityViewModels<ScheduleViewModel>()
 
     private var _binding: FragmentRoleTabBinding? = null
     private val binding get() = _binding!!

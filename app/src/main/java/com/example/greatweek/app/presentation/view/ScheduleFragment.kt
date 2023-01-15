@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,13 +22,12 @@ import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 class ScheduleFragment : Fragment() {
 
-    private val viewModel by activityViewModel<ScheduleViewModel>()
+    private val viewModel by activityViewModels<ScheduleViewModel>()
 
     private var _binding: FragmentScheduleBinding? = null
     val binding get() = _binding!!
