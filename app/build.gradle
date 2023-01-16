@@ -77,5 +77,5 @@ dependencies {
 
     implementation 'com.github.rubensousa:gravitysnaphelper:2.2.2'
 
-    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation 'androidx.preference:preference:1.2.0'
 }

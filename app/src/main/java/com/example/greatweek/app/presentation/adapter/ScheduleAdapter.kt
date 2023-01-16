@@ -59,7 +59,7 @@ class ScheduleAdapter(
                     val goalId = item.text.toString().toInt()
                     val isCommitment =
                         view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
-                    dropGoal(goalId, getItem(absoluteAdapterPosition).date, isCommitment)
+                    dropGoal(goalId, getItem(adapterPosition).date, isCommitment)
                     true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
@@ -79,7 +79,7 @@ class ScheduleAdapter(
                 prioritiesDropTarget.setOnDragListener(dragListener)
                 commitmentsDropTarget.setOnDragListener(dragListener)
                 // On click
-                addGoalButton.setOnClickListener { addGoal(getItem(absoluteAdapterPosition).date) }
+                addGoalButton.setOnClickListener { addGoal(getItem(adapterPosition).date) }
                 // Adapter
                 prioritiesRecyclerView.adapter = prioritiesAdapter
                 commitmentsRecyclerView.adapter = commitmentAdapter
