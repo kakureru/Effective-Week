@@ -17,9 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:inputType="textCapSentences"
             android:background="@null"
             android:hint="Role"
+            android:inputType="textMultiLine|textCapSentences"
+            android:scrollHorizontally="false"
             android:textColor="?attr/colorOnPrimary"
             android:textColorHint="@color/quarter_white" />
 
