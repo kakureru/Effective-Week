@@ -1,5 +1,7 @@
 package com.example.greatweek.app.presentation.adapter
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.ClipDescription
 import android.content.Context
 import android.graphics.Color
@@ -17,8 +19,8 @@ import com.example.greatweek.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+
 class ScheduleAdapter(
-    private val context: Context,
     private val addGoal: (date: LocalDate) -> Unit,
     private val completeGoal: (goalId: Int) -> Unit,
     private val editGoal: (goalId: Int) -> Unit,
@@ -35,7 +37,10 @@ class ScheduleAdapter(
         }
     }
 
-    inner class WeekDayViewHolder(private var binding: WeekdayCardLayoutBinding) :
+    inner class WeekDayViewHolder(
+        private val context: Context,
+        private var binding: WeekdayCardLayoutBinding
+        ) :
         RecyclerView.ViewHolder(binding.root) {
 
         private val prioritiesAdapter = GoalAdapter(completeGoal, editGoal)
@@ -47,14 +52,27 @@ class ScheduleAdapter(
                     event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
-                    view.setBackgroundColor(Color.GRAY)
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.grey_dark),
+                        colorTo = ContextCompat.getColor(context, R.color.highlight)
+                    )
                     true
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
+                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
+                    )
                     true
                 }
                 DragEvent.ACTION_DROP -> {
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
+                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
+                    )
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val isCommitment =
@@ -93,10 +111,13 @@ class ScheduleAdapter(
             prioritiesAdapter.submitList(priorities)
             commitmentAdapter.submitList(commitments)
 
+            val todayVisibility = if (day.date == today) View.VISIBLE else View.GONE
+
             binding.apply {
                 weekDayTextView.text = getDayOfWeek(date = day.date)
-                weekDayTextView.setTextColor(getDayColor(date = day.date))
                 dateTextView.text = getDate(date = day.date)
+                todayDividerImageView.visibility = todayVisibility
+                todayTextView.visibility = todayVisibility
                 prioritiesDropTarget.visibility =
                     if (priorities.isEmpty()) View.VISIBLE else View.GONE
                 commitmentsDropTarget.visibility =
@@ -107,6 +128,7 @@ class ScheduleAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeekDayViewHolder {
         return WeekDayViewHolder(
+            parent.context,
             WeekdayCardLayoutBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
@@ -141,10 +163,12 @@ class ScheduleAdapter(
             .replaceFirstChar { it.uppercase() }
     }
 
-    private fun getDayColor(date: LocalDate): Int {
-        return when (date) {
-            today -> ContextCompat.getColor(context, R.color.highlight)
-            else -> Color.WHITE
+    private fun animateViewColor(view: View, colorFrom: Int, colorTo: Int) {
+        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+        colorAnimation.duration = 250
+        colorAnimation.addUpdateListener { animator ->
+            view.setBackgroundColor(animator.animatedValue as Int)
         }
+        colorAnimation.start()
     }
 }

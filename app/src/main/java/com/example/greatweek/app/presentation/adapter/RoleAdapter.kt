@@ -1,5 +1,7 @@
 package com.example.greatweek.app.presentation.adapter
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.ClipDescription
 import android.content.Context
 import android.graphics.Color
@@ -9,12 +11,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
 import com.example.greatweek.databinding.RoleCardLayoutBinding
 import com.example.greatweek.domain.model.Role
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RoleAdapter(
     private val renameRole: (role: Role) -> Unit,
@@ -40,14 +46,27 @@ class RoleAdapter(
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     expandBottomSheet()
-                    view.setBackgroundColor(Color.GRAY)
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.grey_dark),
+                        colorTo = ContextCompat.getColor(context, R.color.highlight)
+                    )
                     true
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
+                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
+                    )
                     true
                 }
                 DragEvent.ACTION_DROP -> {
+                    animateViewColor(
+                        view = view,
+                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
+                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
+                    )
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val roleId = getItem(absoluteAdapterPosition).name
@@ -147,5 +166,14 @@ class RoleAdapter(
 
     private fun showRoleWarning(context: Context) {
         Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun animateViewColor(view: View, colorFrom: Int, colorTo: Int) {
+        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+        colorAnimation.duration = 250
+        colorAnimation.addUpdateListener { animator ->
+            view.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimation.start()
     }
 }

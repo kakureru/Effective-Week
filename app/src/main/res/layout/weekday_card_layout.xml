@@ -2,10 +2,10 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="280dp"
+    android:layout_width="340dp"
     android:layout_height="wrap_content"
     style="@style/card"
-    android:layout_margin="12dp"
+    android:layout_margin="8dp"
     app:cardBackgroundColor="@color/grey_dark">
 
     <LinearLayout
@@ -46,6 +46,25 @@
                 android:textColor="@color/half_white"
                 android:textSize="18sp"
                 tools:text="Jan 1" />
+
+            <ImageView
+                android:id="@+id/today_divider_image_view"
+                android:layout_width="6dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="10dp"
+                android:alpha="0.5"
+                android:src="@drawable/ic_circle"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/today_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/half_white"
+                android:textSize="18sp"
+                android:text="@string/today"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

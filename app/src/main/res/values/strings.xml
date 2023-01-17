@@ -6,4 +6,6 @@
     <string name="invalid_value">Invalid value</string>
     <string name="appointments">Appointments</string>
     <string name="appointment">Appointment</string>
+
+    <string name="today">Today</string>
 </resources>

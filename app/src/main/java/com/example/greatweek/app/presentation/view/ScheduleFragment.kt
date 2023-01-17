@@ -3,6 +3,7 @@ package com.example.greatweek.app.presentation.view
 import android.content.ClipDescription
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -71,7 +72,6 @@ class ScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         scheduleAdapter = ScheduleAdapter(
-            context = requireContext(),
             addGoal = { date -> openAddGoalDialog(date) },
             completeGoal = { goalId -> viewModel.completeGoal(goalId = goalId) },
             editGoal = { goalId -> openEditGoalDialog(goalId) },

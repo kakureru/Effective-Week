@@ -9,7 +9,7 @@
     android:checkable="true"
     android:focusable="true"
     android:clickable="true"
-    app:cardBackgroundColor="@color/grey_light">
+    app:cardBackgroundColor="@color/grey_darker">
 
     <LinearLayout
         android:layout_width="match_parent"
