@@ -18,16 +18,18 @@
     <string name="login_title">Login</string>
     <string name="account_header">Account</string>
 
+    <!-- Registration and authorisation -->
+    <string name="username">Username</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
-
-    <!-- Registration and authorisation -->
     <string name="registration">Registration</string>
     <string name="registration_message">Enter the registration details</string>
     <string name="authorisation">Authorisation</string>
     <string name="authorisation_message">Enter the authorization data</string>
     <string name="email_message">Enter email</string>
+    <string name="username_message">Enter username</string>
     <string name="password_message">Enter password</string>
     <string name="password_repeat_message">Repeat password</string>
+    <string name="passwords_do_not_match_message">Passwords do not match</string>
 </resources>

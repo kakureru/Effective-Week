@@ -1,7 +1,7 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.storage.RoleDao
-import com.example.greatweek.data.storage.model.Roles
+import com.example.greatweek.data.model.Roles
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.map

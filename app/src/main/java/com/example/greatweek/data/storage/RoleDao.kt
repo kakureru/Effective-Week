@@ -1,7 +1,7 @@
 package com.example.greatweek.data.storage
 
 import androidx.room.*
-import com.example.greatweek.data.storage.model.Roles
+import com.example.greatweek.data.model.Roles
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -2,6 +2,7 @@ package com.example.greatweek.app.di
 
 import android.content.Context
 import com.example.greatweek.app.presentation.viewmodel.*
+import com.example.greatweek.data.network.GreatWeekApiService
 import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
 import dagger.Module
@@ -32,6 +33,11 @@ class AppModule(val context: Context) {
             getRolesWithGoalsUseCase = getRolesWithGoalsUseCase,
             dropGoalToRoleUseCase = dropGoalToRoleUseCase
         )
+    }
+
+    @Provides
+    fun provideSettingsViewModelFactory(greatWeekApiService: GreatWeekApiService): SettingsViewModelFactory {
+        return SettingsViewModelFactory(greatWeekApiService)
     }
 
     @Provides

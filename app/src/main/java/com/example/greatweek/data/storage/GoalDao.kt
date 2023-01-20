@@ -1,7 +1,7 @@
 package com.example.greatweek.data.storage
 
 import androidx.room.*
-import com.example.greatweek.data.storage.model.Goals
+import com.example.greatweek.data.model.Goals
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

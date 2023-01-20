@@ -14,12 +14,11 @@
         android:layout_margin="20dp">
 
         <EditText
-            android:id="@+id/email_edit_text"
+            android:id="@+id/username_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:text="" />
+            android:hint="@string/username"
+            android:inputType="text"/>
 
         <EditText
             android:id="@+id/password_edit_text"
@@ -28,8 +27,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:hint="@string/password"
-            android:inputType="textPassword"
-            android:text="" />
+            android:inputType="textPassword"/>
 
     </LinearLayout>
 

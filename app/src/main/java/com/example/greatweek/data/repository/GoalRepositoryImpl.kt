@@ -1,7 +1,7 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.storage.GoalDao
-import com.example.greatweek.data.storage.model.Goals
+import com.example.greatweek.data.model.Goals
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
