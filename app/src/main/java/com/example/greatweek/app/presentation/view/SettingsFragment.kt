@@ -33,7 +33,25 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.settingsFragment = this@SettingsFragment
+        binding.apply {
+            settingsFragment = this@SettingsFragment
+            settingsViewModel = viewModel
+        }
+
+        viewModel.isAuthorised.observe(viewLifecycleOwner) { isAuthorised ->
+            if (isAuthorised) {
+                binding.apply {
+                    signSection.visibility = View.GONE
+                    userInfoSection.visibility = View.VISIBLE
+                    usernameTextView.text = viewModel.username.value
+                }
+            } else {
+                binding.apply {
+                    signSection.visibility = View.VISIBLE
+                    userInfoSection.visibility = View.GONE
+                }
+            }
+        }
     }
 
     /**

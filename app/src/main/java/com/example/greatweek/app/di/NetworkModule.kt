@@ -1,6 +1,8 @@
 package com.example.greatweek.app.di
 
 import android.content.SharedPreferences
+import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
+import com.example.greatweek.app.presentation.constants.NEED_TOKEN_HEADER
 import com.example.greatweek.data.network.GreatWeekApi
 import dagger.Module
 import dagger.Provides
@@ -8,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -36,14 +39,14 @@ class NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request()
-                val needToken = request.headers["needToken"] != "false"
+                val needToken = request.headers[NEED_TOKEN_HEADER] != "false"
                 val requestBuilder = request
                     .newBuilder()
-                    .removeHeader("needToken")
+                    .removeHeader(NEED_TOKEN_HEADER)
                 if (needToken)
                     requestBuilder.addHeader(
                         "Authorization",
-                        "Token ${sharedPreferences.getString("AUTH_TOKEN", "").orEmpty()}"
+                        "Token ${sharedPreferences.getString(AUTH_TOKEN_KEY, "").orEmpty()}"
                     )
                 return@addInterceptor chain.proceed(requestBuilder.build())
             }
@@ -57,6 +60,7 @@ class NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

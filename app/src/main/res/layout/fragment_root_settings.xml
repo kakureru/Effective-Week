@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -7,26 +9,78 @@
             name="settingsFragment"
             type="com.example.greatweek.app.presentation.view.SettingsFragment" />
 
+        <variable
+            name="settingsViewModel"
+            type="com.example.greatweek.app.presentation.viewmodel.SettingsViewModel" />
+
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/grey_double_dark"
+        android:orientation="vertical"
+        android:padding="24dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:onClick="@{() -> settingsFragment.showSignUpDialog()}"
-            android:text="@string/registration" />
+            android:layout_marginBottom="8dp"
+            android:text="@string/account_header"
+            android:textColor="@color/white" />
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/user_info_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:onClick="@{() -> settingsFragment.showSignInDialog()}"
-            android:text="@string/login_title" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/username_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:drawableLeftCompat="@drawable/ic_account"
+                tools:text="Username" />
+
+            <Button
+                android:id="@+id/logout_button"
+                style="@style/settings_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_logout"
+                android:onClick="@{() -> settingsViewModel.logout()}"
+                android:text="@string/action_logout"
+                android:textColor="@color/red" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sign_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                style="@style/settings_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_login"
+                android:onClick="@{() -> settingsFragment.showSignInDialog()}"
+                android:text="@string/action_sign_in" />
+
+            <Button
+                style="@style/settings_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_role_add"
+                android:onClick="@{() -> settingsFragment.showSignUpDialog()}"
+                android:text="@string/action_sign_up" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </layout>

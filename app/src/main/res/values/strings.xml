@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GreatWeek</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
 
     <string name="empty_value">Value is empty</string>
     <string name="invalid_value">Invalid value</string>
@@ -13,9 +13,11 @@
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_confirm">Confirm</string>
+    <string name="action_sign_up">Register</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_logout">Logout</string>
 
-    <!-- Preference Titles -->
-    <string name="login_title">Login</string>
+    <!-- Settings -->
     <string name="account_header">Account</string>
 
     <!-- Registration and authorisation -->
@@ -24,6 +26,7 @@
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
     <string name="registration">Registration</string>
+    <string name="login">Login</string>
     <string name="registration_message">Enter the registration details</string>
     <string name="authorisation">Authorisation</string>
     <string name="authorisation_message">Enter the authorization data</string>

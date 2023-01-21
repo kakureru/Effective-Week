@@ -40,7 +40,7 @@ class AppModule(val context: Context) {
         getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
         dropGoalToRoleUseCase: DropGoalToRoleUseCase
     ): ScheduleViewModelFactory {
-        return ScheduleViewModelFactory (
+        return ScheduleViewModelFactory(
             getScheduleUseCase = getScheduleUseCase,
             completeGoalUseCase = completeGoalUseCase,
             dropGoalToWeekUseCase = dropGoalToWeekUseCase,
@@ -51,8 +51,14 @@ class AppModule(val context: Context) {
     }
 
     @Provides
-    fun provideSettingsViewModelFactory(greatWeekApi: GreatWeekApi): SettingsViewModelFactory {
-        return SettingsViewModelFactory(greatWeekApi)
+    fun provideSettingsViewModelFactory(
+        greatWeekApi: GreatWeekApi,
+        sharedPreferences: SharedPreferences
+    ): SettingsViewModelFactory {
+        return SettingsViewModelFactory(
+            greatWeekApi = greatWeekApi,
+            sharedPreferences = sharedPreferences
+        )
     }
 
     @Provides

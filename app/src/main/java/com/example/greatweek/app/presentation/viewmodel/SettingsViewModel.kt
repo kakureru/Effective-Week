@@ -1,38 +1,67 @@
 package com.example.greatweek.app.presentation.viewmodel
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.greatweek.R
-import com.example.greatweek.data.model.RetrofitCreateUser
-import com.example.greatweek.data.model.RetrofitLoginUser
+import com.example.greatweek.app.presentation.constants.AUTH_STATUS_KEY
+import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
+import com.example.greatweek.app.presentation.constants.USERNAME_KEY
+import com.example.greatweek.data.model.RemoteUser
+import com.example.greatweek.data.model.RemoteUserLogin
 import com.example.greatweek.data.network.GreatWeekApi
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val greatWeekApi: GreatWeekApi): ViewModel() {
+class SettingsViewModel(
+    private val greatWeekApi: GreatWeekApi,
+    private val sharedPreferences: SharedPreferences
+    ): ViewModel() {
 
-    private var _isAuthorised = MutableLiveData(false)
+    private val editor = sharedPreferences.edit()
+
+    private var _isAuthorised = MutableLiveData(sharedPreferences.getBoolean(AUTH_STATUS_KEY, false))
     val isAuthorised: LiveData<Boolean> get() = _isAuthorised
 
+    private var _username: MutableLiveData<String> = MutableLiveData(sharedPreferences.getString(USERNAME_KEY, ""))
+    val username: LiveData<String> get() = _username
+
     fun register(username: String, password: String, email: String) = viewModelScope.launch {
-        val retrofitCreateUser = RetrofitCreateUser(username, password, email)
+        val remoteUser = RemoteUser(username = username, password = password, email = email)
         try {
-            greatWeekApi.register(retrofitCreateUser)
-            // TODO получить ответ
-            // TODO если удачно -> сохранить логин и пароль -> login(username, password)
+            val response = greatWeekApi.register(remoteUser)
+            Log.d("TAG", "Reg response -> $response")
+            login(username, password)
         } catch (e: Exception) {
             Log.e("TAG", "Exception during request -> ${e.localizedMessage}")
         }
     }
 
     fun login(username: String, password: String) = viewModelScope.launch {
-        val retrofitLoginUser = RetrofitLoginUser(username, password)
+        val remoteUserLogin = RemoteUserLogin(username = username, password = password)
         try {
-            greatWeekApi.login(retrofitLoginUser)
-            // TODO получить ответ
-            // TODO если удачно -> сохранить токен -> _isAuthorised.value = true
+            val response = greatWeekApi.login(remoteUserLogin)
+            Log.d("TAG", "Login response -> $response")
+            editor.apply {
+                putBoolean(AUTH_STATUS_KEY, true)
+                putString(AUTH_TOKEN_KEY, response.token)
+                putString(USERNAME_KEY, username)
+                apply()
+            }
+            _username.value = username
+            _isAuthorised.value = true
         } catch (e: Exception) {
             Log.e("TAG", "Exception during request -> ${e.localizedMessage}")
         }
+    }
+
+    fun logout() {
+        editor.apply {
+            putBoolean(AUTH_STATUS_KEY, false)
+            remove(AUTH_TOKEN_KEY)
+            remove(USERNAME_KEY)
+            apply()
+        }
+        _isAuthorised.value = false
     }
 
     /**
@@ -74,12 +103,14 @@ class SettingsViewModel(private val greatWeekApi: GreatWeekApi): ViewModel() {
 
 @Suppress("UNCHECKED_CAST")
 class SettingsViewModelFactory(
-    private val greatWeekApi: GreatWeekApi
+    private val greatWeekApi: GreatWeekApi,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
             return SettingsViewModel(
-                greatWeekApi = greatWeekApi
+                greatWeekApi = greatWeekApi,
+                sharedPreferences = sharedPreferences
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
