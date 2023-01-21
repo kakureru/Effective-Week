@@ -58,11 +58,11 @@ class SettingsFragment : Fragment() {
                 val email = dialogBinding.emailEditText.text.toString()
                 val password = dialogBinding.passwordEditText.text.toString()
                 val passwordRepeat = dialogBinding.repeatPasswordEditText.text.toString()
-                val (checkResult, checkMessage) = checkRegistrationForm(
+                val (checkResult, checkMessage) = viewModel.checkRegistrationForm(
                     username, email, password, passwordRepeat
                 )
                 if (!checkResult) {
-                    Toast.makeText(context, checkMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resources.getString(checkMessage), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 viewModel.register(username, password, email)
@@ -70,27 +70,6 @@ class SettingsFragment : Fragment() {
             }
         }
         dialog.show()
-    }
-
-    /**
-     * Reg data verification
-     */
-
-    private fun checkRegistrationForm(
-        username: String, email: String, password: String, passwordRepeat: String
-    ): Pair<Boolean, String> {
-        if (username.isBlank())
-            return Pair(false, resources.getString(R.string.username_message))
-        if (email.isBlank())
-            return Pair(false, resources.getString(R.string.email_message))
-        if (password.isBlank())
-            return Pair(false, resources.getString(R.string.password_message))
-        if (passwordRepeat.isBlank())
-            return Pair(false, resources.getString(R.string.password_repeat_message))
-        if (password != passwordRepeat)
-            return Pair(false, resources.getString(R.string.passwords_do_not_match_message))
-        else
-            return Pair(true, "")
     }
 
     /**
@@ -113,9 +92,9 @@ class SettingsFragment : Fragment() {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val username = dialogBinding.usernameEditText.text.toString()
                 val password = dialogBinding.passwordEditText.text.toString()
-                val (checkResult, checkMessage) = checkAuthorisationForm(username, password)
+                val (checkResult, checkMessage) = viewModel.checkAuthorisationForm(username, password)
                 if (!checkResult) {
-                    Toast.makeText(context, checkMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resources.getString(checkMessage), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 viewModel.login(username, password)
@@ -123,20 +102,5 @@ class SettingsFragment : Fragment() {
             }
         }
         dialog.show()
-    }
-
-    /**
-     * Auth data verification
-     */
-
-    private fun checkAuthorisationForm(
-        username: String, password: String
-    ): Pair<Boolean, String> {
-        if (username.isBlank())
-            return Pair(false, resources.getString(R.string.username_message))
-        if (password.isBlank())
-            return Pair(false, resources.getString(R.string.password_message))
-        else
-            return Pair(true, "")
     }
 }

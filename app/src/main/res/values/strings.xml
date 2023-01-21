@@ -32,4 +32,5 @@
     <string name="password_message">Enter password</string>
     <string name="password_repeat_message">Repeat password</string>
     <string name="passwords_do_not_match_message">Passwords do not match</string>
+    <string name="success_message">Successfully</string>
 </resources>
