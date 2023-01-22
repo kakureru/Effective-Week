@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.greatweek.R
+import com.example.greatweek.app.presentation.viewmodel.LoginState
 import com.example.greatweek.app.presentation.viewmodel.SettingsViewModel
 import com.example.greatweek.databinding.FragmentRootSettingsBinding
 import com.example.greatweek.databinding.SignInWindowBinding
@@ -38,18 +39,25 @@ class SettingsFragment : Fragment() {
             settingsViewModel = viewModel
         }
 
-        viewModel.isAuthorised.observe(viewLifecycleOwner) { isAuthorised ->
-            if (isAuthorised) {
-                binding.apply {
-                    signSection.visibility = View.GONE
-                    userInfoSection.visibility = View.VISIBLE
-                    usernameTextView.text = viewModel.username.value
+        viewModel.loginState.observe(viewLifecycleOwner) { loginState ->
+            when (loginState) {
+                LoginState.UNAUTHORIZED -> {
+                    binding.apply {
+                        signSection.visibility = View.VISIBLE
+                        userInfoSection.visibility = View.GONE
+                    }
                 }
-            } else {
-                binding.apply {
-                    signSection.visibility = View.VISIBLE
-                    userInfoSection.visibility = View.GONE
+                LoginState.AUTHORIZED -> {
+                    binding.apply {
+                        signSection.visibility = View.GONE
+                        userInfoSection.visibility = View.VISIBLE
+                        usernameTextView.text = viewModel.username.value
+                    }
                 }
+                is LoginState.FAILURE -> {
+                    Toast.makeText(context, loginState.message, Toast.LENGTH_SHORT).show()
+                }
+                LoginState.LOADING -> {}
             }
         }
     }

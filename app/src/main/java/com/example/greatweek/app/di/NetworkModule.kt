@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
 import com.example.greatweek.app.presentation.constants.NEED_TOKEN_HEADER
 import com.example.greatweek.data.network.GreatWeekApi
+import com.example.greatweek.data.network.ResultCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -62,6 +63,7 @@ class NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(ResultCallAdapterFactory())
             .build()
     }
 

@@ -12,9 +12,9 @@ interface GreatWeekApi {
 
     @Headers("$NEED_TOKEN_HEADER: false")
     @POST("api/v1/auth/users/")
-    suspend fun register(@Body remoteUser: RemoteUser): RemoteUser
+    suspend fun register(@Body remoteUser: RemoteUser): Result<RemoteUser>
 
     @Headers("$NEED_TOKEN_HEADER: false")
     @POST("auth/token/login/")
-    suspend fun login(@Body remoteUserLogin: RemoteUserLogin): AuthToken
+    suspend fun login(@Body remoteUserLogin: RemoteUserLogin): Result<AuthToken>
 }

@@ -3,7 +3,6 @@ package com.example.greatweek.app.presentation.viewmodel
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.greatweek.R
 import com.example.greatweek.app.presentation.constants.AUTH_STATUS_KEY
 import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
 import com.example.greatweek.app.presentation.constants.USERNAME_KEY
@@ -19,39 +18,45 @@ class SettingsViewModel(
 
     private val editor = sharedPreferences.edit()
 
-    private var _isAuthorised = MutableLiveData(sharedPreferences.getBoolean(AUTH_STATUS_KEY, false))
-    val isAuthorised: LiveData<Boolean> get() = _isAuthorised
+    private var _loginState = MutableLiveData(
+        if (!sharedPreferences.getBoolean(AUTH_STATUS_KEY, false))
+            LoginState.UNAUTHORIZED
+        else
+            LoginState.AUTHORIZED
+    )
+    val loginState: LiveData<LoginState> get() = _loginState
 
     private var _username: MutableLiveData<String> = MutableLiveData(sharedPreferences.getString(USERNAME_KEY, ""))
     val username: LiveData<String> get() = _username
 
     fun register(username: String, password: String, email: String) = viewModelScope.launch {
         val remoteUser = RemoteUser(username = username, password = password, email = email)
-        try {
-            val response = greatWeekApi.register(remoteUser)
-            Log.d("TAG", "Reg response -> $response")
+        greatWeekApi.register(remoteUser).onSuccess {
+            Log.d("TAG", "Reg response -> $it")
             login(username, password)
-        } catch (e: Exception) {
-            Log.e("TAG", "Exception during request -> ${e.localizedMessage}")
         }
+            .onFailure {
+                _loginState.value = LoginState.FAILURE(message = it.localizedMessage)
+            }
     }
 
     fun login(username: String, password: String) = viewModelScope.launch {
         val remoteUserLogin = RemoteUserLogin(username = username, password = password)
-        try {
-            val response = greatWeekApi.login(remoteUserLogin)
-            Log.d("TAG", "Login response -> $response")
+
+        greatWeekApi.login(remoteUserLogin).onSuccess {
+            Log.d("TAG", "Login response -> $it")
             editor.apply {
                 putBoolean(AUTH_STATUS_KEY, true)
-                putString(AUTH_TOKEN_KEY, response.token)
+                putString(AUTH_TOKEN_KEY, it.token)
                 putString(USERNAME_KEY, username)
                 apply()
             }
             _username.value = username
-            _isAuthorised.value = true
-        } catch (e: Exception) {
-            Log.e("TAG", "Exception during request -> ${e.localizedMessage}")
+            _loginState.value = LoginState.AUTHORIZED
         }
+            .onFailure {
+                _loginState.value = LoginState.FAILURE(message = it.localizedMessage)
+            }
     }
 
     fun logout() {
@@ -61,7 +66,7 @@ class SettingsViewModel(
             remove(USERNAME_KEY)
             apply()
         }
-        _isAuthorised.value = false
+        _loginState.value = LoginState.UNAUTHORIZED
     }
 
     /**
@@ -72,17 +77,17 @@ class SettingsViewModel(
         username: String, email: String, password: String, passwordRepeat: String
     ): Pair<Boolean, Int> {
         if (username.isBlank())
-            return Pair(false, R.string.username_message)
+            return Pair(false, com.example.greatweek.R.string.username_message)
         if (email.isBlank())
-            return Pair(false, R.string.email_message)
+            return Pair(false, com.example.greatweek.R.string.email_message)
         if (password.isBlank())
-            return Pair(false, R.string.password_message)
+            return Pair(false, com.example.greatweek.R.string.password_message)
         if (passwordRepeat.isBlank())
-            return Pair(false, R.string.password_repeat_message)
+            return Pair(false, com.example.greatweek.R.string.password_repeat_message)
         if (password != passwordRepeat)
-            return Pair(false, R.string.passwords_do_not_match_message)
+            return Pair(false, com.example.greatweek.R.string.passwords_do_not_match_message)
         else
-            return Pair(true, R.string.success_message)
+            return Pair(true, com.example.greatweek.R.string.success_message)
     }
 
     /**
@@ -93,12 +98,19 @@ class SettingsViewModel(
         username: String, password: String
     ): Pair<Boolean, Int> {
         if (username.isBlank())
-            return Pair(false, R.string.username_message)
+            return Pair(false, com.example.greatweek.R.string.username_message)
         if (password.isBlank())
-            return Pair(false, R.string.password_message)
+            return Pair(false, com.example.greatweek.R.string.password_message)
         else
-            return Pair(true, R.string.success_message)
+            return Pair(true, com.example.greatweek.R.string.success_message)
     }
+}
+
+sealed class LoginState {
+    object UNAUTHORIZED : LoginState()
+    object LOADING : LoginState()
+    object AUTHORIZED : LoginState()
+    data class FAILURE(val message: String?) : LoginState()
 }
 
 @Suppress("UNCHECKED_CAST")
