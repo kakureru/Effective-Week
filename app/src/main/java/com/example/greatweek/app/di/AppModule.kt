@@ -1,17 +1,28 @@
 package com.example.greatweek.app.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.example.greatweek.R
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
+import com.example.greatweek.app.presentation.constants.USER_PREFERENCES_NAME
 import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModelFactory
 import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModelFactory
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModelFactory
 import com.example.greatweek.app.presentation.viewmodel.SettingsViewModelFactory
-import com.example.greatweek.data.network.GreatWeekApi
+import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.authentication.SignInUseCase
+import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
@@ -20,15 +31,6 @@ class AppModule(val context: Context) {
     @Provides
     fun provideContext(): Context {
         return context
-    }
-
-    @Singleton
-    @Provides
-    fun provideSharedPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(
-            context.getString(R.string.app_name),
-            Context.MODE_PRIVATE
-        )
     }
 
     @Provides
@@ -52,12 +54,14 @@ class AppModule(val context: Context) {
 
     @Provides
     fun provideSettingsViewModelFactory(
-        greatWeekApi: GreatWeekApi,
-        sharedPreferences: SharedPreferences
+        userRepository: UserRepository,
+        signInUseCase: SignInUseCase,
+        signUpUseCase: SignUpUseCase
     ): SettingsViewModelFactory {
         return SettingsViewModelFactory(
-            greatWeekApi = greatWeekApi,
-            sharedPreferences = sharedPreferences
+            userRepository = userRepository,
+            signInUseCase = signInUseCase,
+            signUpUseCase = signUpUseCase
         )
     }
 

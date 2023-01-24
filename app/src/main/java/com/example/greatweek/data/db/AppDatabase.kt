@@ -1,4 +1,4 @@
-package com.example.greatweek.data.storage
+package com.example.greatweek.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

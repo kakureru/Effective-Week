@@ -1,12 +1,16 @@
 package com.example.greatweek.app.di
 
+import android.content.Context
 import android.content.SharedPreferences
-import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
-import com.example.greatweek.app.presentation.constants.NEED_TOKEN_HEADER
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.asLiveData
+import com.example.greatweek.data.constants.AUTH_TOKEN
+import com.example.greatweek.data.constants.NEED_TOKEN_HEADER
 import com.example.greatweek.data.network.GreatWeekApi
-import com.example.greatweek.data.network.ResultCallAdapterFactory
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.flow.map
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -35,7 +39,7 @@ class NetworkModule {
     @Provides
     fun provideHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        sharedPreferences: SharedPreferences
+        prefDataStore: DataStore<Preferences>
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -44,11 +48,13 @@ class NetworkModule {
                 val requestBuilder = request
                     .newBuilder()
                     .removeHeader(NEED_TOKEN_HEADER)
-                if (needToken)
+                if (needToken) {
+                    val token = prefDataStore.data.map { it[AUTH_TOKEN] ?: ""}.asLiveData()
                     requestBuilder.addHeader(
                         "Authorization",
-                        "Token ${sharedPreferences.getString(AUTH_TOKEN_KEY, "").orEmpty()}"
+                        "Token ${token.value}"
                     )
+                }
                 return@addInterceptor chain.proceed(requestBuilder.build())
             }
             .addInterceptor(httpLoggingInterceptor)
@@ -63,7 +69,6 @@ class NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(ResultCallAdapterFactory())
             .build()
     }
 

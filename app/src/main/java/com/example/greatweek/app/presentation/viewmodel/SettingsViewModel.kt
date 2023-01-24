@@ -1,128 +1,114 @@
 package com.example.greatweek.app.presentation.viewmodel
 
-import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.*
-import com.example.greatweek.app.presentation.constants.AUTH_STATUS_KEY
-import com.example.greatweek.app.presentation.constants.AUTH_TOKEN_KEY
-import com.example.greatweek.app.presentation.constants.USERNAME_KEY
-import com.example.greatweek.data.model.RemoteUser
-import com.example.greatweek.data.model.RemoteUserLogin
-import com.example.greatweek.data.network.GreatWeekApi
+import com.example.greatweek.R
+import com.example.greatweek.app.presentation.utils.RequestState
+import com.example.greatweek.domain.model.network.SignIn
+import com.example.greatweek.domain.model.network.SignUp
+import com.example.greatweek.domain.model.network.UserSignIn
+import com.example.greatweek.domain.model.network.UserSignUp
+import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.authentication.SignInUseCase
+import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
+import com.example.greatweek.domain.utils.Either
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val greatWeekApi: GreatWeekApi,
-    private val sharedPreferences: SharedPreferences
+    private val userRepository: UserRepository,
+    private val signInUseCase: SignInUseCase,
+    private val signUpUseCase: SignUpUseCase,
     ): ViewModel() {
 
-    private val editor = sharedPreferences.edit()
+    val authState: LiveData<Boolean> = userRepository.isAuthorised.asLiveData()
+    val username: LiveData<String> = userRepository.username.asLiveData()
 
-    private var _loginState = MutableLiveData(
-        if (!sharedPreferences.getBoolean(AUTH_STATUS_KEY, false))
-            LoginState.UNAUTHORIZED
-        else
-            LoginState.AUTHORIZED
-    )
-    val loginState: LiveData<LoginState> get() = _loginState
+    private val _signInRequestState = MutableStateFlow<RequestState<SignIn>>(RequestState.Idle())
+    val signInRequestState = _signInRequestState.asStateFlow()
 
-    private var _username: MutableLiveData<String> = MutableLiveData(sharedPreferences.getString(USERNAME_KEY, ""))
-    val username: LiveData<String> get() = _username
+    private val _signUpRequestState = MutableStateFlow<RequestState<SignUp>>(RequestState.Idle())
+    val signUpRequestState = _signUpRequestState.asStateFlow()
 
-    fun register(username: String, password: String, email: String) = viewModelScope.launch {
-        val remoteUser = RemoteUser(username = username, password = password, email = email)
-        greatWeekApi.register(remoteUser).onSuccess {
-            Log.d("TAG", "Reg response -> $it")
-            login(username, password)
-        }
-            .onFailure {
-                _loginState.value = LoginState.FAILURE(message = it.localizedMessage)
+    fun signIn(userSignIn: UserSignIn) = signInUseCase(userSignIn).collectRequest(_signInRequestState)
+
+    fun signUp(userSignUp: UserSignUp) =
+        viewModelScope.launch(Dispatchers.IO) {
+            signUpUseCase(userSignUp).collect {
+                when (it) {
+                    is Either.Left -> _signUpRequestState.value = RequestState.Error(it.value)
+                    is Either.Right -> userRepository.signIn(
+                        UserSignIn(
+                            username = userSignUp.username,
+                            password = userSignUp.password
+                        )
+                    ).collectRequest(_signInRequestState)
+                }
             }
-    }
-
-    fun login(username: String, password: String) = viewModelScope.launch {
-        val remoteUserLogin = RemoteUserLogin(username = username, password = password)
-
-        greatWeekApi.login(remoteUserLogin).onSuccess {
-            Log.d("TAG", "Login response -> $it")
-            editor.apply {
-                putBoolean(AUTH_STATUS_KEY, true)
-                putString(AUTH_TOKEN_KEY, it.token)
-                putString(USERNAME_KEY, username)
-                apply()
-            }
-            _username.value = username
-            _loginState.value = LoginState.AUTHORIZED
         }
-            .onFailure {
-                _loginState.value = LoginState.FAILURE(message = it.localizedMessage)
-            }
-    }
 
-    fun logout() {
-        editor.apply {
-            putBoolean(AUTH_STATUS_KEY, false)
-            remove(AUTH_TOKEN_KEY)
-            remove(USERNAME_KEY)
-            apply()
-        }
-        _loginState.value = LoginState.UNAUTHORIZED
-    }
+    fun logout() = viewModelScope.launch { userRepository.logout() }
 
     /**
-     * Reg data verification
+     * Collect network request and return [RequestState] depending on request result
      */
+    private fun <T> Flow<Either<String, T>>.collectRequest(
+        state: MutableStateFlow<RequestState<T>>,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            state.value = RequestState.Loading()
+            this@collectRequest.collect {
+                when (it) {
+                    is Either.Left -> state.value = RequestState.Error(it.value)
+                    is Either.Right -> state.value = RequestState.Success(it.value)
+                }
+            }
+        }
+    }
 
-    fun checkRegistrationForm(
+    // Sign up data verification
+    fun checkSignUpForm(
         username: String, email: String, password: String, passwordRepeat: String
-    ): Pair<Boolean, Int> {
+    ): Either<Int, Int> {
         if (username.isBlank())
-            return Pair(false, com.example.greatweek.R.string.username_message)
+            return Either.Left(R.string.username_message)
         if (email.isBlank())
-            return Pair(false, com.example.greatweek.R.string.email_message)
+            return Either.Left(R.string.email_message)
         if (password.isBlank())
-            return Pair(false, com.example.greatweek.R.string.password_message)
+            return Either.Left(R.string.password_message)
         if (passwordRepeat.isBlank())
-            return Pair(false, com.example.greatweek.R.string.password_repeat_message)
+            return Either.Left(R.string.password_repeat_message)
         if (password != passwordRepeat)
-            return Pair(false, com.example.greatweek.R.string.passwords_do_not_match_message)
+            return Either.Left(R.string.passwords_do_not_match_message)
         else
-            return Pair(true, com.example.greatweek.R.string.success_message)
+            return Either.Right(R.string.success_message)
     }
 
-    /**
-     * Auth data verification
-     */
-
-    fun checkAuthorisationForm(
-        username: String, password: String
-    ): Pair<Boolean, Int> {
+    // Sign in data verification
+    fun checkSignInForm(username: String, password: String): Either<Int, Int> {
         if (username.isBlank())
-            return Pair(false, com.example.greatweek.R.string.username_message)
+            return Either.Left(R.string.username_message)
         if (password.isBlank())
-            return Pair(false, com.example.greatweek.R.string.password_message)
+            return Either.Left(R.string.password_message)
         else
-            return Pair(true, com.example.greatweek.R.string.success_message)
+            return Either.Right(R.string.success_message)
     }
-}
-
-sealed class LoginState {
-    object UNAUTHORIZED : LoginState()
-    object LOADING : LoginState()
-    object AUTHORIZED : LoginState()
-    data class FAILURE(val message: String?) : LoginState()
 }
 
 @Suppress("UNCHECKED_CAST")
 class SettingsViewModelFactory(
-    private val greatWeekApi: GreatWeekApi,
-    private val sharedPreferences: SharedPreferences
+    private val userRepository: UserRepository,
+    private val signInUseCase: SignInUseCase,
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
             return SettingsViewModel(
-                greatWeekApi = greatWeekApi,
-                sharedPreferences = sharedPreferences
+                userRepository = userRepository,
+                signInUseCase = signInUseCase,
+                signUpUseCase = signUpUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

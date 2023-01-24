@@ -30,10 +30,11 @@
             android:textColor="@color/white" />
 
         <LinearLayout
-            android:id="@+id/user_info_section"
+            android:id="@+id/group_user_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/username_text_view"
@@ -43,6 +44,7 @@
                 android:gravity="center_vertical"
                 android:textColor="@color/white"
                 android:textSize="24sp"
+                android:text="@{settingsViewModel.username}"
                 app:drawableLeftCompat="@drawable/ic_account"
                 tools:text="Username" />
 
@@ -59,12 +61,13 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/sign_section"
+            android:id="@+id/group_authentication"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <Button
+                android:id="@+id/sign_in_button"
                 style="@style/settings_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,6 +76,7 @@
                 android:text="@string/action_sign_in" />
 
             <Button
+                android:id="@+id/sign_up_button"
                 style="@style/settings_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
