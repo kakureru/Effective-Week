@@ -1,11 +1,40 @@
 <resources>
     <string name="app_name">GreatWeek</string>
+    <string name="title_activity_settings">Settings</string>
 
-    <string name="action_confirm">Confirm</string>
     <string name="empty_value">Value is empty</string>
     <string name="invalid_value">Invalid value</string>
     <string name="appointments">Appointments</string>
     <string name="appointment">Appointment</string>
-
+    
     <string name="today">Today</string>
+
+    <!-- Actions -->
+    <string name="action_settings">Settings</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_sign_up">Register</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_logout">Logout</string>
+
+    <!-- Settings -->
+    <string name="account_header">Account</string>
+
+    <!-- Registration and authorisation -->
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="registration">Registration</string>
+    <string name="login">Login</string>
+    <string name="authorisation">Authorisation</string>
+    <string name="email_message">Enter email</string>
+    <string name="username_message">Enter username</string>
+    <string name="password_message">Enter password</string>
+    <string name="password_repeat_message">Repeat password</string>
+    <string name="passwords_do_not_match_message">Passwords do not match</string>
+    <string name="success_message">Successfully</string>
+
 </resources>

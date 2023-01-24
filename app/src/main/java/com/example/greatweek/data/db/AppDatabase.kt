@@ -1,9 +1,9 @@
-package com.example.greatweek.data.storage
+package com.example.greatweek.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.greatweek.data.storage.model.Goals
-import com.example.greatweek.data.storage.model.Roles
+import com.example.greatweek.data.model.Goals
+import com.example.greatweek.data.model.Roles
 
 @Database(entities = [Goals::class, Roles::class], version = 7)
 abstract class AppDatabase : RoomDatabase() {

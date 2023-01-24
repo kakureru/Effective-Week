@@ -1,11 +1,29 @@
 package com.example.greatweek.app.di
 
 import android.content.Context
-import com.example.greatweek.app.presentation.viewmodel.*
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
+import com.example.greatweek.app.presentation.constants.USER_PREFERENCES_NAME
+import com.example.greatweek.app.presentation.viewmodel.GoalDialogFragmentViewModelFactory
+import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewModelFactory
+import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModelFactory
+import com.example.greatweek.app.presentation.viewmodel.SettingsViewModelFactory
+import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.authentication.SignInUseCase
+import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Singleton
 
 @Module
 class AppModule(val context: Context) {
@@ -24,13 +42,26 @@ class AppModule(val context: Context) {
         getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
         dropGoalToRoleUseCase: DropGoalToRoleUseCase
     ): ScheduleViewModelFactory {
-        return ScheduleViewModelFactory (
+        return ScheduleViewModelFactory(
             getScheduleUseCase = getScheduleUseCase,
             completeGoalUseCase = completeGoalUseCase,
             dropGoalToWeekUseCase = dropGoalToWeekUseCase,
             deleteRoleUseCase = deleteRoleUseCase,
             getRolesWithGoalsUseCase = getRolesWithGoalsUseCase,
             dropGoalToRoleUseCase = dropGoalToRoleUseCase
+        )
+    }
+
+    @Provides
+    fun provideSettingsViewModelFactory(
+        userRepository: UserRepository,
+        signInUseCase: SignInUseCase,
+        signUpUseCase: SignUpUseCase
+    ): SettingsViewModelFactory {
+        return SettingsViewModelFactory(
+            userRepository = userRepository,
+            signInUseCase = signInUseCase,
+            signUpUseCase = signUpUseCase
         )
     }
 

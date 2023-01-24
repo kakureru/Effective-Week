@@ -69,7 +69,7 @@ class RoleAdapter(
                     )
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
-                    val roleId = getItem(absoluteAdapterPosition).name
+                    val roleId = getItem(adapterPosition).name
                     dropGoal(goalId, roleId)
                     true
                 }
@@ -91,8 +91,8 @@ class RoleAdapter(
                 goalsRecyclerView.setOnDragListener(dragListener)
                 goalDropTarget.setOnDragListener(dragListener)
                 // On click
-                moreButton.setOnClickListener { popupMenus(it, context, getItem(absoluteAdapterPosition)) }
-                addGoalButton.setOnClickListener { addGoal(getItem(absoluteAdapterPosition).name) }
+                moreButton.setOnClickListener { popupMenus(it, context, getItem(adapterPosition)) }
+                addGoalButton.setOnClickListener { addGoal(getItem(adapterPosition).name) }
             }
         }
 

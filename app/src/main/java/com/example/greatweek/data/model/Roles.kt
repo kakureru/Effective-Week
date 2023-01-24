@@ -1,4 +1,4 @@
-package com.example.greatweek.data.storage.model
+package com.example.greatweek.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

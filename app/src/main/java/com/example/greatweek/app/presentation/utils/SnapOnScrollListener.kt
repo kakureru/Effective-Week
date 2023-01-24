@@ -1,4 +1,4 @@
-package com.example.greatweek.app.presentation.view.utils
+package com.example.greatweek.app.presentation.utils
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper

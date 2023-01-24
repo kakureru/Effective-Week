@@ -2,6 +2,9 @@ package com.example.greatweek.app.di
 
 import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.repository.RoleRepository
+import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.authentication.SignInUseCase
+import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.usecase.goal.*
 import com.example.greatweek.domain.usecase.role.*
 import dagger.Module
@@ -74,5 +77,15 @@ class DomainModule {
     @Provides
     fun provideGetGoalUseCase(goalRepository: GoalRepository): GetGoalUseCase {
         return GetGoalUseCase(goalRepository = goalRepository)
+    }
+
+    @Provides
+    fun provideSignInUseCase(userRepository: UserRepository): SignInUseCase {
+        return SignInUseCase(userRepository = userRepository)
+    }
+
+    @Provides
+    fun provideSignUpUseCase(userRepository: UserRepository): SignUpUseCase {
+        return SignUpUseCase(userRepository = userRepository)
     }
 }

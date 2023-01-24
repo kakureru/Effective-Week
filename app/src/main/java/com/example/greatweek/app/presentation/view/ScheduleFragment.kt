@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
 import com.example.greatweek.app.presentation.adapter.ScheduleAdapter
 import com.example.greatweek.app.presentation.constants.*
-import com.example.greatweek.app.presentation.view.utils.OnSnapPositionChangeListener
-import com.example.greatweek.app.presentation.view.utils.SnapOnScrollListener
-import com.example.greatweek.app.presentation.view.utils.SnapOnScrollListener.Behavior
+import com.example.greatweek.app.presentation.utils.OnSnapPositionChangeListener
+import com.example.greatweek.app.presentation.utils.SnapOnScrollListener
+import com.example.greatweek.app.presentation.utils.SnapOnScrollListener.Behavior
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
 import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper

@@ -1,11 +1,11 @@
-package com.example.greatweek.data.storage.model
+package com.example.greatweek.data.model
 
 import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.greatweek.data.storage.Converters
+import com.example.greatweek.data.db.Converters
 import java.time.LocalDate
 import java.time.LocalTime
 
