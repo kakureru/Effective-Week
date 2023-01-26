@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.greatweek.data.db.Converters
+import com.example.greatweek.domain.model.Goal
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -27,4 +28,14 @@ data class Goals(
     val date: LocalDate?,
     val time: LocalTime?,
     val commitment: Boolean
+)
+
+fun Goals.toDomain() = Goal(
+    id = id,
+    title = title,
+    description = description,
+    role = role,
+    date = date,
+    time = time,
+    commitment = commitment
 )

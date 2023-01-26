@@ -2,6 +2,7 @@ package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.GoalDao
 import com.example.greatweek.data.model.Goals
+import com.example.greatweek.data.model.toDomain
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,31 +11,22 @@ import java.time.LocalDate
 
 class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
 
-    override val allGoals = goalDao.getAll().map {
-        mapToDomain(it)
+    override val allGoals = goalDao.getAll().map { goals ->
+        goals.map { it.toDomain() }
     }
 
     override fun getGoals(firstDay: LocalDate, lastDay: LocalDate): Flow<List<Goal>> {
-        return goalDao.getGoals(firstDay, lastDay).map {
-            mapToDomain(it)
+        return goalDao.getGoals(firstDay, lastDay).map { goals ->
+            goals.map { it.toDomain() }
         }
     }
 
     override suspend fun getGoal(goalId: Int): Goal {
-        return mapToDomain(goalDao.getGoalById(goalId = goalId))
+        return goalDao.getGoalById(goalId = goalId).toDomain()
     }
 
     override suspend fun addGoal(goal: Goal) {
-        goalDao.addGoal(
-            Goals(
-                title = goal.title,
-                description = goal.description,
-                role = goal.role,
-                date = goal.date,
-                time = goal.time,
-                commitment = goal.commitment
-            )
-        )
+        goalDao.addGoal(mapToData(goal, false))
     }
 
     override suspend fun completeGoal(goalId: Int) {
@@ -42,19 +34,11 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
     }
 
     override suspend fun editGoal(goal: Goal) {
-        goalDao.updateGoal(
-            mapToData(goal)
-        )
+        goalDao.updateGoal(mapToData(goal, true))
     }
 
-    private fun mapToDomain(goals: List<Goals>): List<Goal> {
-        return goals.map { goal ->
-            mapToDomain(goal)
-        }
-    }
-
-    private fun mapToDomain(goal: Goals): Goal {
-        return Goal(
+    private fun mapToData(goal: Goal, mapId: Boolean): Goals {
+        return if (mapId) Goals(
             id = goal.id,
             title = goal.title,
             description = goal.description,
@@ -62,12 +46,7 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
             date = goal.date,
             time = goal.time,
             commitment = goal.commitment
-        )
-    }
-
-    private fun mapToData(goal: Goal): Goals {
-        return Goals(
-            id = goal.id,
+        ) else Goals(
             title = goal.title,
             description = goal.description,
             role = goal.role,

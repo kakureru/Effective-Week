@@ -2,7 +2,7 @@ package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.RoleDao
 import com.example.greatweek.data.model.Roles
-import com.example.greatweek.domain.model.Role
+import com.example.greatweek.data.model.toDomain
 import com.example.greatweek.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.map
 
@@ -10,8 +10,8 @@ class RoleRepositoryImpl(
     private val roleDao: RoleDao
 ) : RoleRepository {
 
-    override val allRoles = roleDao.getRoles().map {
-        mapToDomain(it)
+    override val allRoles = roleDao.getRoles().map { roles ->
+        roles.map { it.toDomain() }
     }
 
     override suspend fun addRole(name: String) {
@@ -25,15 +25,5 @@ class RoleRepositoryImpl(
 
     override suspend fun renameRole(oldName: String, newName: String) {
         roleDao.updateRole(oldName, newName)
-    }
-
-    private fun mapToDomain(roles: List<Roles>): List<Role> {
-        return roles.map { role ->
-            mapToDomain(role)
-        }
-    }
-
-    private fun mapToDomain(role: Roles): Role {
-        return Role(name = role.name)
     }
 }
