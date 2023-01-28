@@ -11,7 +11,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.example.greatweek.app.presentation.constants.USER_PREFERENCES_NAME
+import com.example.greatweek.data.SyncManager
 import com.example.greatweek.data.db.AppDatabase
+import com.example.greatweek.data.db.DataVersionDao
 import com.example.greatweek.data.db.GoalDao
 import com.example.greatweek.data.db.RoleDao
 import com.example.greatweek.data.network.GreatWeekApi
@@ -71,26 +73,50 @@ class DataModule(val application: Application) {
 
     @Singleton
     @Provides
-    fun provideGoalRepository(goalDao: GoalDao): GoalRepository {
-        return GoalRepositoryImpl(goalDao = goalDao)
+    fun provideDataVersionDao(database: AppDatabase): DataVersionDao {
+        return database.DataVersionDao()
     }
 
     @Singleton
     @Provides
-    fun provideRoleRepository(roleDao: RoleDao): RoleRepository {
-        return RoleRepositoryImpl(roleDao = roleDao)
+    fun provideGoalRepository(
+        goalDao: GoalDao,
+        syncManager: SyncManager
+    ): GoalRepository {
+        return GoalRepositoryImpl(
+            goalDao = goalDao,
+            syncManager = syncManager
+        )
     }
+
+    @Singleton
+    @Provides
+    fun provideRoleRepository(
+        roleDao: RoleDao,
+        syncManager: SyncManager
+    ): RoleRepository = RoleRepositoryImpl(
+        roleDao = roleDao,
+        syncManager = syncManager
+    )
+
 
     @Singleton
     @Provides
     fun provideUserRepository(
         greatWeekApi: GreatWeekApi,
-        preferencesDataStore: DataStore<Preferences>
-    ): UserRepository {
-        return UserRepositoryImpl(
-            greatWeekApi = greatWeekApi,
-            prefDataStore = preferencesDataStore
-        )
-    }
+        preferencesDataStore: DataStore<Preferences>,
+        syncManager: SyncManager
+    ): UserRepository = UserRepositoryImpl(
+        greatWeekApi = greatWeekApi,
+        prefDataStore = preferencesDataStore,
+        syncManager = syncManager
+    )
 
+    @Singleton
+    @Provides
+    fun provideSyncManager(
+        dataVersionDao: DataVersionDao
+    ): SyncManager = SyncManager(
+        dataVersionDao = dataVersionDao
+    )
 }

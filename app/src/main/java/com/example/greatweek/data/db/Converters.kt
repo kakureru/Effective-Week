@@ -28,4 +28,19 @@ class Converters {
     fun timeToSeconds(value: LocalTime?): Int? {
         return value?.toSecondOfDay()
     }
+
+    @TypeConverter
+    fun dateTimeToTimestamp(value: LocalDateTime?): Long? {
+        return if (value == null)
+            null
+        else
+            ZonedDateTime.of(value, ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    @TypeConverter
+    fun dateTimeFromTimestamp(value: Long?): LocalDateTime? {
+        return value?.let {
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneId.systemDefault())
+        }
+    }
 }

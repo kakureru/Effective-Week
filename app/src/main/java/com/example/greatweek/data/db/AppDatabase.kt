@@ -2,11 +2,13 @@ package com.example.greatweek.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.greatweek.data.model.Goals
-import com.example.greatweek.data.model.Roles
+import com.example.greatweek.data.model.db.DataVersion
+import com.example.greatweek.data.model.db.Goals
+import com.example.greatweek.data.model.db.Roles
 
-@Database(entities = [Goals::class, Roles::class], version = 7)
+@Database(entities = [Goals::class, Roles::class, DataVersion::class], version = 8)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun GoalDao(): GoalDao
     abstract fun RoleDao(): RoleDao
+    abstract fun DataVersionDao(): DataVersionDao
 }

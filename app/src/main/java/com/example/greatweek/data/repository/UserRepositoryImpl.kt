@@ -30,7 +30,6 @@ class UserRepositoryImpl(
     override fun signUp(userSignUp: UserSignUp) = doRequest {
         greatWeekApi.signUp(userSignUp.fromDomain()).also {
             Log.d("TAG", "Sign up response -> $it")
-//            signIn(UserSignIn(userSignUp.username, userSignUp.password))
         }.toDomain()
     }
 
