@@ -14,6 +14,7 @@ import com.example.greatweek.app.presentation.viewmodel.RoleDialogFragmentViewMo
 import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModelFactory
 import com.example.greatweek.app.presentation.viewmodel.SettingsViewModelFactory
 import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.SyncUseCase
 import com.example.greatweek.domain.usecase.authentication.SignInUseCase
 import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.usecase.goal.*
@@ -56,12 +57,14 @@ class AppModule(val context: Context) {
     fun provideSettingsViewModelFactory(
         userRepository: UserRepository,
         signInUseCase: SignInUseCase,
-        signUpUseCase: SignUpUseCase
+        signUpUseCase: SignUpUseCase,
+        syncUseCase: SyncUseCase
     ): SettingsViewModelFactory {
         return SettingsViewModelFactory(
             userRepository = userRepository,
             signInUseCase = signInUseCase,
-            signUpUseCase = signUpUseCase
+            signUpUseCase = signUpUseCase,
+            syncUseCase = syncUseCase
         )
     }
 

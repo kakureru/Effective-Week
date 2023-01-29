@@ -1,8 +1,10 @@
 package com.example.greatweek.app.di
 
+import com.example.greatweek.domain.SyncManager
 import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.repository.RoleRepository
 import com.example.greatweek.domain.repository.UserRepository
+import com.example.greatweek.domain.usecase.SyncUseCase
 import com.example.greatweek.domain.usecase.authentication.SignInUseCase
 import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.usecase.goal.*
@@ -88,4 +90,9 @@ class DomainModule {
     fun provideSignUpUseCase(userRepository: UserRepository): SignUpUseCase {
         return SignUpUseCase(userRepository = userRepository)
     }
+
+    @Provides
+    fun provideSyncUseCase(syncManager: SyncManager): SyncUseCase = SyncUseCase(
+        syncManager = syncManager
+    )
 }

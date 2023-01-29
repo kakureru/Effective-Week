@@ -1,13 +1,12 @@
-package com.example.greatweek.data.repository
+package com.example.greatweek.domain.repository
 
-import com.example.greatweek.data.SyncManager
 import com.example.greatweek.domain.utils.Either
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-abstract class BaseRepository(private val syncManager: SyncManager? = null) {
+abstract class BaseRepository(private val dataVersionRepository: DataVersionRepository? = null) {
     protected fun <T> doRequest(request: suspend () -> T) = flow<Either<String, T>> {
         emit(Either.Right(value = request()))
     }.flowOn(Dispatchers.IO).catch { exception ->
@@ -16,6 +15,6 @@ abstract class BaseRepository(private val syncManager: SyncManager? = null) {
 
     protected suspend fun <T> doEntry(entry: suspend () -> T) {
         entry()
-        syncManager?.addDataVersion()
+        dataVersionRepository?.addDataVersion()
     }
 }

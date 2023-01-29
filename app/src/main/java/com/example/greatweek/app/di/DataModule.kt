@@ -11,15 +11,18 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.example.greatweek.app.presentation.constants.USER_PREFERENCES_NAME
-import com.example.greatweek.data.SyncManager
+import com.example.greatweek.data.SyncManagerImpl
 import com.example.greatweek.data.db.AppDatabase
 import com.example.greatweek.data.db.DataVersionDao
 import com.example.greatweek.data.db.GoalDao
 import com.example.greatweek.data.db.RoleDao
 import com.example.greatweek.data.network.GreatWeekApi
+import com.example.greatweek.data.repository.DataVersionRepositoryImpl
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
 import com.example.greatweek.data.repository.UserRepositoryImpl
+import com.example.greatweek.domain.SyncManager
+import com.example.greatweek.domain.repository.DataVersionRepository
 import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.repository.RoleRepository
 import com.example.greatweek.domain.repository.UserRepository
@@ -81,11 +84,11 @@ class DataModule(val application: Application) {
     @Provides
     fun provideGoalRepository(
         goalDao: GoalDao,
-        syncManager: SyncManager
+        dataVersionRepository: DataVersionRepository
     ): GoalRepository {
         return GoalRepositoryImpl(
             goalDao = goalDao,
-            syncManager = syncManager
+            dataVersionRepository = dataVersionRepository
         )
     }
 
@@ -93,10 +96,10 @@ class DataModule(val application: Application) {
     @Provides
     fun provideRoleRepository(
         roleDao: RoleDao,
-        syncManager: SyncManager
+        dataVersionRepository: DataVersionRepository
     ): RoleRepository = RoleRepositoryImpl(
         roleDao = roleDao,
-        syncManager = syncManager
+        dataVersionRepository = dataVersionRepository
     )
 
 
@@ -104,19 +107,31 @@ class DataModule(val application: Application) {
     @Provides
     fun provideUserRepository(
         greatWeekApi: GreatWeekApi,
-        preferencesDataStore: DataStore<Preferences>,
-        syncManager: SyncManager
+        preferencesDataStore: DataStore<Preferences>
     ): UserRepository = UserRepositoryImpl(
         greatWeekApi = greatWeekApi,
-        prefDataStore = preferencesDataStore,
-        syncManager = syncManager
+        prefDataStore = preferencesDataStore
+    )
+
+    @Singleton
+    @Provides
+    fun provideDataVersionRepository(
+        dataVersionDao: DataVersionDao
+    ): DataVersionRepository = DataVersionRepositoryImpl(
+        dataVersionDao = dataVersionDao
     )
 
     @Singleton
     @Provides
     fun provideSyncManager(
-        dataVersionDao: DataVersionDao
-    ): SyncManager = SyncManager(
-        dataVersionDao = dataVersionDao
+        roleRepository: RoleRepository,
+        goalRepository: GoalRepository,
+        userRepository: UserRepository,
+        dataVersionRepository: DataVersionRepository
+    ): SyncManager = SyncManagerImpl(
+        roleRepository = roleRepository,
+        goalRepository = goalRepository,
+        userRepository = userRepository,
+        dataVersionRepository = dataVersionRepository
     )
 }

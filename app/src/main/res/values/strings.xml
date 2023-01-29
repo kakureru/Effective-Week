@@ -18,9 +18,11 @@
     <string name="action_sign_up">Register</string>
     <string name="action_sign_in">Login</string>
     <string name="action_logout">Logout</string>
+    <string name="action_sync">Sync</string>
 
     <!-- Settings -->
     <string name="account_header">Account</string>
+    <string name="sync_header">Synchronization</string>
 
     <!-- Registration and authorisation -->
     <string name="username">Username</string>

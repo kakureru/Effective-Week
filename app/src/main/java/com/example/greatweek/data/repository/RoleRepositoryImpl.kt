@@ -1,16 +1,18 @@
 package com.example.greatweek.data.repository
 
-import com.example.greatweek.data.SyncManager
 import com.example.greatweek.data.db.RoleDao
 import com.example.greatweek.data.model.db.Roles
 import com.example.greatweek.data.model.db.toDomain
+import com.example.greatweek.domain.SyncManager
+import com.example.greatweek.domain.repository.BaseRepository
+import com.example.greatweek.domain.repository.DataVersionRepository
 import com.example.greatweek.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.map
 
 class RoleRepositoryImpl(
     private val roleDao: RoleDao,
-    syncManager: SyncManager
-) : BaseRepository(syncManager), RoleRepository {
+    dataVersionRepository: DataVersionRepository
+) : BaseRepository(dataVersionRepository), RoleRepository {
 
     override val allRoles = roleDao.getRoles().map { roles ->
         roles.map { it.toDomain() }
