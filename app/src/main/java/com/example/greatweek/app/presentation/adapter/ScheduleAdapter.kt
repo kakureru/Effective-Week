@@ -38,7 +38,7 @@ class ScheduleAdapter(
     }
 
     inner class WeekDayViewHolder(
-        private val context: Context,
+        context: Context,
         private var binding: WeekdayCardLayoutBinding
         ) :
         RecyclerView.ViewHolder(binding.root) {
@@ -46,33 +46,24 @@ class ScheduleAdapter(
         private val prioritiesAdapter = GoalAdapter(completeGoal, editGoal)
         private val commitmentAdapter = GoalAdapter(completeGoal, editGoal)
 
+        private val highlightColor = ContextCompat.getColor(context, R.color.highlight)
+        private val baseColor = ContextCompat.getColor(context, R.color.grey_dark)
+
         private val dragListener = View.OnDragListener { view, event ->
             when (event.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     event.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.grey_dark),
-                        colorTo = ContextCompat.getColor(context, R.color.highlight)
-                    )
+                    animateViewColor(view = view, colorFrom = baseColor, colorTo = highlightColor)
                     true
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
-                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
-                    )
+                    animateViewColor(view = view, colorFrom = highlightColor, colorTo = baseColor)
                     true
                 }
                 DragEvent.ACTION_DROP -> {
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
-                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
-                    )
+                    animateViewColor(view = view, colorFrom = highlightColor, colorTo = baseColor)
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val isCommitment =

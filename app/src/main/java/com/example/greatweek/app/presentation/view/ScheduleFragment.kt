@@ -41,7 +41,8 @@ class ScheduleFragment : Fragment() {
     private var snapHelper = GravitySnapHelper(Gravity.CENTER)
 
     init {
-        snapHelper.maxFlingSizeFraction = 0.5f
+        snapHelper.maxFlingSizeFraction = 1f
+        snapHelper.scrollMsPerInch = 50f
     }
 
     @Suppress("RedundantNullableReturnType")

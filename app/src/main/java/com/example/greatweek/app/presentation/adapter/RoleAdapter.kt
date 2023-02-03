@@ -39,6 +39,9 @@ class RoleAdapter(
 
         private val goalAdapter = GoalAdapter(completeGoal, editGoal)
 
+        private val highlightColor = ContextCompat.getColor(context, R.color.highlight)
+        private val baseColor = ContextCompat.getColor(context, R.color.grey_dark)
+
         private val dragListener = View.OnDragListener { view, event ->
             when (event.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
@@ -46,27 +49,15 @@ class RoleAdapter(
                 }
                 DragEvent.ACTION_DRAG_ENTERED -> {
                     expandBottomSheet()
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.grey_dark),
-                        colorTo = ContextCompat.getColor(context, R.color.highlight)
-                    )
+                    animateViewColor(view = view, colorFrom = baseColor, colorTo = highlightColor)
                     true
                 }
                 DragEvent.ACTION_DRAG_EXITED -> {
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
-                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
-                    )
+                    animateViewColor(view = view, colorFrom = highlightColor, colorTo = baseColor)
                     true
                 }
                 DragEvent.ACTION_DROP -> {
-                    animateViewColor(
-                        view = view,
-                        colorFrom = ContextCompat.getColor(context, R.color.highlight),
-                        colorTo = ContextCompat.getColor(context, R.color.grey_dark)
-                    )
+                    animateViewColor(view = view, colorFrom = highlightColor, colorTo = baseColor)
                     val item = event.clipData.getItemAt(0)
                     val goalId = item.text.toString().toInt()
                     val roleId = getItem(adapterPosition).name
