@@ -1,7 +1,7 @@
 package com.example.greatweek.data.db
 
 import androidx.room.*
-import com.example.greatweek.data.model.db.Roles
+import com.example.greatweek.data.db.model.Roles
 import kotlinx.coroutines.flow.Flow
 
 @Dao

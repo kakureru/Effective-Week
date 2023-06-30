@@ -1,9 +1,8 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.GoalDao
-import com.example.greatweek.data.model.db.Goals
-import com.example.greatweek.data.model.db.toDomain
-import com.example.greatweek.domain.SyncManager
+import com.example.greatweek.data.db.model.Goals
+import com.example.greatweek.data.db.model.toDomain
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.BaseRepository
 import com.example.greatweek.domain.repository.DataVersionRepository

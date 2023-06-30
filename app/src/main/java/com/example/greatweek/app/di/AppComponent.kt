@@ -1,10 +1,9 @@
 package com.example.greatweek.app.di
 
-import com.example.greatweek.app.presentation.view.GoalDialogFragment
-import com.example.greatweek.app.presentation.view.MainActivity
-import com.example.greatweek.app.presentation.view.RoleDialogFragment
-import com.example.greatweek.app.presentation.view.SettingsActivity
-import com.example.greatweek.app.presentation.viewmodel.SettingsViewModel
+import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
+import com.example.greatweek.app.presentation.MainActivity
+import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragment
+import com.example.greatweek.app.presentation.screens.settings.SettingsActivity
 import dagger.Component
 import javax.inject.Singleton
 

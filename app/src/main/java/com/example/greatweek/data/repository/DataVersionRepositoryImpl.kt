@@ -1,7 +1,7 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.DataVersionDao
-import com.example.greatweek.data.model.db.DataVersion
+import com.example.greatweek.data.db.model.DataVersion
 import com.example.greatweek.domain.repository.DataVersionRepository
 import java.time.LocalDateTime
 

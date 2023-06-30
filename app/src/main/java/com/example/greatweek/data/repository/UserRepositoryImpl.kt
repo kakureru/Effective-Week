@@ -5,9 +5,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.example.greatweek.data.constants.*
-import com.example.greatweek.data.model.network.fromDomain
-import com.example.greatweek.data.model.network.toDomain
 import com.example.greatweek.data.network.GreatWeekApi
+import com.example.greatweek.data.network.model.fromDomain
+import com.example.greatweek.data.network.model.toDomain
 import com.example.greatweek.domain.model.network.UserSignIn
 import com.example.greatweek.domain.model.network.UserSignUp
 import com.example.greatweek.domain.repository.BaseRepository

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.TypeConverters
-import com.example.greatweek.data.model.db.DataVersion
+import com.example.greatweek.data.db.model.DataVersion
 import kotlinx.coroutines.flow.Flow
 
 @Dao

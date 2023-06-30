@@ -1,10 +1,10 @@
 package com.example.greatweek.data.network
 
 import com.example.greatweek.data.constants.NEED_TOKEN_HEADER
-import com.example.greatweek.data.model.network.SignInResponse
-import com.example.greatweek.data.model.network.SignUpResponse
-import com.example.greatweek.data.model.network.UserSignUpDto
-import com.example.greatweek.data.model.network.UserSignInDto
+import com.example.greatweek.data.network.model.SignInResponse
+import com.example.greatweek.data.network.model.SignUpResponse
+import com.example.greatweek.data.network.model.UserSignInDto
+import com.example.greatweek.data.network.model.UserSignUpDto
 import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST

@@ -7,11 +7,11 @@
 
         <variable
             name="settingsFragment"
-            type="com.example.greatweek.app.presentation.view.SettingsFragment" />
+            type="com.example.greatweek.app.presentation.screens.settings.SettingsFragment" />
 
         <variable
             name="settingsViewModel"
-            type="com.example.greatweek.app.presentation.viewmodel.SettingsViewModel" />
+            type="com.example.greatweek.app.presentation.screens.settings.SettingsViewModel" />
 
     </data>
 
