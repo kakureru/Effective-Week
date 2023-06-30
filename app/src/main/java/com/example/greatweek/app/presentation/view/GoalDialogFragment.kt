@@ -65,9 +65,6 @@ class GoalDialogFragment : DialogFragment() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         when (requestKey) {
-            /**
-             * Диалог открыт для редактирования цели
-             */
             KEY_EDIT_GOAL_REQUEST_KEY -> {
                 viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -76,26 +73,17 @@ class GoalDialogFragment : DialogFragment() {
                 }
             }
 
-            /**
-             * Диалог открыт для добавления цели из расписания
-             */
             KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
                 viewModel.setDate(requireArguments().get(ARG_ARGUMENT) as LocalDate)
                 bind()
             }
 
-            /**
-             * Диалог открыт для добавления цели из роли
-             */
             KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
                 viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
                 bind()
             }
         }
 
-        /**
-         * Confirm
-         */
         binding.confirmButton.setOnClickListener {
             if (binding.titleEditText.text.toString().isBlank()) {
                 binding.titleEditText.error = getString(R.string.empty_value)
@@ -117,9 +105,6 @@ class GoalDialogFragment : DialogFragment() {
             dismiss()
         }
 
-        /**
-         * Dismiss
-         */
         binding.dismissButton.setOnClickListener {
             dismiss()
         }
@@ -127,9 +112,6 @@ class GoalDialogFragment : DialogFragment() {
         return dialog
     }
 
-    /**
-     * Обновить содержимое диалога
-     */
     private fun bind() {
         binding.apply {
             if (titleEditText.text.isEmpty())
@@ -151,9 +133,6 @@ class GoalDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Открыть диалог выбора роли
-     */
     fun showRoleDialog() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val dialogBinding = RoleBottomSheetDialogLayoutBinding.inflate(layoutInflater)
@@ -203,14 +182,9 @@ class GoalDialogFragment : DialogFragment() {
     }
 
     companion object {
-        @JvmStatic
         private val TAG = GoalDialogFragment::class.java.simpleName
-
-        @JvmStatic
-        private val ARG_ARGUMENT = "ARG_ARGUMENT"
-
-        @JvmStatic
-        private val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+        private const val ARG_ARGUMENT = "ARG_ARGUMENT"
+        private const val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
 
         fun show(
             manager: FragmentManager,

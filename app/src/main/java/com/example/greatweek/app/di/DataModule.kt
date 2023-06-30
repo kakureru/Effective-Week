@@ -58,7 +58,7 @@ class DataModule(val application: Application) {
             AppDatabase::class.java,
             "app_database"
         )
-            .fallbackToDestructiveMigration() //!!!
+            .fallbackToDestructiveMigration() // TODO migrations
             .build()
     }
 
