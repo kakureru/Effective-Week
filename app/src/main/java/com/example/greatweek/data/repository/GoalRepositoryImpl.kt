@@ -1,15 +1,21 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.GoalDao
-import com.example.greatweek.data.model.Goals
-import com.example.greatweek.data.model.toDomain
+import com.example.greatweek.data.model.db.Goals
+import com.example.greatweek.data.model.db.toDomain
+import com.example.greatweek.domain.SyncManager
 import com.example.greatweek.domain.model.Goal
+import com.example.greatweek.domain.repository.BaseRepository
+import com.example.greatweek.domain.repository.DataVersionRepository
 import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
-class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
+class GoalRepositoryImpl(
+    private val goalDao: GoalDao,
+    dataVersionRepository: DataVersionRepository
+    ) : BaseRepository(dataVersionRepository), GoalRepository {
 
     override val allGoals = goalDao.getAll().map { goals ->
         goals.map { it.toDomain() }
@@ -25,15 +31,15 @@ class GoalRepositoryImpl(private val goalDao: GoalDao) : GoalRepository {
         return goalDao.getGoalById(goalId = goalId).toDomain()
     }
 
-    override suspend fun addGoal(goal: Goal) {
+    override suspend fun addGoal(goal: Goal) = doEntry {
         goalDao.addGoal(mapToData(goal, false))
     }
 
-    override suspend fun completeGoal(goalId: Int) {
+    override suspend fun completeGoal(goalId: Int) = doEntry {
         goalDao.completeGoal(goalId = goalId)
     }
 
-    override suspend fun editGoal(goal: Goal) {
+    override suspend fun editGoal(goal: Goal) = doEntry {
         goalDao.updateGoal(mapToData(goal, true))
     }
 

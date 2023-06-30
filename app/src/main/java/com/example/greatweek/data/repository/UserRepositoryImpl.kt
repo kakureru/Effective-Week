@@ -10,6 +10,7 @@ import com.example.greatweek.data.model.network.toDomain
 import com.example.greatweek.data.network.GreatWeekApi
 import com.example.greatweek.domain.model.network.UserSignIn
 import com.example.greatweek.domain.model.network.UserSignUp
+import com.example.greatweek.domain.repository.BaseRepository
 import com.example.greatweek.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,6 @@ class UserRepositoryImpl(
     override fun signUp(userSignUp: UserSignUp) = doRequest {
         greatWeekApi.signUp(userSignUp.fromDomain()).also {
             Log.d("TAG", "Sign up response -> $it")
-//            signIn(UserSignIn(userSignUp.username, userSignUp.password))
         }.toDomain()
     }
 
