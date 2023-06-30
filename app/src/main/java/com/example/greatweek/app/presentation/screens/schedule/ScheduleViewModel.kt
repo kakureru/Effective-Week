@@ -1,6 +1,10 @@
-package com.example.greatweek.app.presentation.viewmodel
+package com.example.greatweek.app.presentation.screens.schedule
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
@@ -16,8 +20,9 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import javax.inject.Inject
 
-class ScheduleViewModel(
+class ScheduleViewModel @Inject constructor(
     private val getScheduleUseCase: GetGoalsForDatesUseCase,
     private val completeGoalUseCase: CompleteGoalUseCase,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
@@ -75,29 +80,5 @@ class ScheduleViewModel(
             .limit(numOfDaysBetween)
             .mapToObj { i -> startDate.plusDays(i.toLong()) }
             .collect(Collectors.toList())
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-class ScheduleViewModelFactory(
-    private val getScheduleUseCase: GetGoalsForDatesUseCase,
-    private val completeGoalUseCase: CompleteGoalUseCase,
-    private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
-    private val deleteRoleUseCase: DeleteRoleUseCase,
-    private val getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
-    private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ScheduleViewModel::class.java)) {
-            return ScheduleViewModel(
-                getScheduleUseCase,
-                completeGoalUseCase,
-                dropGoalToWeekUseCase,
-                deleteRoleUseCase,
-                getRolesWithGoalsUseCase,
-                dropGoalToRoleUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

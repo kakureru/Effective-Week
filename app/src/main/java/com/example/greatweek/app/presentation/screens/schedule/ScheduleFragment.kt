@@ -1,23 +1,25 @@
 package com.example.greatweek.app.presentation.screens.schedule
 
 import android.content.ClipDescription
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
+import com.example.greatweek.app.App
+import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.constants.*
-import com.example.greatweek.app.presentation.screens.schedule.scrolling.SnapOnScrollListener.Behavior
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.app.presentation.screens.roles.RolesFragment
 import com.example.greatweek.app.presentation.screens.schedule.scrolling.OnSnapPositionChangeListener
 import com.example.greatweek.app.presentation.screens.schedule.scrolling.SnapOnScrollListener
-import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
+import com.example.greatweek.app.presentation.screens.schedule.scrolling.SnapOnScrollListener.Behavior
 import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 import kotlinx.coroutines.Dispatchers
@@ -25,10 +27,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
+import javax.inject.Inject
 
 class ScheduleFragment : Fragment() {
 
-    private val viewModel by activityViewModels<ScheduleViewModel>()
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: ScheduleViewModel by viewModels { viewModelFactory }
 
     private var _binding: FragmentScheduleBinding? = null
     val binding get() = _binding!!
@@ -43,6 +47,11 @@ class ScheduleFragment : Fragment() {
     init {
         snapHelper.maxFlingSizeFraction = 1f
         snapHelper.scrollMsPerInch = 50f
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().applicationContext as App).appComponent.inject(this)
     }
 
     @Suppress("RedundantNullableReturnType")

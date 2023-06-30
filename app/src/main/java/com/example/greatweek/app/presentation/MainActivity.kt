@@ -5,13 +5,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.navigation.Screens
 import com.example.greatweek.app.presentation.screens.settings.SettingsActivity
-import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModel
-import com.example.greatweek.app.presentation.viewmodel.ScheduleViewModelFactory
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
@@ -23,13 +20,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     @Inject lateinit var router: Router
     private val navigator = AppNavigator(this, R.id.mainContainer)
 
-    @Inject lateinit var scheduleViewModelFactory: ScheduleViewModelFactory
-    private lateinit var scheduleViewModel: ScheduleViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         (applicationContext as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        scheduleViewModel = ViewModelProvider(this, scheduleViewModelFactory)[ScheduleViewModel::class.java]
 
         if (savedInstanceState == null) {
             router.replaceScreen(Screens.Schedule())

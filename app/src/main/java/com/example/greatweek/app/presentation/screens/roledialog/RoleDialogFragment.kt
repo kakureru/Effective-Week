@@ -11,9 +11,10 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.example.greatweek.R
 import com.example.greatweek.app.App
+import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
@@ -22,8 +23,8 @@ import javax.inject.Inject
 class RoleDialogFragment : DialogFragment() {
 
     @Inject
-    lateinit var viewModelFactory: RoleDialogFragmentViewModelFactory
-    private lateinit var viewModel: RoleDialogFragmentViewModel
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: RoleDialogFragmentViewModel by viewModels { viewModelFactory }
 
     private val roleName: String
         get() = requireArguments().getString(ARG_ROLE_NAME).toString()
@@ -33,11 +34,6 @@ class RoleDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         (activity?.applicationContext as App).appComponent.inject(this)
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            viewModelFactory
-        )[RoleDialogFragmentViewModel::class.java]
-
         val dialogBinding = RoleDialogLayoutBinding.inflate(layoutInflater)
         dialogBinding.roleEditText.setText(roleName)
 

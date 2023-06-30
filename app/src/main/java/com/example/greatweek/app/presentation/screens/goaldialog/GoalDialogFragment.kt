@@ -15,11 +15,12 @@ import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.greatweek.R
 import com.example.greatweek.app.App
+import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
@@ -30,14 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 
 class GoalDialogFragment : DialogFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: GoalDialogFragmentViewModelFactory
-    private lateinit var viewModel: GoalDialogFragmentViewModel
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: GoalDialogFragmentViewModel by viewModels { viewModelFactory }
 
     private val requestKey: String
         get() = requireArguments().getString(ARG_REQUEST_KEY)!!
@@ -46,10 +46,6 @@ class GoalDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         (activity?.applicationContext as App).appComponent.inject(this)
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            viewModelFactory
-        )[GoalDialogFragmentViewModel::class.java]
 
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.goal_dialog_layout, null, false

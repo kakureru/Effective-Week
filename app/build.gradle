@@ -36,25 +36,11 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation "androidx.appcompat:appcompat:$appcompat_version"
-
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-
-    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
-    implementation "androidx.fragment:fragment-ktx:$fragment_version"
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
-
-    implementation deps.cicerone
-
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-
-    implementation deps.material
-
-    implementation deps.gravitysnaphelper
+    implementation deps.androidx.core
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.constraintlayout
+    implementation deps.androidx.fragment
+    implementation deps.androidx.livedata
 
     implementation deps.room.runtime
     implementation deps.room.ktx
@@ -68,4 +54,12 @@ dependencies {
     implementation deps.retrofit.scalars
     implementation deps.okhttp.okhttp
     implementation deps.okhttp.logginginterceptor
+
+    implementation deps.datastore
+
+    implementation deps.cicerone
+
+    implementation deps.material
+
+    implementation deps.gravitysnaphelper
 }

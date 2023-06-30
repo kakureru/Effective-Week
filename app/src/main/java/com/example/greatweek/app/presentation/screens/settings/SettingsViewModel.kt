@@ -1,6 +1,9 @@
 package com.example.greatweek.app.presentation.screens.settings
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.greatweek.R
 import com.example.greatweek.app.presentation.RequestState
 import com.example.greatweek.domain.model.network.SignIn
@@ -17,8 +20,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel(
+class SettingsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val signInUseCase: SignInUseCase,
     private val signUpUseCase: SignUpUseCase,
@@ -98,25 +102,5 @@ class SettingsViewModel(
             return Either.Left(R.string.password_message)
         else
             return Either.Right(R.string.success_message)
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-class SettingsViewModelFactory(
-    private val userRepository: UserRepository,
-    private val signInUseCase: SignInUseCase,
-    private val signUpUseCase: SignUpUseCase,
-    private val syncUseCase: SyncUseCase
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-            return SettingsViewModel(
-                userRepository = userRepository,
-                signInUseCase = signInUseCase,
-                signUpUseCase = signUpUseCase,
-                syncUseCase = syncUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

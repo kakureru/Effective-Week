@@ -1,5 +1,6 @@
 package com.example.greatweek.app.presentation.screens.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,23 +8,38 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.greatweek.R
-import com.example.greatweek.app.presentation.BaseFragment
+import com.example.greatweek.app.App
+import com.example.greatweek.app.presentation.RequestState
+import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.databinding.DialogSignInBinding
 import com.example.greatweek.databinding.DialogSignUpBinding
 import com.example.greatweek.databinding.FragmentRootSettingsBinding
 import com.example.greatweek.domain.model.network.UserSignIn
 import com.example.greatweek.domain.model.network.UserSignUp
 import com.example.greatweek.domain.utils.Either
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsFragment : BaseFragment<SettingsViewModel, FragmentRootSettingsBinding>(
-    R.layout.fragment_root_settings
-) {
+class SettingsFragment : Fragment() {
 
-    override val viewModel by activityViewModels<SettingsViewModel>()
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: SettingsViewModel by viewModels { viewModelFactory }
+
     private var _binding: FragmentRootSettingsBinding? = null
-    override val binding get() = _binding!!
+    private val binding get() = _binding!!
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().applicationContext as App).appComponent.inject(this)
+    }
 
     @Suppress("RedundantNullableReturnType")
     override fun onCreateView(
@@ -123,5 +139,35 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentRootSettingsBin
             }
         }
         dialog.show()
+    }
+
+    private fun <T> StateFlow<RequestState<T>>.collectRequestState(
+        lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+        state: ((RequestState<T>) -> Unit)? = null,
+        onError: ((error: String) -> Unit),
+        onSuccess: ((data: T) -> Unit)
+    ) {
+        collectFlowSafely(lifecycleState) {
+            this.collect {
+                state?.invoke(it)
+                when (it) {
+                    is RequestState.Idle -> {}
+                    is RequestState.Loading -> {}
+                    is RequestState.Error -> onError.invoke(it.error)
+                    is RequestState.Success -> onSuccess.invoke(it.data)
+                }
+            }
+        }
+    }
+
+    private fun collectFlowSafely(
+        lifecycleState: Lifecycle.State,
+        collect: suspend () -> Unit
+    ) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(lifecycleState) {
+                collect()
+            }
+        }
     }
 }

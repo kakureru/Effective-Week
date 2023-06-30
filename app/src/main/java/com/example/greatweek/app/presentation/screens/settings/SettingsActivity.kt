@@ -2,7 +2,6 @@ package com.example.greatweek.app.presentation.screens.settings
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.navigation.Screens
@@ -17,13 +16,9 @@ class SettingsActivity : AppCompatActivity(R.layout.activity_settings) {
     @Inject lateinit var router: Router
     private val navigator = AppNavigator(this, R.id.settingsMainContainer)
 
-    @Inject lateinit var settingsViewModelFactory: SettingsViewModelFactory
-    private lateinit var settingsViewModel: SettingsViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         (applicationContext as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
-        settingsViewModel = ViewModelProvider(this, settingsViewModelFactory)[SettingsViewModel::class.java]
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (savedInstanceState == null) {
             router.replaceScreen(Screens.Setting())
