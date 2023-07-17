@@ -14,13 +14,10 @@ import com.example.greatweek.app.presentation.constants.USER_PREFERENCES_NAME
 import com.example.greatweek.data.db.AppDatabase
 import com.example.greatweek.data.db.GoalDao
 import com.example.greatweek.data.db.RoleDao
-import com.example.greatweek.data.network.GreatWeekApi
 import com.example.greatweek.data.repository.GoalRepositoryImpl
 import com.example.greatweek.data.repository.RoleRepositoryImpl
-import com.example.greatweek.data.repository.UserRepositoryImpl
 import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.repository.RoleRepository
-import com.example.greatweek.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
@@ -85,16 +82,5 @@ class DataModule(val application: Application) {
         roleDao: RoleDao,
     ): RoleRepository = RoleRepositoryImpl(
         roleDao = roleDao,
-    )
-
-
-    @Singleton
-    @Provides
-    fun provideUserRepository(
-        greatWeekApi: GreatWeekApi,
-        preferencesDataStore: DataStore<Preferences>
-    ): UserRepository = UserRepositoryImpl(
-        greatWeekApi = greatWeekApi,
-        prefDataStore = preferencesDataStore
     )
 }

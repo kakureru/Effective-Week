@@ -6,7 +6,6 @@ import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragm
 import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragmentViewModel
 import com.example.greatweek.app.presentation.screens.roles.RolesViewModel
 import com.example.greatweek.app.presentation.screens.schedule.ScheduleViewModel
-import com.example.greatweek.app.presentation.screens.settings.SettingsViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -41,10 +40,5 @@ class AppModule(val context: Context) {
         @IntoMap
         @ViewModelKey(RoleDialogFragmentViewModel::class)
         fun bindsRoleDialogFragmentViewModel(viewModel: RoleDialogFragmentViewModel): ViewModel
-
-        @Binds
-        @IntoMap
-        @ViewModelKey(SettingsViewModel::class)
-        fun bindsSettingsViewModel(viewModel: SettingsViewModel): ViewModel
     }
 }

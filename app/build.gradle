@@ -49,12 +49,6 @@ dependencies {
     implementation deps.dagger.dagger
     kapt deps.dagger.kapt
 
-    implementation deps.retrofit.retrofit
-    implementation deps.retrofit.gson
-    implementation deps.retrofit.scalars
-    implementation deps.okhttp.okhttp
-    implementation deps.okhttp.logginginterceptor
-
     implementation deps.datastore
 
     implementation deps.cicerone

@@ -8,8 +8,6 @@ buildscript {
 
     ext.versions = [
         'dagger': '2.45',
-        'retrofit': '2.9.0',
-        'okhttp': '4.10.0',
         'room': '2.4.3',
     ]
 
@@ -31,11 +29,6 @@ buildscript {
                 'runtime': "androidx.room:room-runtime:${versions.room}",
                 'ktx': "androidx.room:room-ktx:${versions.room}",
                 'kapt': "androidx.room:room-compiler:${versions.room}"
-        ],
-        'retrofit': [
-                'retrofit': "com.squareup.retrofit2:retrofit:${versions.retrofit}",
-                'gson': "com.squareup.retrofit2:converter-gson:${versions.retrofit}",
-                'scalars': "com.squareup.retrofit2:converter-scalars:${versions.retrofit}",
         ],
         'okhttp': [
                 'okhttp': "com.squareup.okhttp3:okhttp:${versions.okhttp}",
