@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-abstract class BaseRepository(private val dataVersionRepository: DataVersionRepository? = null) {
+abstract class BaseRepository() {
     protected fun <T> doRequest(request: suspend () -> T) = flow<Either<String, T>> {
         emit(Either.Right(value = request()))
     }.flowOn(Dispatchers.IO).catch { exception ->
@@ -15,6 +15,5 @@ abstract class BaseRepository(private val dataVersionRepository: DataVersionRepo
 
     protected suspend fun <T> doEntry(entry: suspend () -> T) {
         entry()
-        dataVersionRepository?.addDataVersion()
     }
 }

@@ -11,7 +11,6 @@ import com.example.greatweek.domain.model.network.SignUp
 import com.example.greatweek.domain.model.network.UserSignIn
 import com.example.greatweek.domain.model.network.UserSignUp
 import com.example.greatweek.domain.repository.UserRepository
-import com.example.greatweek.domain.usecase.SyncUseCase
 import com.example.greatweek.domain.usecase.authentication.SignInUseCase
 import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
 import com.example.greatweek.domain.utils.Either
@@ -26,7 +25,6 @@ class SettingsViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val signInUseCase: SignInUseCase,
     private val signUpUseCase: SignUpUseCase,
-    private val syncUseCase: SyncUseCase
     ): ViewModel() {
 
     val authState: LiveData<Boolean> = userRepository.isAuthorised.asLiveData()
@@ -56,8 +54,6 @@ class SettingsViewModel @Inject constructor(
         }
 
     fun logout() = viewModelScope.launch { userRepository.logout() }
-
-    fun sync() = syncUseCase.invoke()
 
     /**
      * Collect network request and return [RequestState] depending on request result

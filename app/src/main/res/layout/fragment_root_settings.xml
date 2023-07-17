@@ -84,22 +84,6 @@
                 android:onClick="@{() -> settingsFragment.showSignUpDialog()}"
                 android:text="@string/action_sign_up" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"
-                android:text="@string/sync_header"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/sync_button"
-                style="@style/settings_section"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_sync"
-                android:onClick="@{() -> settingsViewModel.sync()}"
-                android:text="@string/action_sync" />
-
         </LinearLayout>
 
     </LinearLayout>
