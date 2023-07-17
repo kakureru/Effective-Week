@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.model.Role
-import com.example.greatweek.domain.usecase.goal.AddGoalUseCase
-import com.example.greatweek.domain.usecase.goal.EditGoalUseCase
-import com.example.greatweek.domain.usecase.goal.GetGoalUseCase
-import com.example.greatweek.domain.usecase.role.GetRolesUseCase
+import com.example.greatweek.domain.repository.GoalRepository
+import com.example.greatweek.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,10 +17,8 @@ import java.util.Date
 import javax.inject.Inject
 
 class GoalDialogFragmentViewModel @Inject constructor(
-    private val addGoalUseCase: AddGoalUseCase,
-    private val getRolesUseCase: GetRolesUseCase,
-    private val editGoalUseCase: EditGoalUseCase,
-    private val getGoalUseCase: GetGoalUseCase
+    private val roleRepository: RoleRepository,
+    private val goalRepository: GoalRepository,
 ) : ViewModel() {
 
     private var _id: Int = 0
@@ -49,7 +45,7 @@ class GoalDialogFragmentViewModel @Inject constructor(
     val commitment: Boolean get() = _commitment
 
     suspend fun getGoal() {
-        val goal = getGoalUseCase.execute(goalId = _id)
+        val goal = goalRepository.getGoal(goalId = _id)
         _title = goal.title
         _description = goal.description
         _role = goal.role
@@ -60,11 +56,11 @@ class GoalDialogFragmentViewModel @Inject constructor(
     }
 
     fun getRoles(): Flow<List<Role>> {
-        return getRolesUseCase.execute()
+        return roleRepository.allRoles
     }
 
     fun editGoal() = viewModelScope.launch {
-        editGoalUseCase.execute(
+        goalRepository.editGoal(
             Goal(
                 id = id,
                 title = title,
@@ -78,7 +74,7 @@ class GoalDialogFragmentViewModel @Inject constructor(
     }
 
     fun addGoal() = viewModelScope.launch {
-        addGoalUseCase.execute(
+        goalRepository.addGoal(
             Goal(
                 title = title,
                 description = description,

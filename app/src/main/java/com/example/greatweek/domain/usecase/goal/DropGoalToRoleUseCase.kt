@@ -4,7 +4,7 @@ import com.example.greatweek.domain.model.Goal
 import com.example.greatweek.domain.repository.GoalRepository
 
 class DropGoalToRoleUseCase(private val goalRepository: GoalRepository) {
-    suspend fun execute(goalId: Int, role: String) {
+    suspend operator fun invoke(goalId: Int, role: String) {
         val goal = goalRepository.getGoal(goalId = goalId)
         goalRepository.editGoal(
             Goal(

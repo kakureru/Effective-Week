@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragmentViewModel
 import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragmentViewModel
+import com.example.greatweek.app.presentation.screens.roles.RolesViewModel
 import com.example.greatweek.app.presentation.screens.schedule.ScheduleViewModel
 import com.example.greatweek.app.presentation.screens.settings.SettingsViewModel
 import dagger.Binds
@@ -25,6 +26,11 @@ class AppModule(val context: Context) {
         @IntoMap
         @ViewModelKey(ScheduleViewModel::class)
         fun bindsScheduleViewModel(viewModel: ScheduleViewModel): ViewModel
+
+        @Binds
+        @IntoMap
+        @ViewModelKey(RolesViewModel::class)
+        fun bindsRolesViewModel(viewModel: RolesViewModel): ViewModel
 
         @Binds
         @IntoMap

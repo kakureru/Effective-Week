@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.greatweek.R
+import com.example.greatweek.app.presentation.screens.schedule.goals.GoalAdapter
+import com.example.greatweek.app.presentation.screens.schedule.goals.GoalCallback
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
 import java.time.LocalDate
@@ -21,10 +23,8 @@ import java.time.format.DateTimeFormatter
 
 
 class ScheduleAdapter(
-    private val addGoal: (date: LocalDate) -> Unit,
-    private val completeGoal: (goalId: Int) -> Unit,
-    private val editGoal: (goalId: Int) -> Unit,
-    private val dropGoal: (goalId: Int, date: LocalDate, isCommitment: Boolean) -> Unit
+    private val goalCallback: GoalCallback,
+    private val scheduleCallback: ScheduleCallback,
 ) : ListAdapter<WeekDay, ScheduleAdapter.WeekDayViewHolder>(DiffCallback) {
 
     private val today = LocalDate.now()
@@ -43,8 +43,8 @@ class ScheduleAdapter(
         ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val prioritiesAdapter = GoalAdapter(completeGoal, editGoal)
-        private val commitmentAdapter = GoalAdapter(completeGoal, editGoal)
+        private val prioritiesAdapter = GoalAdapter(goalCallback)
+        private val commitmentAdapter = GoalAdapter(goalCallback)
 
         private val highlightColor = ContextCompat.getColor(context, R.color.highlight)
         private val baseColor = ContextCompat.getColor(context, R.color.grey_dark)
@@ -68,7 +68,7 @@ class ScheduleAdapter(
                     val goalId = item.text.toString().toInt()
                     val isCommitment =
                         view == binding.commitmentsRecyclerView || view == binding.commitmentsDropTarget
-                    dropGoal(goalId, getItem(adapterPosition).date, isCommitment)
+                    scheduleCallback.onGoalDrop(goalId, getItem(adapterPosition).date, isCommitment)
                     true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
@@ -88,7 +88,9 @@ class ScheduleAdapter(
                 prioritiesDropTarget.setOnDragListener(dragListener)
                 commitmentsDropTarget.setOnDragListener(dragListener)
                 // On click
-                addGoalButton.setOnClickListener { addGoal(getItem(adapterPosition).date) }
+                addGoalButton.setOnClickListener {
+                    scheduleCallback.onAddGoalClick(getItem(adapterPosition).date)
+                }
                 // Adapter
                 prioritiesRecyclerView.adapter = prioritiesAdapter
                 commitmentsRecyclerView.adapter = commitmentAdapter
@@ -134,13 +136,8 @@ class ScheduleAdapter(
 
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<WeekDay>() {
-            override fun areItemsTheSame(oldItem: WeekDay, newItem: WeekDay): Boolean {
-                return oldItem.date == newItem.date
-            }
-
-            override fun areContentsTheSame(oldItem: WeekDay, newItem: WeekDay): Boolean {
-                return oldItem.goals == newItem.goals
-            }
+            override fun areItemsTheSame(oldItem: WeekDay, newItem: WeekDay) = oldItem.date == newItem.date
+            override fun areContentsTheSame(oldItem: WeekDay, newItem: WeekDay) = oldItem.goals == newItem.goals
         }
     }
 

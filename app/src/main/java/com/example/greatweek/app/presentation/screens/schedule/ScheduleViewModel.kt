@@ -1,84 +1,90 @@
 package com.example.greatweek.app.presentation.screens.schedule
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.greatweek.domain.model.Role
 import com.example.greatweek.domain.model.WeekDay
-import com.example.greatweek.domain.usecase.goal.CompleteGoalUseCase
-import com.example.greatweek.domain.usecase.goal.DropGoalToRoleUseCase
+import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.usecase.goal.DropGoalToWeekUseCase
-import com.example.greatweek.domain.usecase.goal.GetGoalsForDatesUseCase
-import com.example.greatweek.domain.usecase.role.DeleteRoleUseCase
-import com.example.greatweek.domain.usecase.role.GetRolesWithGoalsUseCase
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
+import java.util.Date
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 import javax.inject.Inject
 
 class ScheduleViewModel @Inject constructor(
-    private val getScheduleUseCase: GetGoalsForDatesUseCase,
-    private val completeGoalUseCase: CompleteGoalUseCase,
+    private val goalRepository: GoalRepository,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
-    private val deleteRoleUseCase: DeleteRoleUseCase,
-    private val getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
-    private val dropGoalToRoleUseCase: DropGoalToRoleUseCase
 ) : ViewModel() {
 
-    val preloadDays = 30L
-    private val today: LocalDate = LocalDate.now()
-    private var startDate = today.minusDays(preloadDays)
-    private val endDate = today.plusDays(preloadDays)
+    private val _scheduleState = MutableStateFlow(ScheduleState())
+    val scheduleState: StateFlow<ScheduleState> = _scheduleState.asStateFlow()
 
-    val schedule = getScheduleUseCase.execute(startDate, endDate).map { goals ->
-        getDatesBetween(startDate, endDate).map { date ->
-            WeekDay(
-                date = date,
-                goals = goals.filter { it.date == date }
-            )
+    private val startDate = getFirstWeekDay()
+    private val endDate = startDate.plusDays(7)
+
+    private fun getFirstWeekDay(): LocalDate {
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.time = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant())
+        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY)
+            calendar.add(Calendar.DATE, -1);
+        return LocalDateTime.ofInstant(calendar.toInstant(), calendar.timeZone.toZoneId()).toLocalDate()
+    }
+
+    init {
+        loadSchedule()
+    }
+
+    fun accept(event: ScheduleEvent) {
+        when (event) {
+            is ScheduleEvent.CompleteGoal -> completeGoal(event.goalId)
+            is ScheduleEvent.GoalDrop -> dropGoal(event.goalId, event.date, event.isCommitment)
+            ScheduleEvent.DragRight -> onDragRight()
+            ScheduleEvent.DragLeft -> onDragLeft()
+            ScheduleEvent.DragIdle -> Unit
         }
-    }.asLiveData()
-
-    val allRoles: LiveData<List<Role>> = getRolesWithGoalsUseCase.execute().asLiveData()
-
-    private var _tabExpanded = MutableLiveData(BottomSheetBehavior.STATE_COLLAPSED)
-    val tabExpanded: LiveData<Int> get() = _tabExpanded
-
-    fun collapseBottomSheet() {
-        _tabExpanded.value = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    fun expandBottomSheet() {
-        _tabExpanded.value = BottomSheetBehavior.STATE_EXPANDED
+    private fun loadSchedule() = viewModelScope.launch {
+        goalRepository.getGoals(startDate, endDate).collect { goals ->
+            val schedule = getDatesBetween(startDate, endDate).map { date ->
+                WeekDay(
+                    date = date,
+                    goals = goals.filter { it.date == date }
+                )
+            }
+            _scheduleState.value = ScheduleState(schedule = schedule)
+        }
     }
 
-    fun completeGoal(goalId: Int) = viewModelScope.launch {
-        completeGoalUseCase.execute(goalId = goalId)
+    private fun completeGoal(goalId: Int) = viewModelScope.launch {
+        goalRepository.completeGoal(goalId = goalId)
     }
 
-    fun dropGoal(goalId: Int, date: LocalDate, isCommitment: Boolean) = viewModelScope.launch {
-        dropGoalToWeekUseCase.execute(goalId, date, isCommitment)
+    private fun dropGoal(goalId: Int, date: LocalDate, isCommitment: Boolean) = viewModelScope.launch {
+        dropGoalToWeekUseCase(goalId, date, isCommitment)
     }
 
-    fun dropGoal(goalId: Int, role: String) = viewModelScope.launch {
-        dropGoalToRoleUseCase.execute(goalId, role)
+    private fun onDragRight() {
+        _scheduleState.update { it.copy(currentDate = it.currentDate.plusDays(1)) }
     }
 
-    fun deleteRole(name: String) = viewModelScope.launch {
-        deleteRoleUseCase.execute(name = name)
+    private fun onDragLeft() {
+        _scheduleState.update { it.copy(currentDate = it.currentDate.minusDays(1)) }
     }
 
-    private fun getDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {
-        val numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate)
-        return IntStream.iterate(0) { i -> i + 1 }
-            .limit(numOfDaysBetween)
+    private fun getDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> =
+        IntStream.iterate(0) { i -> i + 1 }
+            .limit(ChronoUnit.DAYS.between(startDate, endDate))
             .mapToObj { i -> startDate.plusDays(i.toLong()) }
             .collect(Collectors.toList())
-    }
+
 }

@@ -10,15 +10,13 @@ class GetRolesWithGoalsUseCase(
     private val roleRepository: RoleRepository,
     private val goalRepository: GoalRepository
 ) {
-    fun execute(): Flow<List<Role>> {
-        val roleFlow = roleRepository.allRoles
-        val goalFlow = goalRepository.allGoals
-        return roleFlow.combine(goalFlow) { roleList, goalList ->
+    operator fun invoke(): Flow<List<Role>> {
+        return roleRepository.allRoles.combine(goalRepository.allGoals) { roleList, goalList ->
             roleList.map { role ->
                 Role(
                     name = role.name,
                     goals = goalList.filter { goal ->
-                        goal.role == role.name
+                        goal.role == role.name && goal.date == null
                     }
                 )
             }

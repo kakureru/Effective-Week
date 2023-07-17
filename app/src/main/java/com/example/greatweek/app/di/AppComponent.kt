@@ -3,6 +3,7 @@ package com.example.greatweek.app.di
 import com.example.greatweek.app.presentation.MainActivity
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragment
+import com.example.greatweek.app.presentation.screens.roles.RolesFragment
 import com.example.greatweek.app.presentation.screens.schedule.ScheduleFragment
 import com.example.greatweek.app.presentation.screens.settings.SettingsActivity
 import com.example.greatweek.app.presentation.screens.settings.SettingsFragment
@@ -21,5 +22,6 @@ interface AppComponent {
     fun inject(fragment: GoalDialogFragment)
     fun inject(fragment: RoleDialogFragment)
     fun inject(fragment: ScheduleFragment)
+    fun inject(fragment: RolesFragment)
     fun inject(fragment: SettingsFragment)
 }

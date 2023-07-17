@@ -1,4 +1,4 @@
-package com.example.greatweek.app.presentation.screens.schedule
+package com.example.greatweek.app.presentation.screens.schedule.goals
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -12,18 +12,25 @@ import com.example.greatweek.databinding.GoalLayoutBinding
 import com.example.greatweek.domain.model.Goal
 
 class GoalAdapter(
-    private val completeGoal: (goalId: Int) -> Unit,
-    private val editGoal: (goalId: Int) -> Unit
-    )
-    : ListAdapter<Goal, GoalAdapter.GoalViewHolder>(DiffCallback) {
+    private val goalCallback: GoalCallback,
+) : ListAdapter<Goal, GoalAdapter.GoalViewHolder>(DiffCallback) {
 
-    inner class GoalViewHolder(private val binding: GoalLayoutBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class GoalViewHolder(private val binding: GoalLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            with(binding) {
+                goalCheckbox.setOnClickListener {
+                    goalCallback.onCompleteClick(getItem(adapterPosition).id)
+                }
+                root.setOnClickListener {
+                    goalCallback.onClick(getItem(adapterPosition).id)
+                }
+            }
+        }
+
         fun bind(goal: Goal) {
             binding.goalTextView.text = goal.title
             binding.roleTextView.text = goal.role
-            binding.goalCheckbox.setOnClickListener { completeGoal(goal.id) }
-            binding.root.setOnClickListener { editGoal(goal.id) }
             binding.root.setOnLongClickListener {
                 val itemId = ClipData.Item(goal.id.toString())
                 val date = goal.date.toString()
@@ -55,13 +62,8 @@ class GoalAdapter(
 
     companion object {
         private val DiffCallback = object : DiffUtil.ItemCallback<Goal>() {
-            override fun areItemsTheSame(oldItem: Goal, newItem: Goal): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: Goal, newItem: Goal): Boolean {
-                return oldItem == newItem
-            }
+            override fun areItemsTheSame(oldItem: Goal, newItem: Goal) = oldItem.id == newItem.id
+            override fun areContentsTheSame(oldItem: Goal, newItem: Goal) = oldItem == newItem
         }
     }
 }

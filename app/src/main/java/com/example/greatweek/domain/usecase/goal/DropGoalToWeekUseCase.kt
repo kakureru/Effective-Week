@@ -5,7 +5,7 @@ import com.example.greatweek.domain.repository.GoalRepository
 import java.time.LocalDate
 
 class DropGoalToWeekUseCase(private val goalRepository: GoalRepository) {
-    suspend fun execute(goalId: Int, date: LocalDate, isCommitment: Boolean) {
+    suspend operator fun invoke(goalId: Int, date: LocalDate, isCommitment: Boolean) {
         val goal = goalRepository.getGoal(goalId = goalId)
         goalRepository.editGoal(
             Goal(

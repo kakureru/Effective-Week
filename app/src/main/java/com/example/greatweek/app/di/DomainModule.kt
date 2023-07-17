@@ -7,33 +7,14 @@ import com.example.greatweek.domain.repository.UserRepository
 import com.example.greatweek.domain.usecase.SyncUseCase
 import com.example.greatweek.domain.usecase.authentication.SignInUseCase
 import com.example.greatweek.domain.usecase.authentication.SignUpUseCase
-import com.example.greatweek.domain.usecase.goal.*
-import com.example.greatweek.domain.usecase.role.*
+import com.example.greatweek.domain.usecase.goal.DropGoalToRoleUseCase
+import com.example.greatweek.domain.usecase.goal.DropGoalToWeekUseCase
+import com.example.greatweek.domain.usecase.role.GetRolesWithGoalsUseCase
 import dagger.Module
 import dagger.Provides
 
 @Module
 class DomainModule {
-
-    @Provides
-    fun provideAddRoleUseCase(roleRepository: RoleRepository): AddRoleUseCase {
-        return AddRoleUseCase(roleRepository = roleRepository)
-    }
-
-    @Provides
-    fun provideAddGoalUseCase(goalRepository: GoalRepository): AddGoalUseCase {
-        return AddGoalUseCase(goalRepository = goalRepository)
-    }
-
-    @Provides
-    fun provideCompleteGoalUseCase(goalRepository: GoalRepository): CompleteGoalUseCase {
-        return CompleteGoalUseCase(goalRepository = goalRepository)
-    }
-
-    @Provides
-    fun provideDeleteRoleUseCase(roleRepository: RoleRepository): DeleteRoleUseCase {
-        return DeleteRoleUseCase(roleRepository = roleRepository)
-    }
 
     @Provides
     fun provideDropGoalToRoleUseCase(goalRepository: GoalRepository): DropGoalToRoleUseCase {
@@ -46,11 +27,6 @@ class DomainModule {
     }
 
     @Provides
-    fun provideGetGoalsForDatesUseCase(goalRepository: GoalRepository): GetGoalsForDatesUseCase {
-        return GetGoalsForDatesUseCase(goalRepository = goalRepository)
-    }
-
-    @Provides
     fun provideGetRolesWithGoalsUseCase(
         roleRepository: RoleRepository,
         goalRepository: GoalRepository
@@ -59,26 +35,6 @@ class DomainModule {
             roleRepository = roleRepository,
             goalRepository = goalRepository
         )
-    }
-
-    @Provides
-    fun provideGetRolesUseCase(roleRepository: RoleRepository): GetRolesUseCase {
-        return GetRolesUseCase(roleRepository = roleRepository)
-    }
-
-    @Provides
-    fun provideRenameRoleUseCase(roleRepository: RoleRepository): RenameRoleUseCase {
-        return RenameRoleUseCase(roleRepository = roleRepository)
-    }
-
-    @Provides
-    fun provideEditGoalUseCase(goalRepository: GoalRepository): EditGoalUseCase {
-        return EditGoalUseCase(goalRepository = goalRepository)
-    }
-
-    @Provides
-    fun provideGetGoalUseCase(goalRepository: GoalRepository): GetGoalUseCase {
-        return GetGoalUseCase(goalRepository = goalRepository)
     }
 
     @Provides
