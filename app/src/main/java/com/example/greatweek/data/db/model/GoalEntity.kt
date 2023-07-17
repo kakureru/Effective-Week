@@ -6,13 +6,13 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.greatweek.data.db.Converters
-import com.example.greatweek.domain.model.Goal
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Entity(
+    tableName = "goals",
     foreignKeys = [ForeignKey(
-        entity = Roles::class,
+        entity = RoleEntity::class,
         parentColumns = arrayOf("name"),
         childColumns = arrayOf("role"),
         onDelete = ForeignKey.SET_NULL,
@@ -20,7 +20,7 @@ import java.time.LocalTime
     )]
 )
 @TypeConverters(Converters::class)
-data class Goals(
+data class GoalEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @NonNull val title: String,
     val description: String,
@@ -28,14 +28,4 @@ data class Goals(
     val date: LocalDate?,
     val time: LocalTime?,
     val commitment: Boolean
-)
-
-fun Goals.toDomain() = Goal(
-    id = id,
-    title = title,
-    description = description,
-    role = role,
-    date = date,
-    time = time,
-    commitment = commitment
 )

@@ -1,10 +1,8 @@
 package com.example.greatweek.data.repository
 
 import com.example.greatweek.data.db.GoalDao
-import com.example.greatweek.data.db.model.Goals
-import com.example.greatweek.data.db.model.toDomain
+import com.example.greatweek.data.db.model.GoalEntity
 import com.example.greatweek.domain.model.Goal
-import com.example.greatweek.domain.repository.BaseRepository
 import com.example.greatweek.domain.repository.GoalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -12,9 +10,9 @@ import java.time.LocalDate
 
 class GoalRepositoryImpl(
     private val goalDao: GoalDao,
-    ) : BaseRepository(), GoalRepository {
+) : GoalRepository {
 
-    override val allGoals = goalDao.getAll().map { goals ->
+    override fun getGoals() = goalDao.getAll().map { goals ->
         goals.map { it.toDomain() }
     }
 
@@ -28,20 +26,20 @@ class GoalRepositoryImpl(
         return goalDao.getGoalById(goalId = goalId).toDomain()
     }
 
-    override suspend fun addGoal(goal: Goal) = doEntry {
+    override suspend fun addGoal(goal: Goal) {
         goalDao.addGoal(mapToData(goal, false))
     }
 
-    override suspend fun completeGoal(goalId: Int) = doEntry {
+    override suspend fun completeGoal(goalId: Int) {
         goalDao.completeGoal(goalId = goalId)
     }
 
-    override suspend fun editGoal(goal: Goal) = doEntry {
+    override suspend fun editGoal(goal: Goal) {
         goalDao.updateGoal(mapToData(goal, true))
     }
 
-    private fun mapToData(goal: Goal, mapId: Boolean): Goals {
-        return if (mapId) Goals(
+    private fun mapToData(goal: Goal, mapId: Boolean): GoalEntity {
+        return if (mapId) GoalEntity(
             id = goal.id,
             title = goal.title,
             description = goal.description,
@@ -49,7 +47,7 @@ class GoalRepositoryImpl(
             date = goal.date,
             time = goal.time,
             commitment = goal.commitment
-        ) else Goals(
+        ) else GoalEntity(
             title = goal.title,
             description = goal.description,
             role = goal.role,
@@ -58,4 +56,14 @@ class GoalRepositoryImpl(
             commitment = goal.commitment
         )
     }
+
+    private fun GoalEntity.toDomain() = Goal(
+        id = id,
+        title = title,
+        description = description,
+        role = role,
+        date = date,
+        time = time,
+        commitment = commitment
+    )
 }

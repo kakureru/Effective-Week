@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RoleRepository {
 
-    val allRoles: Flow<List<Role>>
+    fun getRoles(): Flow<List<Role>>
 
     suspend fun addRole(name: String)
 

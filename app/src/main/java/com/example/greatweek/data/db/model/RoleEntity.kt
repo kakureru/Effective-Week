@@ -2,13 +2,8 @@ package com.example.greatweek.data.db.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.greatweek.domain.model.Role
 
-@Entity
-data class Roles(
+@Entity(tableName = "roles")
+data class RoleEntity(
     @PrimaryKey val name: String
-)
-
-fun Roles.toDomain() = Role(
-    name = name
 )

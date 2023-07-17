@@ -56,7 +56,7 @@ class GoalDialogFragmentViewModel @Inject constructor(
     }
 
     fun getRoles(): Flow<List<Role>> {
-        return roleRepository.allRoles
+        return roleRepository.getRoles()
     }
 
     fun editGoal() = viewModelScope.launch {
