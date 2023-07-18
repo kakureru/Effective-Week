@@ -24,7 +24,7 @@ data class GoalEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @NonNull val title: String,
     val description: String,
-    @NonNull val role: String,
+    val role: String?,
     val date: LocalDate?,
     val time: LocalTime?,
     val commitment: Boolean

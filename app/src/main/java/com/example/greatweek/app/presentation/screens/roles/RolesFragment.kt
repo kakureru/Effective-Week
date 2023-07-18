@@ -19,9 +19,7 @@ import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.collectFlowSafely
-import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
 import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragment
@@ -210,18 +208,16 @@ class RolesFragment : Fragment() {
      */
 
     private fun openEditGoalDialog(goalId: Int) {
-        GoalDialogFragment.show(
+        GoalDialogFragment.showForGoal(
             manager = parentFragmentManager,
-            argument = goalId,
-            requestKey = KEY_EDIT_GOAL_REQUEST_KEY
+            goalId = goalId,
         )
     }
 
     private fun openAddGoalDialog(role: String) {
-        GoalDialogFragment.show(
+        GoalDialogFragment.showForRole(
             manager = parentFragmentManager,
-            argument = role,
-            requestKey = KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
+            role = role,
         )
     }
 

@@ -32,7 +32,7 @@
 
             <Button
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:id="@+id/dismiss_button"
+                android:id="@+id/btn_dismiss"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -40,7 +40,7 @@
                 android:textAllCaps="false" />
 
             <Button
-                android:id="@+id/confirm_button"
+                android:id="@+id/btn_confirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

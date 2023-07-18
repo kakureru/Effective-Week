@@ -1,221 +1,151 @@
 package com.example.greatweek.app.presentation.screens.goaldialog
 
 import android.app.DatePickerDialog
-import android.app.DatePickerDialog.OnDateSetListener
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.app.TimePickerDialog.OnTimeSetListener
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.databinding.DataBindingUtil
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.lifecycleScope
 import com.example.greatweek.R
 import com.example.greatweek.app.App
-import com.example.greatweek.app.presentation.ViewModelFactory
-import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
+import com.example.greatweek.app.presentation.collectFlowSafely
+import com.example.greatweek.app.presentation.screens.goaldialog.dialogdata.DateDialogData
+import com.example.greatweek.app.presentation.screens.goaldialog.dialogdata.RoleDialogData
+import com.example.greatweek.app.presentation.screens.goaldialog.dialogdata.TimeDialogData
+import com.example.greatweek.app.presentation.screens.goaldialog.rolepicker.RolePickerDialogFragment
 import com.example.greatweek.databinding.GoalDialogLayoutBinding
-import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import javax.inject.Inject
 
 class GoalDialogFragment : DialogFragment() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: GoalDialogFragmentViewModel by viewModels { viewModelFactory }
+    private val id: Int? by lazy { requireArguments().getInt(ARG_ID, -1).takeIf { it > -1 } }
+    private val date: LocalDate? by lazy { requireArguments().get(ARG_DATE) as LocalDate? }
+    private val role: String? by lazy { requireArguments().getString(ARG_ROLE) }
 
-    private val requestKey: String
-        get() = requireArguments().getString(ARG_REQUEST_KEY)!!
+    @Inject lateinit var viewModelFactory: GoalDialogViewModelFactory.Factory
+    private val viewModel: GoalDialogViewModel by viewModels { viewModelFactory.create(id, date, role) }
 
     private lateinit var binding: GoalDialogLayoutBinding
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         (activity?.applicationContext as App).appComponent.inject(this)
+    }
 
-        binding = DataBindingUtil.inflate(
-            layoutInflater, R.layout.goal_dialog_layout, null, false
-        )
-        binding.goalDialogFragment = this@GoalDialogFragment
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .create()
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        binding = GoalDialogLayoutBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(requireContext()).setView(binding.root).create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        when (requestKey) {
-            KEY_EDIT_GOAL_REQUEST_KEY -> {
-                viewModel.setId(requireArguments().getInt(ARG_ARGUMENT))
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.getGoal()
-                    bind()
-                }
+        binding.apply {
+            etTitle.addTextChangedListener {
+                viewModel.accept(GoalDialogEvent.TitleChanged(etTitle.text.toString()))
+            }
+            etDescription.addTextChangedListener {
+                viewModel.accept(GoalDialogEvent.DescriptionChanged(etDescription.text.toString()))
             }
 
-            KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY -> {
-                viewModel.setDate(requireArguments().get(ARG_ARGUMENT) as LocalDate)
-                bind()
+            btnRole.setOnClickListener { viewModel.accept(GoalDialogEvent.RoleClick) }
+            btnDate.setOnClickListener { viewModel.accept(GoalDialogEvent.DateClick) }
+            btnTime.setOnClickListener { viewModel.accept(GoalDialogEvent.TimeClick) }
+
+            cbAppointment.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.accept(GoalDialogEvent.AppointmentCheckChanged(isChecked))
             }
 
-            KEY_ADD_GOAL_FOR_A_ROLE_REQUEST_KEY -> {
-                viewModel.setRole(requireArguments().getString(ARG_ARGUMENT).toString())
-                bind()
-            }
+            btnConfirm.setOnClickListener { viewModel.accept(GoalDialogEvent.ConfirmClick) }
+            btnDismiss.setOnClickListener { dismiss() }
         }
 
-        binding.confirmButton.setOnClickListener {
-            if (binding.titleEditText.text.toString().isBlank()) {
-                binding.titleEditText.error = getString(R.string.empty_value)
-                return@setOnClickListener
-            }
-            if (viewModel.role == null) {
-                Toast.makeText(requireContext(), "Choose role", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            viewModel.setGoal(
-                binding.titleEditText.text.toString(),
-                binding.descriptionEditText.text.toString(),
-                binding.commitmentCheckBox.isChecked
-            )
-            when (requestKey) {
-                KEY_EDIT_GOAL_REQUEST_KEY -> viewModel.editGoal()
-                else -> viewModel.addGoal()
-            }
-            dismiss()
-        }
-
-        binding.dismissButton.setOnClickListener {
-            dismiss()
-        }
-
+        viewModel.dialogState.render()
+        viewModel.dialogEffect.handleEffect()
         return dialog
     }
 
-    private fun bind() {
-        binding.apply {
-            if (titleEditText.text.isEmpty())
-                titleEditText.setText(viewModel.title)
-            if (descriptionEditText.text.isEmpty())
-                descriptionEditText.setText(viewModel.description)
-            viewModel.date?.let {
-                dateButton.text = DateTimeFormatter.ofPattern("MMM d").format(viewModel.date)
-            }
-            viewModel.time?.let {
-                timeButton.text = DateUtils.formatDateTime(
-                    requireContext(),
-                    viewModel.calendar.timeInMillis,
-                    DateUtils.FORMAT_SHOW_TIME
-                )
-            }
-            viewModel.role?.let { roleButton.text = viewModel.role }
-            commitmentCheckBox.isChecked = viewModel.commitment
-        }
-    }
-
-    fun showRoleDialog() {
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
-        val dialogBinding = RoleBottomSheetDialogLayoutBinding.inflate(layoutInflater)
-        bottomSheetDialog.setContentView(dialogBinding.root)
-
-        val roleAdapter = RoleBottomSheetDialogAdapter { role ->
-            viewModel.setRole(role.name)
-            binding.roleButton.text = viewModel.role
-            bottomSheetDialog.dismiss()
-        }
-        dialogBinding.roleRecyclerView.adapter = roleAdapter
-        lifecycle.coroutineScope.launch {
-            viewModel.getRoles().collect {
-                roleAdapter.submitList(it)
+    private fun StateFlow<GoalDialogState>.render() = collectFlowSafely {
+        collect { state ->
+            if (state.isSuccessful) dismiss()
+            binding.apply {
+                if (etTitle.text.isEmpty()) etTitle.setText(state.goalData.title)
+                if (etDescription.text.isEmpty()) etDescription.setText(state.goalData.description)
+                btnRole.text = state.goalData.role ?: requireContext().getString(R.string.role)
+                btnDate.text = state.goalData.date ?: requireContext().getString(R.string.date)
+                btnTime.text = state.goalData.time ?: requireContext().getString(R.string.time)
+                cbAppointment.isChecked = state.goalData.commitment
             }
         }
-
-        bottomSheetDialog.show()
     }
 
-    private val timeCallBack = OnTimeSetListener { _, h, m ->
-        viewModel.setTime(h, m)
-        bind()
+    private fun SharedFlow<GoalDialogEffect>.handleEffect() = collectFlowSafely {
+        collect { effect ->
+            when (effect) {
+                is GoalDialogEffect.Error -> showError(effect.msg)
+                is GoalDialogEffect.RoleDialog -> showRoleDialog(effect.dialogData)
+                is GoalDialogEffect.TimeDialog -> showTimeDialog(effect.dialogData)
+                is GoalDialogEffect.DateDialog -> showDateDialog(effect.dialogData)
+            }
+        }
     }
 
-    private val dateCallBack = OnDateSetListener { _, y, m, d ->
-        viewModel.setDate(y, m, d)
-        bind()
+    private fun showError(msg: Int) {
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 
-    fun showTimeDialog() {
-        TimePickerDialog(
-            requireContext(), timeCallBack,
-            viewModel.calendar.get(Calendar.HOUR_OF_DAY),
-            viewModel.calendar.get(Calendar.MINUTE),
-            true
-        ).show()
-    }
+    private fun showRoleDialog(dialogData: RoleDialogData) = RolePickerDialogFragment.apply {
+        setupListener(childFragmentManager, this@GoalDialogFragment) { role ->
+            dialogData.onRolePickListener(role)
+        }
+    }.show(childFragmentManager)
 
-    fun showDateDialog() {
-        DatePickerDialog(
-            requireContext(), dateCallBack,
-            viewModel.calendar.get(Calendar.YEAR),
-            viewModel.calendar.get(Calendar.MONTH),
-            viewModel.calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
+    private fun showTimeDialog(dialogData: TimeDialogData) = TimePickerDialog(
+        requireContext(),
+        dialogData.onTimeSetListener,
+        dialogData.hourOfDay,
+        dialogData.minute,
+        true
+    ).show()
+
+    private fun showDateDialog(dialogData: DateDialogData) = DatePickerDialog(
+        requireContext(),
+        dialogData.onDateSetListener,
+        dialogData.year,
+        dialogData.month,
+        dialogData.dayOfMonth
+    ).show()
 
     companion object {
         private val TAG = GoalDialogFragment::class.java.simpleName
-        private const val ARG_ARGUMENT = "ARG_ARGUMENT"
-        private const val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+        private const val ARG_ID = "ARG_ID"
+        private const val ARG_DATE = "ARG_DATE"
+        private const val ARG_ROLE = "ARG_ROLE"
 
-        fun show(
-            manager: FragmentManager,
-            argument: Int,
-            requestKey: String
-        ) {
-            val dialogFragment = GoalDialogFragment()
-            dialogFragment.arguments = bundleOf(
-                ARG_ARGUMENT to argument,
-                ARG_REQUEST_KEY to requestKey
-            )
-            dialogFragment.show(manager, TAG)
+        fun showForGoal(manager: FragmentManager, goalId: Int) {
+            GoalDialogFragment().apply {
+                arguments = bundleOf(ARG_ID to goalId)
+            }.show(manager, TAG)
         }
 
-        fun show(
-            manager: FragmentManager,
-            argument: LocalDate,
-            requestKey: String
-        ) {
-            val dialogFragment = GoalDialogFragment()
-            dialogFragment.arguments = bundleOf(
-                ARG_ARGUMENT to argument,
-                ARG_REQUEST_KEY to requestKey
-            )
-            dialogFragment.show(manager, TAG)
+        fun showForDate(manager: FragmentManager, date: LocalDate) {
+            GoalDialogFragment().apply {
+                arguments = bundleOf(ARG_DATE to date)
+            }.show(manager, TAG)
         }
 
-        fun show(
-            manager: FragmentManager,
-            argument: String, //!!!!!!!!!!!
-            requestKey: String
-        ) {
-            val dialogFragment = GoalDialogFragment()
-            dialogFragment.arguments = bundleOf(
-                ARG_ARGUMENT to argument,
-                ARG_REQUEST_KEY to requestKey
-            )
-            dialogFragment.show(manager, TAG)
+        fun showForRole(manager: FragmentManager, role: String) {
+            GoalDialogFragment().apply {
+                arguments = bundleOf(ARG_ROLE to role)
+            }.show(manager, TAG)
         }
     }
 }

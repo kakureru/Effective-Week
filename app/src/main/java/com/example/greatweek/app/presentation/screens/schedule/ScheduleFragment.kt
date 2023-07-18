@@ -16,8 +16,6 @@ import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.collectFlowSafely
-import com.example.greatweek.app.presentation.constants.KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_EDIT_GOAL_REQUEST_KEY
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.app.presentation.screens.roles.RolesFragment
 import com.example.greatweek.app.presentation.screens.schedule.goals.GoalCallback
@@ -120,18 +118,16 @@ class ScheduleFragment : Fragment() {
 //    }
 
     private fun openEditGoalDialog(goalId: Int) {
-        GoalDialogFragment.show(
+        GoalDialogFragment.showForGoal(
             manager = parentFragmentManager,
-            argument = goalId,
-            requestKey = KEY_EDIT_GOAL_REQUEST_KEY
+            goalId = goalId,
         )
     }
 
     private fun openAddGoalDialog(date: LocalDate) {
-        GoalDialogFragment.show(
+        GoalDialogFragment.showForDate(
             manager = parentFragmentManager,
-            argument = date,
-            requestKey = KEY_ADD_GOAL_FOR_A_DAY_REQUEST_KEY
+            date = date,
         )
     }
 

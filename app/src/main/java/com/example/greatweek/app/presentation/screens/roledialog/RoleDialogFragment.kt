@@ -42,7 +42,7 @@ class RoleDialogFragment : DialogFragment() {
             .create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        dialogBinding.confirmButton.setOnClickListener {
+        dialogBinding.btnConfirm.setOnClickListener {
             val enteredText = dialogBinding.roleEditText.text.toString()
             if (enteredText.isBlank()) {
                 dialogBinding.roleEditText.error = getString(R.string.empty_value)
@@ -55,7 +55,7 @@ class RoleDialogFragment : DialogFragment() {
             dismiss()
         }
 
-        dialogBinding.dismissButton.setOnClickListener {
+        dialogBinding.btnDismiss.setOnClickListener {
             dismiss()
         }
 

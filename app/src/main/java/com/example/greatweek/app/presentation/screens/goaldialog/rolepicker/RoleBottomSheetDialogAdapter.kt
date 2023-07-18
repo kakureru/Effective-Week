@@ -1,4 +1,4 @@
-package com.example.greatweek.app.presentation.screens.goaldialog
+package com.example.greatweek.app.presentation.screens.goaldialog.rolepicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,14 +9,14 @@ import com.example.greatweek.databinding.RoleLayoutBinding
 import com.example.greatweek.domain.model.Role
 
 class RoleBottomSheetDialogAdapter(
-    private val onItemClick: (role: Role) -> Unit
+    private val onItemClick: (role: String) -> Unit
 ) : ListAdapter<Role, RoleBottomSheetDialogAdapter.RoleViewHolder>(DiffCallback) {
     inner class RoleViewHolder(private val binding: RoleLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(role: Role) {
             binding.roleTextView.text = role.name
             binding.root.setOnClickListener {
-                onItemClick(role)
+                onItemClick(role.name)
             }
         }
     }

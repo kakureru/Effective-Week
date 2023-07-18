@@ -46,14 +46,14 @@ class GoalRepositoryImpl(
             role = goal.role,
             date = goal.date,
             time = goal.time,
-            commitment = goal.commitment
+            commitment = goal.appointment
         ) else GoalEntity(
             title = goal.title,
             description = goal.description,
             role = goal.role,
             date = goal.date,
             time = goal.time,
-            commitment = goal.commitment
+            commitment = goal.appointment
         )
     }
 
@@ -64,6 +64,6 @@ class GoalRepositoryImpl(
         role = role,
         date = date,
         time = time,
-        commitment = commitment
+        appointment = commitment
     )
 }

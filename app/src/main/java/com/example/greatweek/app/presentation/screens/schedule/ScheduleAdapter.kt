@@ -98,8 +98,8 @@ class ScheduleAdapter(
         }
 
         fun bind(day: WeekDay) {
-            val priorities = day.goals.filter { !it.commitment }
-            val commitments = day.goals.filter { it.commitment }
+            val priorities = day.goals.filter { !it.appointment }
+            val commitments = day.goals.filter { it.appointment }
 
             prioritiesAdapter.submitList(priorities)
             commitmentAdapter.submitList(commitments)

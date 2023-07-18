@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 class DropGoalToWeekUseCase(private val goalRepository: GoalRepository) {
     suspend operator fun invoke(goalId: Int, date: LocalDate, isCommitment: Boolean) {
-        val goal = goalRepository.getGoal(goalId = goalId).copy(date = date, commitment = isCommitment)
+        val goal = goalRepository.getGoal(goalId = goalId).copy(date = date, appointment = isCommitment)
         goalRepository.editGoal(goal)
     }
 }
