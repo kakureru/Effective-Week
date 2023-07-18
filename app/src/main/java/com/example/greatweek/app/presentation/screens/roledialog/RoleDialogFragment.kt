@@ -6,8 +6,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -15,96 +13,71 @@ import androidx.fragment.app.viewModels
 import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.ViewModelFactory
-import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.databinding.RoleDialogLayoutBinding
 import javax.inject.Inject
 
 class RoleDialogFragment : DialogFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: RoleDialogFragmentViewModel by viewModels { viewModelFactory }
 
-    private val roleName: String
-        get() = requireArguments().getString(ARG_ROLE_NAME).toString()
+    private val role: String? by lazy { requireArguments().getString(ARG_ROLE) }
+    private val requestKey: String by lazy { requireArguments().getString(ARG_REQUEST_KEY) ?: throw IllegalArgumentException() }
 
-    private val requestKey: String
-        get() = requireArguments().getString(ARG_REQUEST_KEY)!!
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (activity?.applicationContext as App).appComponent.inject(this)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        (activity?.applicationContext as App).appComponent.inject(this)
-        val dialogBinding = RoleDialogLayoutBinding.inflate(layoutInflater)
-        dialogBinding.roleEditText.setText(roleName)
-
+        val binding = RoleDialogLayoutBinding.inflate(layoutInflater)
         val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogBinding.root)
+            .setView(binding.root)
             .create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        dialogBinding.btnConfirm.setOnClickListener {
-            val enteredText = dialogBinding.roleEditText.text.toString()
-            if (enteredText.isBlank()) {
-                dialogBinding.roleEditText.error = getString(R.string.empty_value)
-                return@setOnClickListener
+        binding.apply {
+            roleEditText.setText(role)
+            btnConfirm.setOnClickListener {
+                val enteredText = binding.roleEditText.text.toString()
+                if (enteredText.isBlank()) {
+                    binding.roleEditText.error = getString(R.string.empty_value)
+                    return@setOnClickListener
+                }
+                when (requestKey) {
+                    RENAME_ROLE_REQUEST_KEY -> role?.let { viewModel.renameRole(oldName = it, newName = enteredText) }
+                    ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
+                }
+                dismiss()
             }
-            when (requestKey) {
-                KEY_RENAME_ROLE_REQUEST_KEY -> viewModel.renameRole(oldName = roleName, newName = enteredText)
-                KEY_ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
-            }
-            dismiss()
+            btnDismiss.setOnClickListener { dismiss() }
         }
-
-        dialogBinding.btnDismiss.setOnClickListener {
-            dismiss()
-        }
-
-        dialog.setOnDismissListener { hideKeyboard(dialogBinding.roleEditText) }
-
-        dialog.setOnShowListener {
-            dialogBinding.roleEditText.requestFocus()
-            showKeyboard(dialogBinding.roleEditText)
-        }
-
         return dialog
     }
 
-    private fun showKeyboard(view: View) {
-        view.post {
-            getInputMethodManager(view).showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
-
-    private fun hideKeyboard(view: View) {
-        getInputMethodManager(view).hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    private fun getInputMethodManager(view: View): InputMethodManager {
-        val context = view.context
-        return context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    }
-
     companion object {
-        @JvmStatic
         private val TAG = RoleDialogFragment::class.java.simpleName
+        private const val ARG_ROLE = "ARG_ROLE_NAME"
+        private const val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
 
-        @JvmStatic
-        private val ARG_ROLE_NAME = "ARG_ROLE_NAME"
+        const val ADD_ROLE_REQUEST_KEY = "ADD_ROLE_REQUEST_KEY"
+        const val RENAME_ROLE_REQUEST_KEY = "RENAME_ROLE_REQUEST_KEY"
 
-        @JvmStatic
-        private val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+        fun showForNew(manager: FragmentManager) {
+            RoleDialogFragment().apply {
+                arguments = bundleOf(
+                    ARG_REQUEST_KEY to ADD_ROLE_REQUEST_KEY
+                )
+            }.show(manager, TAG)
+        }
 
-        fun show(
-            manager: FragmentManager,
-            roleName: String = "",
-            requestKey: String
-        ) {
-            val dialogFragment = RoleDialogFragment()
-            dialogFragment.arguments = bundleOf(
-                ARG_ROLE_NAME to roleName,
-                ARG_REQUEST_KEY to requestKey
-            )
-            dialogFragment.show(manager, TAG)
+        fun showForEdit(manager: FragmentManager, role: String) {
+            RoleDialogFragment().apply {
+                arguments = bundleOf(
+                    ARG_ROLE to role,
+                    ARG_REQUEST_KEY to RENAME_ROLE_REQUEST_KEY
+                )
+            }.show(manager, TAG)
         }
     }
 }

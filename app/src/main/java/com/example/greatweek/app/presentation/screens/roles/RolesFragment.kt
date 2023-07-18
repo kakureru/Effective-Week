@@ -19,8 +19,6 @@ import com.example.greatweek.R
 import com.example.greatweek.app.App
 import com.example.greatweek.app.presentation.ViewModelFactory
 import com.example.greatweek.app.presentation.collectFlowSafely
-import com.example.greatweek.app.presentation.constants.KEY_ADD_ROLE_REQUEST_KEY
-import com.example.greatweek.app.presentation.constants.KEY_RENAME_ROLE_REQUEST_KEY
 import com.example.greatweek.app.presentation.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.app.presentation.screens.roledialog.RoleDialogFragment
 import com.example.greatweek.app.presentation.screens.schedule.ScheduleFragment
@@ -207,32 +205,24 @@ class RolesFragment : Fragment() {
      * Show dialog
      */
 
-    private fun openEditGoalDialog(goalId: Int) {
+    private fun openEditGoalDialog(goalId: Int) =
         GoalDialogFragment.showForGoal(
             manager = parentFragmentManager,
             goalId = goalId,
         )
-    }
 
-    private fun openAddGoalDialog(role: String) {
+    private fun openAddGoalDialog(role: String) =
         GoalDialogFragment.showForRole(
             manager = parentFragmentManager,
             role = role,
         )
-    }
 
-    private fun openRenameRoleDialog(role: Role) {
-        RoleDialogFragment.show(
+    private fun openRenameRoleDialog(role: Role) =
+        RoleDialogFragment.showForEdit(
             manager = parentFragmentManager,
-            roleName = role.name,
-            requestKey = KEY_RENAME_ROLE_REQUEST_KEY
+            role = role.name
         )
-    }
 
-    fun openAddRoleDialog() {
-        RoleDialogFragment.show(
-            manager = parentFragmentManager,
-            requestKey = KEY_ADD_ROLE_REQUEST_KEY
-        )
-    }
+    fun openAddRoleDialog() =
+        RoleDialogFragment.showForNew(manager = parentFragmentManager)
 }
