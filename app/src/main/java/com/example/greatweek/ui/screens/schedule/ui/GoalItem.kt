@@ -1,5 +1,7 @@
 package com.example.greatweek.ui.screens.schedule.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,21 +29,32 @@ import androidx.constraintlayout.compose.Dimension
 import com.example.greatweek.R
 import com.example.greatweek.ui.theme.DarkTheme
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GoalItem(
     title: String,
     role: String,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onCheck: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var checked by rememberSaveable { mutableStateOf(false) }
     ConstraintLayout(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
     ) {
         val (rCheck, rTitle, rRole) = createRefs()
         Checkbox(
             checked = checked,
-            onCheckedChange = { value -> checked = value },
+            onCheckedChange = { value ->
+                checked = value
+                onCheck()
+            },
             modifier = Modifier.constrainAs(rCheck) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
@@ -94,7 +107,10 @@ fun GoalItemPreview() {
         Surface {
             GoalItem(
                 title = "Sample task",
-                role = "User"
+                role = "User",
+                onClick = {},
+                onLongClick = {},
+                onCheck = {}
             )
         }
     }

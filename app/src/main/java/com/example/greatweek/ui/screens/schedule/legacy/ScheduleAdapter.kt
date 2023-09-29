@@ -1,4 +1,4 @@
-package com.example.greatweek.ui.screens.schedule
+package com.example.greatweek.ui.screens.schedule.legacy
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
@@ -18,6 +18,7 @@ import com.example.greatweek.ui.screens.schedule.goals.GoalAdapter
 import com.example.greatweek.ui.screens.schedule.goals.GoalCallback
 import com.example.greatweek.databinding.WeekdayCardLayoutBinding
 import com.example.greatweek.domain.model.WeekDay
+import com.example.greatweek.ui.screens.schedule.ScheduleCallback
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -40,8 +41,7 @@ class ScheduleAdapter(
     inner class WeekDayViewHolder(
         context: Context,
         private var binding: WeekdayCardLayoutBinding
-        ) :
-        RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         private val prioritiesAdapter = GoalAdapter(goalCallback)
         private val commitmentAdapter = GoalAdapter(goalCallback)

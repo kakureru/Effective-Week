@@ -81,7 +81,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:listitem="@layout/goal_layout"
             tools:itemCount="3"/>
 
         <TextView
@@ -111,7 +110,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:listitem="@layout/goal_layout"
             tools:itemCount="2"/>
 
         <TextView

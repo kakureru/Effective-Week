@@ -1,6 +1,7 @@
 package com.example.greatweek.ui.screens.schedule.ui
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
@@ -14,21 +15,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.greatweek.R
 import com.example.greatweek.ui.core.AddGoalButton
+import com.example.greatweek.ui.screens.schedule.goals.GoalCallback
 import com.example.greatweek.ui.screens.schedule.model.GoalItem
 import com.example.greatweek.ui.theme.DarkTheme
-import java.time.LocalDate
-import java.util.Locale
 
 @Composable
 fun ScheduleDay(
-    date: LocalDate,
+    weekday: String,
+    date: String,
+    isToday: Boolean,
+    goalCallback: GoalCallback,
     priorities: List<GoalItem>,
     appointments: List<GoalItem>,
     onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.width(340.dp),
         shape = MaterialTheme.shapes.medium
     ) {
         LazyColumn(
@@ -37,7 +40,7 @@ fun ScheduleDay(
         ) {
             item {
                 Text(
-                    text = date.dayOfWeek.name.lowercase().capitalize(Locale.getDefault()),
+                    text = weekday,
                 )
             }
             item {
@@ -56,10 +59,13 @@ fun ScheduleDay(
                 GoalItem(
                     title = it.title,
                     role = it.role,
+                    onClick = { goalCallback.onClick(it.id) },
+                    onLongClick = { },
+                    onCheck = { goalCallback.onCompleteClick(it.id) },
                 )
             }
             item {
-                Divider(modifier = Modifier.padding(16.dp))
+                Divider(modifier = Modifier.padding(vertical = 16.dp))
             }
             item {
                 Text(text = stringResource(id = R.string.appointments))
@@ -73,6 +79,9 @@ fun ScheduleDay(
                 GoalItem(
                     title = it.title,
                     role = it.role,
+                    onClick = { goalCallback.onClick(it.id) },
+                    onLongClick = { },
+                    onCheck = { goalCallback.onCompleteClick(it.id) },
                 )
             }
             item {
@@ -88,10 +97,13 @@ fun ScheduleDay(
 fun ScheduleDayPreview() {
     DarkTheme {
         ScheduleDay(
-            date = LocalDate.now(),
+            weekday = "Friday",
+            date = "Sep 25",
+            isToday = false,
             onAddGoalClick = {},
             priorities = listOf(GoalItem(0, "Sample Goal", "Me"), GoalItem(1, "Sample Goal", "Me")),
             appointments = listOf(GoalItem(2, "Sample Goal", "Me")),
+            goalCallback = previewGoalCallback
         )
     }
 }
@@ -102,10 +114,18 @@ fun ScheduleDayPreview() {
 fun ScheduleDayPreviewNoGoals() {
     DarkTheme {
         ScheduleDay(
-            date = LocalDate.now(),
+            weekday = "Friday",
+            date = "Sep 25",
+            isToday = false,
             onAddGoalClick = {},
             priorities = emptyList(),
             appointments = emptyList(),
+            goalCallback = previewGoalCallback
         )
     }
+}
+
+private val previewGoalCallback = object : GoalCallback {
+    override fun onCompleteClick(goalId: Int) = Unit
+    override fun onClick(goalId: Int) = Unit
 }

@@ -4,28 +4,30 @@ import android.content.ClipDescription
 import android.content.Context
 import android.os.Bundle
 import android.view.DragEvent
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.greatweek.R
 import com.example.greatweek.App
+import com.example.greatweek.R
+import com.example.greatweek.databinding.FragmentScheduleBinding
 import com.example.greatweek.ui.ViewModelFactory
-import com.example.greatweek.ui.collectFlowSafely
 import com.example.greatweek.ui.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.ui.screens.roles.RolesFragment
 import com.example.greatweek.ui.screens.schedule.goals.GoalCallback
-import com.example.greatweek.ui.screens.schedule.scrolling.OnSnapPositionChangeListener
-import com.example.greatweek.ui.screens.schedule.scrolling.SnapOnScrollListener
-import com.example.greatweek.ui.screens.schedule.scrolling.SnapOnScrollListener.Behavior
-import com.example.greatweek.databinding.FragmentScheduleBinding
-import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
-import kotlinx.coroutines.flow.StateFlow
-import java.time.DayOfWeek
+import com.example.greatweek.ui.screens.schedule.ui.ScheduleDay
+import com.example.greatweek.ui.theme.DarkTheme
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -35,15 +37,8 @@ class ScheduleFragment : Fragment() {
     private val viewModel: ScheduleViewModel by viewModels { viewModelFactory }
     internal lateinit var binding: FragmentScheduleBinding
 
-    private val scheduleLayoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-    private var snapHelper = GravitySnapHelper(Gravity.CENTER)
-
     private val goalCallback = object : GoalCallback {
-        override fun onCompleteClick(goalId: Int) = viewModel.accept(
-            ScheduleEvent.CompleteGoal(
-                goalId
-            )
-        )
+        override fun onCompleteClick(goalId: Int) = viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
         override fun onClick(goalId: Int) = openEditGoalDialog(goalId)
     }
 
@@ -53,51 +48,46 @@ class ScheduleFragment : Fragment() {
             viewModel.accept(ScheduleEvent.GoalDrop(goalId, date, isCommitment))
     }
 
-    private val scheduleAdapter = ScheduleAdapter(
-        goalCallback = goalCallback,
-        scheduleCallback = scheduleCallback,
-    )
-
-    init {
-        snapHelper.maxFlingSizeFraction = 1f
-        snapHelper.scrollMsPerInch = 50f
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().applicationContext as App).appComponent.inject(this)
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentScheduleBinding.inflate(inflater, container, false)
-
-        binding.schedule.layoutManager = scheduleLayoutManager
-        snapHelper.attachToRecyclerView(binding.schedule)
-
-        binding.apply {
-            schedule.addOnScrollListener(onSnapScrollListener)
-            schedule.addOnScrollListener(onSnapIdleListener)
+        binding = FragmentScheduleBinding.inflate(inflater, container, false).apply {
             dragZoneRight.setOnDragListener(dragListener)
             dragZoneLeft.setOnDragListener(dragListener)
-        }
 
-        childFragmentManager.beginTransaction().replace(R.id.bottom_sheet_layout, RolesFragment()).commit()
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.schedule.adapter = scheduleAdapter
-        viewModel.scheduleState.render()
-    }
-
-    private fun StateFlow<ScheduleState>.render() = collectFlowSafely {
-        collect {
-            with(binding) {
-                scheduleAdapter.submitList(value.schedule)
-//                schedule.scrollToDate(value.currentDate)
+            schedule.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            }.setContent {
+                val state by viewModel.scheduleState.collectAsState()
+                DarkTheme {
+                    val rowState = rememberLazyListState()
+                    val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
+                    LazyRow(
+                        state = rowState,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        flingBehavior = snapBehavior,
+                    ) {
+                        items(items = state.schedule, key = { item -> item.dateText }) {
+                            ScheduleDay(
+                                weekday = it.weekday,
+                                date = it.dateText,
+                                isToday = it.isToday,
+                                priorities = it.priorities,
+                                appointments = it.appointments,
+                                onAddGoalClick = { scheduleCallback.onAddGoalClick(it.date) },
+                                goalCallback = goalCallback
+                            )
+                        }
+                    }
+                }
             }
         }
+        childFragmentManager.beginTransaction().replace(R.id.bottom_sheet_layout, RolesFragment()).commit()
+        return binding.root
     }
 
 //    private fun RecyclerView.scrollToDate(date: LocalDate) {
@@ -156,42 +146,6 @@ class ScheduleFragment : Fragment() {
             else -> false
         }
     }
-
-    /**
-     * Snapping
-     */
-
-    private val onRegularSnapPositionChangeListener = object : OnSnapPositionChangeListener {
-        override fun onSnapPositionChange(position: Int) {
-            val day = scheduleAdapter.getItemAt(position)?.date?.dayOfWeek
-            if (day != DayOfWeek.MONDAY && day != DayOfWeek.SUNDAY) {
-                snapHelper.gravity = Gravity.CENTER
-            }
-        }
-    }
-
-    private val onEdgeSnapPositionChangeListener = object : OnSnapPositionChangeListener {
-        override fun onSnapPositionChange(position: Int) {
-            val day = scheduleAdapter.getItemAt(position)?.date?.dayOfWeek
-            if (day == DayOfWeek.MONDAY) {
-                snapHelper.gravity = Gravity.START
-            } else if (day == DayOfWeek.SUNDAY) {
-                snapHelper.gravity = Gravity.END
-            }
-        }
-    }
-
-    private val onSnapScrollListener = SnapOnScrollListener(
-        snapHelper,
-        Behavior.NOTIFY_ON_SCROLL,
-        onRegularSnapPositionChangeListener
-    )
-
-    private val onSnapIdleListener = SnapOnScrollListener(
-        snapHelper,
-        Behavior.NOTIFY_ON_SCROLL_STATE_IDLE,
-        onEdgeSnapPositionChangeListener
-    )
 
     companion object {
         const val SCROLL_DELAY_MS = 500L

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.domain.usecase.goal.DropGoalToWeekUseCase
+import com.example.greatweek.ui.screens.schedule.model.toWeekDayItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,7 +62,7 @@ class ScheduleViewModel @Inject constructor(
                     goals = goals.filter { it.date == date }
                 )
             }
-            _scheduleState.value = ScheduleState(schedule = schedule)
+            _scheduleState.value = ScheduleState(schedule = schedule.map { it.toWeekDayItem() })
         }
     }
 

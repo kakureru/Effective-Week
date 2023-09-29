@@ -1,10 +1,10 @@
 package com.example.greatweek.ui.screens.schedule
 
-import com.example.greatweek.domain.model.WeekDay
+import com.example.greatweek.ui.screens.schedule.model.WeekDayItem
 import java.time.LocalDate
 
 data class ScheduleState(
-    val schedule: List<WeekDay> = emptyList(),
+    val schedule: List<WeekDayItem> = emptyList(),
     val currentDate: LocalDate = LocalDate.now(),
 )
 
