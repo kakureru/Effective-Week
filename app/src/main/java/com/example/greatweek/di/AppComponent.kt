@@ -4,7 +4,6 @@ import com.example.greatweek.ui.MainActivity
 import com.example.greatweek.ui.screens.goaldialog.GoalDialogFragment
 import com.example.greatweek.ui.screens.goaldialog.rolepicker.RolePickerDialogFragment
 import com.example.greatweek.ui.screens.roledialog.RoleDialogFragment
-import com.example.greatweek.ui.screens.roles.RolesFragment
 import com.example.greatweek.ui.screens.schedule.ScheduleFragment
 import dagger.Component
 import javax.inject.Singleton
@@ -21,5 +20,4 @@ interface AppComponent {
     fun inject(fragment: RoleDialogFragment)
     fun inject(fragment: RolePickerDialogFragment)
     fun inject(fragment: ScheduleFragment)
-    fun inject(fragment: RolesFragment)
 }

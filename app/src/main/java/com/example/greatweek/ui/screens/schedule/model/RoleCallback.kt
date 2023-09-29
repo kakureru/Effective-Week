@@ -1,4 +1,4 @@
-package com.example.greatweek.ui.screens.roles
+package com.example.greatweek.ui.screens.schedule.model
 
 import android.content.Context
 import android.view.View

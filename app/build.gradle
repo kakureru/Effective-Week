@@ -67,8 +67,7 @@ dependencies {
     implementation platform(deps.androidx.compose.bom)
     androidTestImplementation platform(deps.androidx.compose.bom)
 
-    implementation 'androidx.activity:activity-compose:1.5.1'
-
+    implementation deps.androidx.activity_compose
     implementation deps.androidx.compose.constraintlayout
     implementation deps.androidx.compose.runtime
     implementation deps.androidx.compose.ui.ui

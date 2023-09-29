@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.greatweek.domain.model.WeekDay
 import com.example.greatweek.domain.repository.GoalRepository
+import com.example.greatweek.domain.repository.RoleRepository
+import com.example.greatweek.domain.usecase.goal.DropGoalToRoleUseCase
 import com.example.greatweek.domain.usecase.goal.DropGoalToWeekUseCase
+import com.example.greatweek.domain.usecase.role.GetRolesWithGoalsUseCase
 import com.example.greatweek.ui.screens.schedule.model.toWeekDayItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +27,9 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val goalRepository: GoalRepository,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
+    private val roleRepository: RoleRepository,
+    private val dropGoalToRoleUseCase: DropGoalToRoleUseCase,
+    private val getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
 ) : ViewModel() {
 
     private val _scheduleState = MutableStateFlow(ScheduleState())
@@ -42,15 +48,18 @@ class ScheduleViewModel @Inject constructor(
 
     init {
         loadSchedule()
+        loadRoles()
     }
 
     fun accept(event: ScheduleEvent) {
         when (event) {
             is ScheduleEvent.CompleteGoal -> completeGoal(event.goalId)
-            is ScheduleEvent.GoalDrop -> dropGoal(event.goalId, event.date, event.isCommitment)
+            is ScheduleEvent.GoalDropOnSchedule -> dropGoalOnSchedule(event.goalId, event.date, event.isCommitment)
             ScheduleEvent.DragRight -> onDragRight()
             ScheduleEvent.DragLeft -> onDragLeft()
             ScheduleEvent.DragIdle -> Unit
+            is ScheduleEvent.DeleteRole -> deleteRole(event.role)
+            is ScheduleEvent.GoalDropOnRole -> dropGoalOnRole(event.goalId, event.role)
         }
     }
 
@@ -66,12 +75,27 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
+    private fun loadRoles() = viewModelScope.launch {
+        getRolesWithGoalsUseCase().collect { roles ->
+            _scheduleState.update { it.copy(roles = roles) }
+        }
+    }
+
+
     private fun completeGoal(goalId: Int) = viewModelScope.launch {
         goalRepository.completeGoal(goalId = goalId)
     }
 
-    private fun dropGoal(goalId: Int, date: LocalDate, isCommitment: Boolean) = viewModelScope.launch {
+    private fun dropGoalOnSchedule(goalId: Int, date: LocalDate, isCommitment: Boolean) = viewModelScope.launch {
         dropGoalToWeekUseCase(goalId, date, isCommitment)
+    }
+
+    private fun dropGoalOnRole(goalId: Int, role: String) = viewModelScope.launch {
+        dropGoalToRoleUseCase(goalId, role)
+    }
+
+    private fun deleteRole(name: String) = viewModelScope.launch {
+        roleRepository.deleteRole(name)
     }
 
     private fun onDragRight() {

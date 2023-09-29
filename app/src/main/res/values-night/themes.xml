@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.GreatWeek" parent="Theme.MaterialComponents.DayNight.Bridge">
+    <style name="Theme.GreatWeek" parent="Theme.AppCompat.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryVariant">@color/grey</item>
@@ -10,30 +10,12 @@
         <item name="colorSecondaryVariant">@color/metallic_dark</item>
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/backgroundColor</item>
         <!-- Customize your theme here. -->
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
-        <!-- Popup menu -->
-        <item name="android:popupMenuStyle">@style/PopupMenu</item>
-        <item name="android:textAppearanceLargePopupMenu">@style/myPopupMenuTextAppearanceLarge
-        </item>
-        <item name="android:textAppearanceSmallPopupMenu">@style/myPopupMenuTextAppearanceSmall
-        </item>
         <!-- Bottom sheet dialog -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
-    </style>
-
-    <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
-        <item name="android:popupBackground">@drawable/popup_menu</item>
-    </style>
-
-    <style name="myPopupMenuTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
-        <item name="android:textColor">#ffffff</item>
-    </style>
-
-    <style name="myPopupMenuTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
-        <item name="android:textColor">#ffffff</item>
     </style>
 
     <!--    -->
@@ -63,23 +45,6 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:drawableLeft">@drawable/ic_add</item>
         <item name="android:background">@android:color/transparent</item>
-    </style>
-
-    <style name="settings_section">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:drawablePadding">12dp</item>
-        <item name="android:gravity">start|center_vertical</item>
-    </style>
-
-    <style name="drop_area">
-        <item name="android:layout_gravity">center</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_height">52dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:visibility">gone</item>
-        <item name="android:layout_marginVertical">2dp</item>
     </style>
 
     <!-- Bottom sheet dialog -->

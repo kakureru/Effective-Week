@@ -1,4 +1,4 @@
-package com.example.greatweek.ui.screens.schedule
+package com.example.greatweek.ui.screens.schedule.model
 
 import java.time.LocalDate
 

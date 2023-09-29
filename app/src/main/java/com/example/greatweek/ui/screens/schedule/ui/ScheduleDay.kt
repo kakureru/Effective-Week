@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.greatweek.R
 import com.example.greatweek.ui.core.AddGoalButton
-import com.example.greatweek.ui.screens.schedule.goals.GoalCallback
+import com.example.greatweek.ui.screens.schedule.model.GoalCallback
 import com.example.greatweek.ui.screens.schedule.model.GoalItem
 import com.example.greatweek.ui.theme.DarkTheme
 
@@ -32,7 +32,7 @@ fun ScheduleDay(
 ) {
     Surface(
         modifier = modifier.width(340.dp),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         LazyColumn(
             modifier = Modifier
@@ -123,9 +123,4 @@ fun ScheduleDayPreviewNoGoals() {
             goalCallback = previewGoalCallback
         )
     }
-}
-
-private val previewGoalCallback = object : GoalCallback {
-    override fun onCompleteClick(goalId: Int) = Unit
-    override fun onClick(goalId: Int) = Unit
 }
