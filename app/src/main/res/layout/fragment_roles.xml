@@ -6,7 +6,7 @@
     <data>
         <variable
             name="roleTabFragment"
-            type="com.example.greatweek.app.presentation.screens.roles.RolesFragment" />
+            type="com.example.greatweek.ui.screens.roles.RolesFragment" />
     </data>
 
     <LinearLayout

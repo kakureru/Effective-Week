@@ -18,6 +18,20 @@ buildscript {
                 'constraintlayout': 'androidx.constraintlayout:constraintlayout:2.1.4',
                 'fragment': 'androidx.fragment:fragment-ktx:1.6.0',
                 'livedata': 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1',
+                'compose': [
+                        'bom': 'androidx.compose:compose-bom:2022.10.00',
+                        'runtime': "androidx.compose.runtime:runtime",
+                        'foundation': "androidx.compose.foundation:foundation",
+                        'foundation_layout': "androidx.compose.foundation:foundation-layout",
+                        'material3': 'androidx.compose.material3:material3',
+                        'constraintlayout': "androidx.constraintlayout:constraintlayout-compose:1.0.1",
+                        'ui': [
+                                'ui': "androidx.compose.ui:ui",
+                                'graphics': 'androidx.compose.ui:ui-graphics',
+                                'tooling': "androidx.compose.ui:ui-tooling",
+                                'tooling_preview': 'androidx.compose.ui:ui-tooling-preview',
+                        ]
+                ],
         ],
         'material': "com.google.android.material:material:1.7.0",
         'dagger': [

@@ -33,6 +33,12 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.0'
+    }
 }
 
 dependencies {
@@ -56,4 +62,20 @@ dependencies {
     implementation deps.material
 
     implementation deps.gravitysnaphelper
+
+    // Compose
+    implementation platform(deps.androidx.compose.bom)
+    androidTestImplementation platform(deps.androidx.compose.bom)
+
+    implementation 'androidx.activity:activity-compose:1.5.1'
+
+    implementation deps.androidx.compose.constraintlayout
+    implementation deps.androidx.compose.runtime
+    implementation deps.androidx.compose.ui.ui
+    implementation deps.androidx.compose.ui.graphics
+    implementation deps.androidx.compose.ui.tooling_preview
+    debugImplementation deps.androidx.compose.ui.tooling
+    implementation deps.androidx.compose.foundation
+    implementation deps.androidx.compose.foundation_layout
+    implementation deps.androidx.compose.material3
 }
