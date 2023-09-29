@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import com.example.greatweek.ui.core.AddGoalButton
 import com.example.greatweek.ui.screens.schedule.model.GoalCallback
 import com.example.greatweek.ui.screens.schedule.model.GoalItem
 import com.example.greatweek.ui.theme.DarkTheme
+import kotlin.math.min
 
 @Composable
 fun RoleItem(
@@ -42,10 +44,13 @@ fun RoleItem(
     onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val configuration = LocalConfiguration.current
+    val maxSizeDp = 500
+    val width = remember(configuration) { min((configuration.screenWidthDp - 32), maxSizeDp).dp }
     var optionsExpanded by remember { mutableStateOf(false) }
     Surface(
         shape = MaterialTheme.shapes.medium,
-        modifier = modifier.width(340.dp),
+        modifier = modifier.width(width),
         tonalElevation = 2.dp
     ) {
         LazyColumn(

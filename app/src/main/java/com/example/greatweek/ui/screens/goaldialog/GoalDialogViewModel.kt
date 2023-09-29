@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.greatweek.R
+import com.example.greatweek.domain.model.Goal
+import com.example.greatweek.domain.repository.GoalRepository
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.RoleDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
-import com.example.greatweek.domain.model.Goal
-import com.example.greatweek.domain.repository.GoalRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -49,11 +49,11 @@ class GoalDialogViewModel @Inject constructor(
     private val calendar: Calendar = Calendar.getInstance()
     private val goalState = MutableStateFlow(defaultGoal)
 
-    private val _dialogState = MutableStateFlow(GoalDialogState(goalState.value.toUI()))
-    val dialogState = _dialogState.asStateFlow()
+    private val _uiState = MutableStateFlow(GoalDialogState(/*goalState.value.toUI()*/))
+    val uiState = _uiState.asStateFlow()
 
-    private val _dialogEffect = MutableSharedFlow<GoalDialogEffect>()
-    val dialogEffect: SharedFlow<GoalDialogEffect> = _dialogEffect.asSharedFlow()
+    private val _uiEffect = MutableSharedFlow<GoalDialogEffect>()
+    val uiEffect: SharedFlow<GoalDialogEffect> = _uiEffect.asSharedFlow()
 
     private val isInputCorrect: Boolean get() = with(goalState.value) {
         title.isNotEmpty() && role != null
@@ -97,7 +97,7 @@ class GoalDialogViewModel @Inject constructor(
 
     private fun subscribeToGoalState() = goalState
         .onEach { goal ->
-            _dialogState.update { it.copy(goalData = goal.toUI()) }
+//            _uiState.update { it.copy(goalData = goal.toUI()) }
             calendar.apply { time = getCalendarTime(goal.date, goal.time) }
         }.launchIn(viewModelScope)
 
@@ -114,15 +114,15 @@ class GoalDialogViewModel @Inject constructor(
     }
 
     private suspend fun onRoleClick() {
-        _dialogEffect.emit(GoalDialogEffect.RoleDialog(roleDialogData))
+        _uiEffect.emit(GoalDialogEffect.RoleDialog(roleDialogData))
     }
 
     private suspend fun onDateClick() {
-        _dialogEffect.emit(GoalDialogEffect.DateDialog(dateDialogData))
+        _uiEffect.emit(GoalDialogEffect.DateDialog(dateDialogData))
     }
 
     private suspend fun onTimeClick() {
-        _dialogEffect.emit(GoalDialogEffect.TimeDialog(timeDialogData))
+        _uiEffect.emit(GoalDialogEffect.TimeDialog(timeDialogData))
     }
 
     private fun onAppointmentChanged(isChecked: Boolean) {
@@ -131,13 +131,13 @@ class GoalDialogViewModel @Inject constructor(
 
     private suspend fun onConfirmClick() {
         if (isInputCorrect.not())
-            _dialogEffect.emit(GoalDialogEffect.Error(R.string.error_title_and_role_required))
+            _uiEffect.emit(GoalDialogEffect.Error(R.string.error_title_and_role_required))
         else {
             if (goalId == null)
                 goalRepository.addGoal(goalState.value)
             else
                 goalRepository.editGoal(goalState.value)
-            _dialogState.update { it.copy(isSuccessful = true) }
+            _uiState.update { it.copy(isSuccessful = true) }
         }
     }
 

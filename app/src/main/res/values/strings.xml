@@ -11,6 +11,8 @@
     <string name="role">Role</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
+    <string name="goal">Goal</string>
+    <string name="description">Description</string>
 
     <!-- Action -->
     <string name="action_edit">Edit</string>

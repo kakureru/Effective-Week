@@ -3,31 +3,24 @@ package com.example.greatweek.ui.screens.goaldialog
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.RoleDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
-import com.example.greatweek.domain.model.Goal
-import java.time.format.DateTimeFormatter
 
 data class GoalDialogState(
-    val goalData: GoalData,
+    val title: String = "",
+    val description: String = "",
+    val role: String? = "",
+    val date: String? = "",
+    val time: String? = "",
+    val appointment: Boolean = false,
     val isSuccessful: Boolean = false,
 )
-
-data class GoalData(
-    val title: String,
-    val description: String,
-    val role: String?,
-    val date: String?,
-    val time: String?,
-    val commitment: Boolean,
-)
-
-fun Goal.toUI() = GoalData(
-    title = title,
-    description = description,
-    role = role,
-    date = date?.let { DateTimeFormatter.ofPattern("MMM d").format(it) },
-    time = time?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) },
-    commitment = appointment,
-)
+//fun Goal.toUI() = GoalData(
+//    title = title,
+//    description = description,
+//    role = role,
+//    date = date?.let { DateTimeFormatter.ofPattern("MMM d").format(it) },
+//    time = time?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) },
+//    commitment = appointment,
+//)
 
 sealed class GoalDialogEvent {
     object RoleClick : GoalDialogEvent()

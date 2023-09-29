@@ -14,14 +14,14 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import com.example.greatweek.R
 import com.example.greatweek.App
+import com.example.greatweek.R
+import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import com.example.greatweek.ui.collectFlowSafely
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.RoleDialogData
 import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
 import com.example.greatweek.ui.screens.goaldialog.rolepicker.RolePickerDialogFragment
-import com.example.greatweek.databinding.GoalDialogLayoutBinding
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
@@ -68,8 +68,8 @@ class GoalDialogFragment : DialogFragment() {
             btnDismiss.setOnClickListener { dismiss() }
         }
 
-        viewModel.dialogState.render()
-        viewModel.dialogEffect.handleEffect()
+        viewModel.uiState.render()
+        viewModel.uiEffect.handleEffect()
         return dialog
     }
 
@@ -77,12 +77,12 @@ class GoalDialogFragment : DialogFragment() {
         collect { state ->
             if (state.isSuccessful) dismiss()
             binding.apply {
-                if (etTitle.text.isEmpty()) etTitle.setText(state.goalData.title)
-                if (etDescription.text.isEmpty()) etDescription.setText(state.goalData.description)
-                btnRole.text = state.goalData.role ?: requireContext().getString(R.string.role)
-                btnDate.text = state.goalData.date ?: requireContext().getString(R.string.date)
-                btnTime.text = state.goalData.time ?: requireContext().getString(R.string.time)
-                cbAppointment.isChecked = state.goalData.commitment
+                if (etTitle.text.isEmpty()) etTitle.setText(state.title)
+                if (etDescription.text.isEmpty()) etDescription.setText(state.description)
+                btnRole.text = state.role ?: requireContext().getString(R.string.role)
+                btnDate.text = state.date ?: requireContext().getString(R.string.date)
+                btnTime.text = state.time ?: requireContext().getString(R.string.time)
+                cbAppointment.isChecked = state.appointment
             }
         }
     }
