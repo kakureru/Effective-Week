@@ -1,25 +1,26 @@
 package com.example.greatweek.ui.screens.roledialog
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import com.example.greatweek.R
 import com.example.greatweek.App
 import com.example.greatweek.ui.ViewModelFactory
-import com.example.greatweek.databinding.RoleDialogLayoutBinding
+import com.example.greatweek.ui.screens.roledialog.ui.RoleDialog
+import com.example.greatweek.ui.theme.DarkTheme
 import javax.inject.Inject
 
 class RoleDialogFragment : DialogFragment() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: RoleDialogFragmentViewModel by viewModels { viewModelFactory }
+    private val viewModel: RoleDialogViewModel by viewModels { viewModelFactory }
 
     private val role: String? by lazy { requireArguments().getString(ARG_ROLE) }
     private val requestKey: String by lazy { requireArguments().getString(ARG_REQUEST_KEY) ?: throw IllegalArgumentException() }
@@ -29,30 +30,27 @@ class RoleDialogFragment : DialogFragment() {
         (activity?.applicationContext as App).appComponent.inject(this)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = RoleDialogLayoutBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .create()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        binding.apply {
-            roleEditText.setText(role)
-            btnConfirm.setOnClickListener {
-                val enteredText = binding.roleEditText.text.toString()
-                if (enteredText.isBlank()) {
-                    binding.roleEditText.error = getString(R.string.empty_value)
-                    return@setOnClickListener
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DarkTheme {
+                    RoleDialog(
+                        viewModel = viewModel,
+                        onConfirmClick = {
+                            when (requestKey) {
+                                RENAME_ROLE_REQUEST_KEY -> role?.let { viewModel.renameRole(oldName = it) }
+                                ADD_ROLE_REQUEST_KEY -> viewModel.addRole()
+                            }
+                            dismiss()
+                        },
+                        onDismissRequest = {
+                            dismiss()
+                        }
+                    )
                 }
-                when (requestKey) {
-                    RENAME_ROLE_REQUEST_KEY -> role?.let { viewModel.renameRole(oldName = it, newName = enteredText) }
-                    ADD_ROLE_REQUEST_KEY -> viewModel.addRole(name = enteredText)
-                }
-                dismiss()
             }
-            btnDismiss.setOnClickListener { dismiss() }
         }
-        return dialog
     }
 
     companion object {

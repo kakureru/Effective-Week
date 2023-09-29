@@ -3,7 +3,7 @@ package com.example.greatweek.di
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.greatweek.ui.screens.goaldialog.rolepicker.RolePickerViewModel
-import com.example.greatweek.ui.screens.roledialog.RoleDialogFragmentViewModel
+import com.example.greatweek.ui.screens.roledialog.RoleDialogViewModel
 import com.example.greatweek.ui.screens.schedule.ScheduleViewModel
 import dagger.Binds
 import dagger.Module
@@ -27,8 +27,8 @@ class AppModule(val context: Context) {
 
         @Binds
         @IntoMap
-        @ViewModelKey(RoleDialogFragmentViewModel::class)
-        fun bindsRoleDialogViewModel(viewModel: RoleDialogFragmentViewModel): ViewModel
+        @ViewModelKey(RoleDialogViewModel::class)
+        fun bindsRoleDialogViewModel(viewModel: RoleDialogViewModel): ViewModel
 
         @Binds
         @IntoMap
