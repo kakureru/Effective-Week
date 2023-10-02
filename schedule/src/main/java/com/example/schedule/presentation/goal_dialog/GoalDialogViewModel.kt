@@ -30,7 +30,7 @@ import java.util.Date
 
 class GoalDialogViewModel (
     private val goalId: Int?,
-    initDate: LocalDate?,
+    initDateEpochDay: Long?,
     initRole: String?,
     private val goalRepository: GoalRepository,
 ) : ViewModel() {
@@ -40,7 +40,7 @@ class GoalDialogViewModel (
         title = "",
         description = "",
         role = initRole,
-        date = initDate,
+        date = initDateEpochDay?.takeIf { it > -1 }?.let { LocalDate.ofEpochDay(it) },
         time = null,
         appointment = false,
     )
@@ -51,7 +51,7 @@ class GoalDialogViewModel (
 
     init {
         subscribeToGoalDateTimeUpdates()
-        if (goalId != null) loadGoal(goalId)
+        if (goalId != null && goalId > -1) loadGoal(goalId)
     }
 
     val uiState: StateFlow<GoalDialogState> = combine(

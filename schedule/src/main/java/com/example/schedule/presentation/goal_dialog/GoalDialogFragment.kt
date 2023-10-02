@@ -39,8 +39,7 @@ class GoalDialogFragment : DialogFragment() {
             setContent {
                 DarkTheme {
                     GoalDialog(
-                        vm = viewModel,
-                        onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
+                        viewModel = viewModel,
                         onDismissRequest = { dismiss() },
                     )
                 }

@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,44 +40,52 @@ fun ColumnScope.RolesTab(
     roles: List<Role>,
     goalCallback: GoalCallback,
     onAddRoleClick: () -> Unit,
-    onDeleteClick: (Role) -> Unit,
+    onDeleteClick: (roleName: String) -> Unit,
     onAddGoalClick: (roleName: String) -> Unit,
-    onEditClick: (Role) -> Unit,
+    onEditClick: (roleName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val configuration = LocalConfiguration.current
     val rowState = rememberLazyListState()
     val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-    ) {
-        Text(text = stringResource(id = R.string.my_roles))
-        Icon(
-            painter = painterResource(id = R.drawable.ic_role_add),
-            contentDescription = "add role",
-            modifier = Modifier.clickable { onAddRoleClick() }
-        )
-    }
-    Spacer(modifier = Modifier.height(16.dp))
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize(),
-        state = rowState,
-        flingBehavior = snapBehavior,
-        contentPadding = PaddingValues(horizontal = 16.dp),
-    ) {
-        items(items = roles, key = { item -> item.name }) {
-            RoleItem(
-                name = it.name,
-                goals = it.goals.map { it.toGoalItem() },
-                goalCallback = goalCallback,
-                onAddGoalClick = { onAddGoalClick(it.name) },
-                onEditClick = { onEditClick(it) },
-                onDeleteClick = { onDeleteClick(it) },
+    Column(modifier = Modifier.height((configuration.screenHeightDp / 2).dp)) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+        ) {
+            Text(text = stringResource(id = R.string.my_roles))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_role_add),
+                contentDescription = "add role",
+                modifier = Modifier.clickable { onAddRoleClick() }
             )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize(),
+            state = rowState,
+            flingBehavior = snapBehavior,
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            items(items = roles, key = { item -> item.name }) {
+                RoleItem(
+                    name = it.name,
+                    goals = it.goals.map { it.toGoalItem() },
+                    goalCallback = goalCallback,
+                    onAddGoalClick = { onAddGoalClick(it.name) },
+                    onEditClick = { onEditClick(it.name) },
+                    onDeleteClick = {
+                        if (it.goals.isNotEmpty())
+//                        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
+                        else
+                            onDeleteClick(it.name)
+                    },
+                )
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ val viewModelModule = module {
     viewModel { params ->
         GoalDialogViewModel(
             goalId = params[0],
-            initDate = params[1],
+            initDateEpochDay = params[1],
             initRole = params[2],
             goalRepository = get(),
         )

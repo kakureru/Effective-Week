@@ -3,10 +3,9 @@ package com.example.schedule.presentation.schedule.ui
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -21,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,10 +34,10 @@ import java.time.LocalDate
 @Composable
 fun ScheduleScreen(
     goalCallback: GoalCallback,
-    onAddGoalToScheduleClick: (LocalDate) -> Unit,
+    onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
     onAddGoalToRoleClick: (roleName: String) -> Unit,
-    onDeleteRoleClick: (Role) -> Unit,
-    onEditRoleClick: (Role) -> Unit,
+    onDeleteRoleClick: (roleName: String) -> Unit,
+    onEditRoleClick: (roleName: String) -> Unit,
     onAddRoleClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ScheduleViewModel,
@@ -50,10 +48,19 @@ fun ScheduleScreen(
         onAddGoalToScheduleClick = onAddGoalToScheduleClick,
         goalCallback = goalCallback,
         modifier = modifier,
-        onAddGoalToRoleClick = onAddGoalToRoleClick,
-        onDeleteRoleClick = onDeleteRoleClick,
-        onEditRoleClick = onEditRoleClick,
-        onAddRoleClick = onAddRoleClick,
+        topBar = {
+            ScheduleTopBar()
+        },
+        sheetContent = {
+            RolesTab(
+                roles = state.roles,
+                goalCallback = goalCallback,
+                onAddRoleClick = onAddRoleClick,
+                onDeleteClick = onDeleteRoleClick,
+                onAddGoalClick = onAddGoalToRoleClick,
+                onEditClick = onEditRoleClick
+            )
+        }
     )
 }
 
@@ -61,35 +68,16 @@ fun ScheduleScreen(
 @Composable
 fun ScheduleScreenUi(
     state: ScheduleState,
-    onAddGoalToScheduleClick: (LocalDate) -> Unit,
-    onAddGoalToRoleClick: (roleName: String) -> Unit,
+    onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
     goalCallback: GoalCallback,
-    onDeleteRoleClick: (Role) -> Unit,
-    onEditRoleClick: (Role) -> Unit,
-    onAddRoleClick: () -> Unit,
     modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit,
+    sheetContent: @Composable ColumnScope.() -> Unit,
 ) {
-    val configuration = LocalConfiguration.current
     BottomSheetScaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.app_name)) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
-            )
-        },
-        sheetContent = {
-            Column(modifier = Modifier.height((configuration.screenHeightDp / 2).dp)) {
-                RolesTab(
-                    roles = state.roles,
-                    goalCallback = goalCallback,
-                    onAddRoleClick = onAddRoleClick,
-                    onDeleteClick = onDeleteRoleClick,
-                    onAddGoalClick = onAddGoalToRoleClick,
-                    onEditClick = onEditRoleClick
-                )
-            }
-        },
+        topBar = topBar,
+        sheetContent = sheetContent,
         containerColor = MaterialTheme.colorScheme.background,
     ) { paddingValues ->
         val rowState = rememberLazyListState()
@@ -102,7 +90,7 @@ fun ScheduleScreenUi(
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(top = 16.dp)
-                .fillMaxHeight()
+                .fillMaxHeight(),
         ) {
             items(items = state.schedule, key = { item -> item.dateText }) {
                 ScheduleDay(
@@ -111,12 +99,32 @@ fun ScheduleScreenUi(
                     isToday = it.isToday,
                     priorities = it.priorities,
                     appointments = it.appointments,
-                    onAddGoalClick = { onAddGoalToScheduleClick(it.date) },
-                    goalCallback = goalCallback
+                    onAddGoalClick = { onAddGoalToScheduleClick(it.date.toEpochDay()) },
+                    goalItem = { goal ->
+                        GoalItem(
+                            title = goal.title,
+                            role = goal.role,
+                            onClick = { goalCallback.onClick(goal.id) },
+                            onLongClick = { },
+                            onCheck = { goalCallback.onCompleteClick(goal.id) },
+                        )
+                    }
                 )
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScheduleTopBar(
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = R.string.app_name)) },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+        modifier = modifier
+    )
 }
 
 @Preview
@@ -127,10 +135,8 @@ fun ScheduleScreenUiPreview() {
             state = ScheduleState(),
             onAddGoalToScheduleClick = {},
             goalCallback = previewGoalCallback,
-            onEditRoleClick = {},
-            onDeleteRoleClick = {},
-            onAddGoalToRoleClick = {},
-            onAddRoleClick = {}
+            sheetContent = {},
+            topBar = { ScheduleTopBar() }
         )
     }
 }

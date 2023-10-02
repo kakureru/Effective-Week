@@ -38,7 +38,6 @@ buildscript {
                 'android': "io.insert-koin:koin-android:${versions.koin}",
                 'compose': "io.insert-koin:koin-androidx-compose:${versions.koin}",
         ],
-        'datastore': 'androidx.datastore:datastore-preferences:1.0.0',
         'room': [
                 'runtime': "androidx.room:room-runtime:${versions.room}",
                 'ktx': "androidx.room:room-ktx:${versions.room}",
@@ -48,8 +47,6 @@ buildscript {
                 'okhttp': "com.squareup.okhttp3:okhttp:${versions.okhttp}",
                 'logginginterceptor': "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}",
         ],
-        'cicerone': 'com.github.terrakok:cicerone:7.1',
-        'gravitysnaphelper': 'com.github.rubensousa:gravitysnaphelper:2.2.2',
     ]
 }
 

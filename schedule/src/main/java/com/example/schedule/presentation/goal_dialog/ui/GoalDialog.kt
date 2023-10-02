@@ -28,48 +28,50 @@ import com.example.schedule.presentation.goal_dialog.GoalDialogViewModel
 
 @Composable
 fun GoalDialog(
-    vm: GoalDialogViewModel,
-    onConfirmClick: () -> Unit,
+    viewModel: GoalDialogViewModel,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val state by vm.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsState()
     GoalDialogUi(
         isSuccess = state.isSuccessful,
-        onConfirmClick = onConfirmClick,
+        onConfirmClick = {
+            viewModel.accept(GoalDialogEvent.ConfirmClick)
+            onDismissRequest()
+        },
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         title = {
             TitleField(
                 value = state.title,
-                onValueChange = { value -> vm.accept(GoalDialogEvent.TitleChanged(value)) }
+                onValueChange = { value -> viewModel.accept(GoalDialogEvent.TitleChanged(value)) }
             )
         },
         description = {
             DescriptionField(
                 value = state.description,
-                onValueChange = { value -> vm.accept(GoalDialogEvent.DescriptionChanged(value)) }
+                onValueChange = { value -> viewModel.accept(GoalDialogEvent.DescriptionChanged(value)) }
             )
         },
         roleField = {
             RoleField(
                 role = state.role,
-                onClick = { vm.accept(GoalDialogEvent.RoleClick) }
+                onClick = { viewModel.accept(GoalDialogEvent.RoleClick) }
             )
         },
         dateTime = {
             DateTimeFields(
                 date = state.date,
                 time = state.time,
-                onDateClick = { vm.accept(GoalDialogEvent.DateClick) },
-                onTimeClick = { vm.accept(GoalDialogEvent.TimeClick) },
+                onDateClick = { viewModel.accept(GoalDialogEvent.DateClick) },
+                onTimeClick = { viewModel.accept(GoalDialogEvent.TimeClick) },
             )
         },
         appointment = {
             AppointmentField(
                 isAppointment = state.appointment,
                 onValueChange = { value ->
-                    vm.accept(
+                    viewModel.accept(
                         GoalDialogEvent.AppointmentValueChanged(value)
                     )
                 }

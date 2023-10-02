@@ -1,11 +1,9 @@
 package com.example.schedule.presentation.schedule
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -38,27 +36,16 @@ class ScheduleFragment : Fragment() {
                         ScheduleScreen(
                             viewModel = viewModel,
                             goalCallback = goalCallback,
-                            onAddGoalToScheduleClick = { date -> openAddGoalDialog(date) },
-                            onDeleteRoleClick = { role -> onDeleteClick(role) },
-                            onEditRoleClick = { role -> openRoleDialog(role) },
+                            onAddGoalToScheduleClick = {},
+                            onEditRoleClick = {  },
                             onAddGoalToRoleClick = { roleName -> openAddGoalDialog(roleName) },
-                            onAddRoleClick = { openRoleDialog() }
+                            onAddRoleClick = { openRoleDialog() },
+                            onDeleteRoleClick = {}
                         )
                     }
                 }
             }
         }
-    }
-
-    private fun onDeleteClick(role: Role) {
-        if (role.goals.isNotEmpty())
-            showRoleWarning(requireContext())
-        else
-            viewModel.accept(ScheduleEvent.DeleteRole(role.name))
-    }
-
-    private fun showRoleWarning(context: Context) {
-        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
     }
 
     private fun openAddGoalDialog(role: String) =
