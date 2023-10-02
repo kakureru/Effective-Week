@@ -8,8 +8,4 @@
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_confirm">Confirm</string>
-    <string name="action_add_goal">Add goal</string>
-
-    <!-- Error -->
-    <string name="error_title_and_role_required">Title and role is required</string>
 </resources>

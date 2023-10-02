@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.AddGoalButton
+import com.example.core.ui.AddButton
 import com.example.core.ui.theme.DarkTheme
 import com.example.core.R
 import com.example.schedule.presentation.schedule.model.GoalCallback
@@ -86,7 +86,7 @@ fun RoleItem(
                     onCheck = { goalCallback.onCompleteClick(it.id) })
             }
             item {
-                AddGoalButton(onClick = onAddGoalClick)
+                AddButton(onClick = onAddGoalClick)
             }
         }
     }

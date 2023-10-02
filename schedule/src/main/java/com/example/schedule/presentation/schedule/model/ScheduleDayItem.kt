@@ -1,10 +1,10 @@
 package com.example.schedule.presentation.schedule.model
 
-import com.example.schedule.domain.model.WeekDay
+import com.example.schedule.domain.model.ScheduleDay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class WeekDayItem(
+class ScheduleDayItem(
     val date: LocalDate,
     val weekday: String,
     val dateText: String,
@@ -13,7 +13,7 @@ class WeekDayItem(
     val appointments: List<GoalItem>,
 )
 
-fun WeekDay.toWeekDayItem() = WeekDayItem(
+fun ScheduleDay.toScheduleDayItem() = ScheduleDayItem(
     date = date,
     weekday = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() },
     dateText = DateTimeFormatter.ofPattern("MMM d").format(date).replaceFirstChar { it.uppercase() },

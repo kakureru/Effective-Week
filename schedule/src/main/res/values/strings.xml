@@ -12,4 +12,6 @@
     <string name="description">Description</string>
     <string name="today">Today</string>
     <string name="appointment">Appointment</string>
+
+    <string name="error_title_and_role_required">Title and role is required</string>
 </resources>

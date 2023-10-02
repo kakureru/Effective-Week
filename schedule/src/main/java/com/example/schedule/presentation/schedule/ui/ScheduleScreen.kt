@@ -44,7 +44,7 @@ fun ScheduleScreen(
     modifier: Modifier = Modifier,
     viewModel: ScheduleViewModel,
 ) {
-    val state by viewModel.scheduleState.collectAsState()
+    val state by viewModel.uiState.collectAsState()
     ScheduleScreenUi(
         state = state,
         onAddGoalToScheduleClick = onAddGoalToScheduleClick,

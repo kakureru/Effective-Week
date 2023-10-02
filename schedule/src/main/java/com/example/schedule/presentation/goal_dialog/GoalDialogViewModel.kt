@@ -3,7 +3,7 @@ package com.example.schedule.presentation.goal_dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.core.R
+import com.example.schedule.R
 import com.example.schedule.domain.model.Goal
 import com.example.schedule.domain.repository.GoalRepository
 import com.example.schedule.presentation.goal_dialog.model.DateDialogData
