@@ -1,26 +1,25 @@
 package com.example.schedule.presentation.goal_dialog
 
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.app.TimePickerDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.example.schedule.R
-import com.example.schedule.databinding.GoalDialogLayoutBinding
-import com.example.schedule.presentation.goal_dialog.model.DateDialogData
-import com.example.schedule.presentation.goal_dialog.model.RoleDialogData
-import com.example.schedule.presentation.goal_dialog.model.TimeDialogData
+import com.example.core.ui.theme.DarkTheme
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.RoleDialogData
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
+import com.example.schedule.presentation.goal_dialog.ui.GoalDialog
 import com.example.schedule.presentation.role_pick_dialog.RolePickerDialogFragment
 import com.example.utils.collectFlowSafely
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
@@ -33,48 +32,18 @@ class GoalDialogFragment : DialogFragment() {
 
     private val viewModel: GoalDialogViewModel by viewModel { parametersOf(id, date, role) }
 
-    private lateinit var binding: GoalDialogLayoutBinding
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        binding = GoalDialogLayoutBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(requireContext()).setView(binding.root).create()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        binding.apply {
-            etTitle.addTextChangedListener {
-                viewModel.accept(GoalDialogEvent.TitleChanged(etTitle.text.toString()))
-            }
-            etDescription.addTextChangedListener {
-                viewModel.accept(GoalDialogEvent.DescriptionChanged(etDescription.text.toString()))
-            }
-
-            btnRole.setOnClickListener { viewModel.accept(GoalDialogEvent.RoleClick) }
-            btnDate.setOnClickListener { viewModel.accept(GoalDialogEvent.DateClick) }
-            btnTime.setOnClickListener { viewModel.accept(GoalDialogEvent.TimeClick) }
-
-            cbAppointment.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.accept(GoalDialogEvent.AppointmentCheckChanged(isChecked))
-            }
-
-            btnConfirm.setOnClickListener { viewModel.accept(GoalDialogEvent.ConfirmClick) }
-            btnDismiss.setOnClickListener { dismiss() }
-        }
-
-        viewModel.uiState.render()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         viewModel.uiEffect.handleEffect()
-        return dialog
-    }
-
-    private fun StateFlow<GoalDialogState>.render() = collectFlowSafely {
-        collect { state ->
-            if (state.isSuccessful) dismiss()
-            binding.apply {
-                if (etTitle.text.isEmpty()) etTitle.setText(state.title)
-                if (etDescription.text.isEmpty()) etDescription.setText(state.description)
-                btnRole.text = state.role ?: requireContext().getString(R.string.role)
-                btnDate.text = state.date ?: requireContext().getString(R.string.date)
-                btnTime.text = state.time ?: requireContext().getString(R.string.time)
-                cbAppointment.isChecked = state.appointment
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DarkTheme {
+                    GoalDialog(
+                        vm = viewModel,
+                        onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
+                        onDismissRequest = { dismiss() },
+                    )
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,37 +23,64 @@ import androidx.compose.ui.unit.dp
 import com.example.core.ui.BasicDialog
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
+import com.example.schedule.presentation.goal_dialog.GoalDialogEvent
 import com.example.schedule.presentation.goal_dialog.GoalDialogViewModel
 
 @Composable
 fun GoalDialog(
-    viewModel: GoalDialogViewModel,
+    vm: GoalDialogViewModel,
     onConfirmClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by vm.uiState.collectAsState()
     GoalDialogUi(
+        isSuccess = state.isSuccessful,
         onConfirmClick = onConfirmClick,
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        title = { TitleField(value = state.title, onValueChange = {}) },
-        description = { DescriptionField(value = state.description, onValueChange = {}) },
-        roleField = { RoleField(role = state.role, onClick = {}) },
+        title = {
+            TitleField(
+                value = state.title,
+                onValueChange = { value -> vm.accept(GoalDialogEvent.TitleChanged(value)) }
+            )
+        },
+        description = {
+            DescriptionField(
+                value = state.description,
+                onValueChange = { value -> vm.accept(GoalDialogEvent.DescriptionChanged(value)) }
+            )
+        },
+        roleField = {
+            RoleField(
+                role = state.role,
+                onClick = { vm.accept(GoalDialogEvent.RoleClick) }
+            )
+        },
         dateTime = {
             DateTimeFields(
                 date = state.date,
                 time = state.time,
-                onDateClick = {},
-                onTimeClick = {},
+                onDateClick = { vm.accept(GoalDialogEvent.DateClick) },
+                onTimeClick = { vm.accept(GoalDialogEvent.TimeClick) },
             )
         },
-        appointment = { AppointmentField(isAppointment = state.appointment, onValueChange = {}) },
+        appointment = {
+            AppointmentField(
+                isAppointment = state.appointment,
+                onValueChange = { value ->
+                    vm.accept(
+                        GoalDialogEvent.AppointmentValueChanged(value)
+                    )
+                }
+            )
+        },
     )
 }
 
 @Composable
 fun GoalDialogUi(
+    isSuccess: Boolean,
     onConfirmClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,6 +90,9 @@ fun GoalDialogUi(
     dateTime: @Composable () -> Unit,
     appointment: @Composable () -> Unit,
 ) {
+    LaunchedEffect(key1 = isSuccess) {
+        if (isSuccess) onDismissRequest()
+    }
     BasicDialog(
         onConfirmClick = onConfirmClick,
         onDismissRequest = onDismissRequest,
@@ -195,6 +226,7 @@ private fun AppointmentField(
 private fun GoalDialogPreview() {
     DarkTheme {
         GoalDialogUi(
+            isSuccess = false,
             onDismissRequest = {},
             onConfirmClick = {},
             title = { TitleField(value = "", onValueChange = {}) },

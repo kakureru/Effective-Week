@@ -2,37 +2,41 @@ package com.example.schedule.presentation.goal_dialog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.RoleDialogData
+import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
 import com.example.schedule.R
 import com.example.schedule.domain.model.Goal
 import com.example.schedule.domain.repository.GoalRepository
-import com.example.schedule.presentation.goal_dialog.model.DateDialogData
-import com.example.schedule.presentation.goal_dialog.model.RoleDialogData
-import com.example.schedule.presentation.goal_dialog.model.TimeDialogData
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 
 class GoalDialogViewModel (
     private val goalId: Int?,
-    private val initDate: LocalDate?,
-    private val initRole: String?,
+    initDate: LocalDate?,
+    initRole: String?,
     private val goalRepository: GoalRepository,
 ) : ViewModel() {
 
     private val defaultGoal = Goal(
-        id = -1,
+        id = goalId ?: -1,
         title = "",
         description = "",
         role = initRole,
@@ -42,15 +46,49 @@ class GoalDialogViewModel (
     )
 
     private val calendar: Calendar = Calendar.getInstance()
-    private val goalState = MutableStateFlow(defaultGoal)
+    private val _goalState = MutableStateFlow(defaultGoal)
+    private val _isSuccess = MutableStateFlow(false)
 
-    private val _uiState = MutableStateFlow(GoalDialogState(/*goalState.value.toUI()*/))
-    val uiState = _uiState.asStateFlow()
+    init {
+        subscribeToGoalDateTimeUpdates()
+        if (goalId != null) loadGoal(goalId)
+    }
+
+    val uiState: StateFlow<GoalDialogState> = combine(
+        _goalState,
+        _isSuccess,
+    ) { goalState, navState ->
+        GoalDialogState(
+            title = goalState.title,
+            description = goalState.description,
+            role = goalState.role,
+            date = goalState.date?.let { DateTimeFormatter.ofPattern("MMM d").format(it) },
+            time = goalState.time?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) },
+            appointment = goalState.appointment,
+            isSuccessful = navState
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(3000L),
+        GoalDialogState()
+    )
 
     private val _uiEffect = MutableSharedFlow<GoalDialogEffect>()
     val uiEffect: SharedFlow<GoalDialogEffect> = _uiEffect.asSharedFlow()
 
-    private val isInputCorrect: Boolean get() = with(goalState.value) {
+    fun accept(event: GoalDialogEvent) = viewModelScope.launch {
+        when(event) {
+            GoalDialogEvent.RoleClick -> onRoleClick()
+            GoalDialogEvent.TimeClick -> onTimeClick()
+            GoalDialogEvent.DateClick -> onDateClick()
+            GoalDialogEvent.ConfirmClick -> onConfirmClick()
+            is GoalDialogEvent.DescriptionChanged -> onDescriptionChanged(event.newDescription)
+            is GoalDialogEvent.TitleChanged -> onTitleChanged(event.newTitle)
+            is GoalDialogEvent.AppointmentValueChanged -> onAppointmentChanged(event.isChecked)
+        }
+    }
+
+    private val isInputCorrect: Boolean get() = with(_goalState.value) {
         title.isNotEmpty() && role != null
     }
 
@@ -73,39 +111,21 @@ class GoalDialogViewModel (
         setTime(h, m)
     }
 
-    fun accept(event: GoalDialogEvent) = viewModelScope.launch {
-        when(event) {
-            GoalDialogEvent.RoleClick -> onRoleClick()
-            GoalDialogEvent.TimeClick -> onTimeClick()
-            GoalDialogEvent.DateClick -> onDateClick()
-            GoalDialogEvent.ConfirmClick -> onConfirmClick()
-            is GoalDialogEvent.DescriptionChanged -> onDescriptionChanged(event.newDescription)
-            is GoalDialogEvent.TitleChanged -> onTitleChanged(event.newTitle)
-            is GoalDialogEvent.AppointmentCheckChanged -> onAppointmentChanged(event.isChecked)
-        }
+    private fun loadGoal(goalId: Int) = viewModelScope.launch {
+        _goalState.value = goalRepository.getGoal(goalId)
     }
 
-    init {
-        subscribeToGoalState()
-        if (goalId != null) loadGoal(goalId)
-    }
-
-    private fun subscribeToGoalState() = goalState
+    private fun subscribeToGoalDateTimeUpdates() = _goalState
         .onEach { goal ->
-//            _uiState.update { it.copy(goalData = goal.toUI()) }
             calendar.apply { time = getCalendarTime(goal.date, goal.time) }
         }.launchIn(viewModelScope)
 
-    private fun loadGoal(goalId: Int) = viewModelScope.launch {
-        goalState.value = goalRepository.getGoal(goalId)
-    }
-
     private fun onTitleChanged(newTitle: String) {
-        goalState.update { it.copy(title = newTitle) }
+        _goalState.update { it.copy(title = newTitle) }
     }
 
     private fun onDescriptionChanged(newDescription: String) {
-        goalState.update { it.copy(description = newDescription) }
+        _goalState.update { it.copy(description = newDescription) }
     }
 
     private suspend fun onRoleClick() {
@@ -121,7 +141,7 @@ class GoalDialogViewModel (
     }
 
     private fun onAppointmentChanged(isChecked: Boolean) {
-        goalState.update { it.copy(appointment = isChecked) }
+        _goalState.update { it.copy(appointment = isChecked) }
     }
 
     private suspend fun onConfirmClick() {
@@ -129,15 +149,15 @@ class GoalDialogViewModel (
             _uiEffect.emit(GoalDialogEffect.Error(R.string.error_title_and_role_required))
         else {
             if (goalId == null)
-                goalRepository.addGoal(goalState.value)
+                goalRepository.addGoal(_goalState.value)
             else
-                goalRepository.editGoal(goalState.value)
-            _uiState.update { it.copy(isSuccessful = true) }
+                goalRepository.editGoal(_goalState.value)
+            _isSuccess.value = true
         }
     }
 
     private fun setRole(role: String) {
-        goalState.update { it.copy(role = role) }
+        _goalState.update { it.copy(role = role) }
     }
 
     private fun setDate(y: Int, m: Int, d: Int) {
@@ -146,7 +166,7 @@ class GoalDialogViewModel (
             set(Calendar.MONTH, m)
             set(Calendar.DAY_OF_MONTH, d)
         }
-        goalState.update { it.copy(date = getLocalDate(calendar)) }
+        _goalState.update { it.copy(date = getLocalDate(calendar)) }
     }
 
     private fun setTime(h: Int, m: Int) {
@@ -154,7 +174,7 @@ class GoalDialogViewModel (
             set(Calendar.HOUR_OF_DAY, h)
             set(Calendar.MINUTE, m)
         }
-        goalState.update { it.copy(time = getLocalTime(calendar)) }
+        _goalState.update { it.copy(time = getLocalTime(calendar)) }
     }
 
     private fun getLocalDate(calendar: Calendar): LocalDate? =

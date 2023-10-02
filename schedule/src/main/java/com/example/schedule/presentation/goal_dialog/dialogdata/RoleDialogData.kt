@@ -1,4 +1,4 @@
-package com.example.schedule.presentation.goal_dialog.model
+package com.example.greatweek.ui.screens.goaldialog.dialogdata
 
 data class RoleDialogData(
     val onRolePickListener: (role: String) -> Unit
