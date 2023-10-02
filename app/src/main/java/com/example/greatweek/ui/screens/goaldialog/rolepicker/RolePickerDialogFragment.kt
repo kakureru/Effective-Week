@@ -1,8 +1,12 @@
 package com.example.greatweek.ui.screens.goaldialog.rolepicker
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -11,8 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import com.example.greatweek.App
 import com.example.greatweek.ui.ViewModelFactory
-import com.example.greatweek.databinding.RoleBottomSheetDialogLayoutBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.example.greatweek.ui.screens.goaldialog.rolepicker.ui.RolePickDialog
+import com.example.greatweek.ui.screens.roledialog.RoleDialogFragment
+import com.example.greatweek.ui.theme.DarkTheme
 import javax.inject.Inject
 
 class RolePickerDialogFragment : DialogFragment() {
@@ -33,17 +38,24 @@ class RolePickerDialogFragment : DialogFragment() {
         (activity?.applicationContext as App).appComponent.inject(this)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = BottomSheetDialog(requireContext())
-        val binding = RoleBottomSheetDialogLayoutBinding.inflate(layoutInflater)
-        dialog.setContentView(binding.root)
-
-        val roleAdapter = RoleBottomSheetDialogAdapter(onItemClick = onRoleItemClick)
-        binding.roleRecyclerView.adapter = roleAdapter
-        viewModel.roles.observe(this) {
-            roleAdapter.submitList(it)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(requireContext()).apply { 
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DarkTheme {
+                    RolePickDialog(
+                        viewModel = viewModel,
+                        onRolePicked = onRoleItemClick,
+                        onDismissRequest = { dismiss() },
+                        onAddRoleClick = { showNewRoleDialog() }
+                    )
+                }
+            }
         }
-        return dialog
+    }
+
+    private fun showNewRoleDialog() {
+        RoleDialogFragment.showForNew(manager = parentFragmentManager)
     }
 
     companion object {
