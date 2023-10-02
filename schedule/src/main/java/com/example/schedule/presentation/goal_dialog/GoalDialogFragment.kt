@@ -3,7 +3,6 @@ package com.example.schedule.presentation.goal_dialog
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,21 +12,18 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
-import com.example.utils.collectFlowSafely
 import com.example.schedule.R
 import com.example.schedule.databinding.GoalDialogLayoutBinding
-import com.example.schedule.di.ScheduleComponentViewModel
 import com.example.schedule.presentation.goal_dialog.model.DateDialogData
 import com.example.schedule.presentation.goal_dialog.model.RoleDialogData
 import com.example.schedule.presentation.goal_dialog.model.TimeDialogData
 import com.example.schedule.presentation.role_pick_dialog.RolePickerDialogFragment
+import com.example.utils.collectFlowSafely
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
-import javax.inject.Inject
 
 class GoalDialogFragment : DialogFragment() {
 
@@ -35,15 +31,9 @@ class GoalDialogFragment : DialogFragment() {
     private val date: LocalDate? by lazy { requireArguments().get(ARG_DATE) as LocalDate? }
     private val role: String? by lazy { requireArguments().getString(ARG_ROLE) }
 
-    @Inject lateinit var viewModelFactory: GoalDialogViewModelFactory.Factory
-    private val viewModel: GoalDialogViewModel by viewModels { viewModelFactory.create(id, date, role) }
+    private val viewModel: GoalDialogViewModel by viewModel { parametersOf(id, date, role) }
 
     private lateinit var binding: GoalDialogLayoutBinding
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        ViewModelProvider(this).get<ScheduleComponentViewModel>().newScheduleComponent.inject(this)
-    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         binding = GoalDialogLayoutBinding.inflate(layoutInflater)

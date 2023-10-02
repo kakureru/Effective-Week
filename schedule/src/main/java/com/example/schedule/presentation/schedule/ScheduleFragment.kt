@@ -11,34 +11,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
-import com.example.utils.ViewModelFactory
 import com.example.core.ui.theme.DarkTheme
-import com.example.schedule.di.ScheduleComponentViewModel
 import com.example.schedule.domain.model.Role
 import com.example.schedule.presentation.goal_dialog.GoalDialogFragment
 import com.example.schedule.presentation.role_dialog.RoleDialogFragment
 import com.example.schedule.presentation.schedule.model.GoalCallback
 import com.example.schedule.presentation.schedule.ui.ScheduleScreen
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
-import javax.inject.Inject
 
 class ScheduleFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: ScheduleViewModel by viewModels { viewModelFactory }
+    private val viewModel: ScheduleViewModel by viewModel()
 
     private val goalCallback = object : GoalCallback {
         override fun onCompleteClick(goalId: Int) = viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
         override fun onClick(goalId: Int) = openEditGoalDialog(goalId)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        ViewModelProvider(this).get<ScheduleComponentViewModel>().newScheduleComponent.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

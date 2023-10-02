@@ -1,7 +1,6 @@
 package com.example.schedule.presentation.goal_dialog
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.schedule.R
 import com.example.schedule.domain.model.Goal
@@ -9,9 +8,6 @@ import com.example.schedule.domain.repository.GoalRepository
 import com.example.schedule.presentation.goal_dialog.model.DateDialogData
 import com.example.schedule.presentation.goal_dialog.model.RoleDialogData
 import com.example.schedule.presentation.goal_dialog.model.TimeDialogData
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,9 +23,8 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
-class GoalDialogViewModel @Inject constructor(
+class GoalDialogViewModel (
     private val goalId: Int?,
     private val initDate: LocalDate?,
     private val initRole: String?,
@@ -174,28 +169,5 @@ class GoalDialogViewModel @Inject constructor(
         return Date.from(
             LocalDateTime.of(calendarDate, calendarTime).atZone(ZoneId.systemDefault()).toInstant()
         )
-    }
-}
-
-class GoalDialogViewModelFactory @AssistedInject constructor(
-    @Assisted private val goalId: Int?,
-    @Assisted private val initDate: LocalDate?,
-    @Assisted private val initRole: String?,
-    private val goalRepository: GoalRepository,
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GoalDialogViewModel::class.java))
-            return GoalDialogViewModel(goalId, initDate, initRole, goalRepository) as T
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted goalId: Int?,
-            @Assisted date: LocalDate?,
-            @Assisted role: String?
-        ): GoalDialogViewModelFactory
     }
 }

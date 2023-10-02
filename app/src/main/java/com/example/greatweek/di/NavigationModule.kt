@@ -2,22 +2,22 @@ package com.example.greatweek.di
 
 import com.github.terrakok.cicerone.Cicerone
 import com.github.terrakok.cicerone.Router
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import org.koin.dsl.module
 
-@Module
-object NavigationModule {
+val navigationModule = module {
 
-    @Provides
-    @Singleton
-    fun provideCicerone() = Cicerone.create()
+    single {
+        Cicerone.create()
+    }
 
-    @Provides
-    @Singleton
-    fun provideRouter(cicerone: Cicerone<Router>) = cicerone.router
+    single {
+        provideRouter(cicerone = get())
+    }
 
-    @Provides
-    @Singleton
-    fun provideNavigatorHolder(cicerone: Cicerone<Router>) = cicerone.getNavigatorHolder()
+    single {
+        provideNavigatorHolder(cicerone = get())
+    }
 }
+
+fun provideRouter(cicerone: Cicerone<Router>) = cicerone.router
+fun provideNavigatorHolder(cicerone: Cicerone<Router>) = cicerone.getNavigatorHolder()

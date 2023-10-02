@@ -34,7 +34,4 @@ dependencies {
     implementation deps.androidx.core
     implementation deps.androidx.appcompat
     implementation deps.androidx.fragment
-
-    implementation deps.dagger.dagger
-    kapt deps.dagger.kapt
 }

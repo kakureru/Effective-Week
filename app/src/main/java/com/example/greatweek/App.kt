@@ -1,24 +1,24 @@
 package com.example.greatweek
 
 import android.app.Application
-import com.example.greatweek.di.AppComponent
-import com.example.greatweek.di.AppModule
-import com.example.greatweek.di.DaggerAppComponent
-import com.example.greatweek.di.DataModule
-import com.example.schedule.di.deps.ScheduleDepsStore
+import com.example.greatweek.di.dataModule
+import com.example.greatweek.di.domainModule
+import com.example.greatweek.di.navigationModule
+import com.example.greatweek.di.viewModelModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 class App : Application() {
 
-    val appComponent: AppComponent by lazy {
-        DaggerAppComponent
-            .builder()
-            .appModule(AppModule(context = this))
-            .dataModule(DataModule(application = this@App))
-            .build()
-    }
-
     override fun onCreate() {
         super.onCreate()
-        ScheduleDepsStore.deps = appComponent
+
+        startKoin {
+            androidLogger(Level.DEBUG)
+            androidContext(this@App)
+            modules(dataModule, navigationModule, viewModelModule, domainModule)
+        }
     }
 }

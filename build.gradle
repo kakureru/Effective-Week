@@ -7,8 +7,8 @@ buildscript {
     ]
 
     ext.versions = [
-        'dagger': '2.45',
         'room': '2.4.3',
+        'koin': '3.4.3',
     ]
 
     ext.deps = [
@@ -34,9 +34,9 @@ buildscript {
                 ],
         ],
         'material': "com.google.android.material:material:1.7.0",
-        'dagger': [
-                'dagger': "com.google.dagger:dagger:${versions.dagger}",
-                'kapt': "com.google.dagger:dagger-compiler:${versions.dagger}"
+        'koin': [
+                'android': "io.insert-koin:koin-android:${versions.koin}",
+                'compose': "io.insert-koin:koin-androidx-compose:${versions.koin}",
         ],
         'datastore': 'androidx.datastore:datastore-preferences:1.0.0',
         'room': [

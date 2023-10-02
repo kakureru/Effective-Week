@@ -2,22 +2,19 @@ package com.example.greatweek
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.greatweek.R
-import com.example.greatweek.App
 import com.example.greatweek.navigation.Screens
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
-    @Inject lateinit var navigatorHolder: NavigatorHolder
-    @Inject lateinit var router: Router
+    private val navigatorHolder: NavigatorHolder by inject()
+    private val router: Router by inject()
     private val navigator = AppNavigator(this, R.id.mainContainer)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (applicationContext as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {

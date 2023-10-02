@@ -44,9 +44,6 @@ dependencies {
 
     implementation deps.material
 
-    implementation deps.dagger.dagger
-    kapt deps.dagger.kapt
-
     // Compose
     implementation platform(deps.androidx.compose.bom)
     androidTestImplementation platform(deps.androidx.compose.bom)

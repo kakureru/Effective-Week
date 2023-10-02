@@ -1,58 +1,30 @@
 package com.example.greatweek.di
 
-import android.app.Application
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.greatweek.data.db.AppDatabase
 import com.example.schedule.data.db.GoalDao
 import com.example.schedule.data.db.RoleDao
-import dagger.Module
-import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import javax.inject.Singleton
+import com.example.schedule.data.repository.GoalRepositoryImpl
+import com.example.schedule.data.repository.RoleRepositoryImpl
+import com.example.schedule.domain.repository.GoalRepository
+import com.example.schedule.domain.repository.RoleRepository
+import org.koin.android.ext.koin.androidApplication
+import org.koin.dsl.module
 
-private const val USER_PREFERENCES_NAME = "USER_PREFERENCES"
+val dataModule = module {
 
-@Module
-class DataModule(val application: Application) {
-
-    private val Context.dataStore by preferencesDataStore(name = USER_PREFERENCES_NAME)
-
-    @Singleton
-    @Provides
-    fun providePreferencesDataStore(context: Context): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { context.preferencesDataStoreFile(USER_PREFERENCES_NAME) }
-        )
+    single<GoalDao> {
+        AppDatabase.getInstance(application = androidApplication()).GoalDao()
     }
 
-    @Singleton
-    @Provides
-    fun provideDatabase(): AppDatabase {
-        return AppDatabase.getInstance(application)
+    single<RoleDao> {
+        AppDatabase.getInstance(application = androidApplication()).RoleDao()
     }
 
-    @Singleton
-    @Provides
-    fun provideGoalDao(database: AppDatabase): GoalDao {
-        return database.GoalDao()
+    single<GoalRepository> {
+        GoalRepositoryImpl(goalDao = get())
     }
 
-    @Singleton
-    @Provides
-    fun provideRoleDao(database: AppDatabase): RoleDao {
-        return database.RoleDao()
+    single<RoleRepository> {
+        RoleRepositoryImpl(roleDao = get())
     }
 }

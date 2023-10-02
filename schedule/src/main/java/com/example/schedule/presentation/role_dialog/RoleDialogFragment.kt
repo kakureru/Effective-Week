@@ -1,6 +1,5 @@
 package com.example.schedule.presentation.role_dialog
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,25 +9,16 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import com.example.core.ui.theme.DarkTheme
-import com.example.schedule.di.ScheduleComponentViewModel
 import com.example.schedule.presentation.role_dialog.ui.RoleDialog
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class RoleDialogFragment : DialogFragment() {
 
     private val roleName: String? by lazy { arguments?.getString(ARG_ROLE_NAME) }
 
-    @Inject lateinit var viewModelFactory: RoleDialogViewModelFactory.Factory
-    private val viewModel: RoleDialogViewModel by viewModels { viewModelFactory.create(roleName) }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        ViewModelProvider(this).get<ScheduleComponentViewModel>().newScheduleComponent.inject(this)
-    }
+    private val viewModel: RoleDialogViewModel by viewModel { parametersOf(roleName) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return ComposeView(requireContext()).apply {

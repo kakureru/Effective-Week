@@ -49,8 +49,8 @@ dependencies {
     implementation deps.room.ktx
     kapt deps.room.kapt
 
-    implementation deps.dagger.dagger
-    kapt deps.dagger.kapt
+    implementation deps.koin.android
+    implementation deps.koin.compose
 
     implementation deps.datastore
 

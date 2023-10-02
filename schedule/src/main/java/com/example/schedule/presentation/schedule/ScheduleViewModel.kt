@@ -18,9 +18,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import javax.inject.Inject
 
-class ScheduleViewModel @Inject constructor(
+class ScheduleViewModel(
     private val goalRepository: GoalRepository,
     private val roleRepository: RoleRepository,
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
