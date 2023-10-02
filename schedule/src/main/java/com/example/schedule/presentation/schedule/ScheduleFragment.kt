@@ -28,7 +28,7 @@ import javax.inject.Inject
 class ScheduleFragment : Fragment() {
 
     @Inject
-    lateinit var viewModelFactory: com.example.utils.ViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ScheduleViewModel by viewModels { viewModelFactory }
 
     private val goalCallback = object : GoalCallback {
@@ -52,9 +52,9 @@ class ScheduleFragment : Fragment() {
                             goalCallback = goalCallback,
                             onAddGoalToScheduleClick = { date -> openAddGoalDialog(date) },
                             onDeleteRoleClick = { role -> onDeleteClick(role) },
-                            onEditRoleClick = { role -> openRenameRoleDialog(role) },
+                            onEditRoleClick = { role -> openRoleDialog(role) },
                             onAddGoalToRoleClick = { roleName -> openAddGoalDialog(roleName) },
-                            onAddRoleClick = { openAddRoleDialog() }
+                            onAddRoleClick = { openRoleDialog() }
                         )
                     }
                 }
@@ -79,10 +79,15 @@ class ScheduleFragment : Fragment() {
             role = role,
         )
 
-    private fun openRenameRoleDialog(role: Role) =
-        RoleDialogFragment.showForEdit(
+    private fun openRoleDialog(role: Role) =
+        RoleDialogFragment.show(
             manager = parentFragmentManager,
-            role = role.name
+            roleName = role.name
+        )
+
+    private fun openRoleDialog() =
+        RoleDialogFragment.show(
+            manager = parentFragmentManager
         )
 
     private fun openEditGoalDialog(goalId: Int) {
@@ -98,6 +103,4 @@ class ScheduleFragment : Fragment() {
             date = date,
         )
     }
-
-    fun openAddRoleDialog() = RoleDialogFragment.showForNew(manager = parentFragmentManager)
 }

@@ -57,7 +57,7 @@ class RolePickerDialogFragment : DialogFragment() {
     }
 
     private fun showNewRoleDialog() {
-        RoleDialogFragment.showForNew(manager = parentFragmentManager)
+        RoleDialogFragment.show(manager = parentFragmentManager)
     }
 
     companion object {

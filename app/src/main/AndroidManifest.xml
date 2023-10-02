@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.greatweek">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:name="com.example.greatweek.App"
         android:allowBackup="true"

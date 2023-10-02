@@ -14,16 +14,11 @@ internal interface ViewModelModule {
 
     @Binds
     @IntoMap
-    @com.example.utils.ViewModelKey(ScheduleViewModel::class)
+    @ViewModelKey(ScheduleViewModel::class)
     fun bindsScheduleViewModel(viewModel: ScheduleViewModel): ViewModel
 
     @Binds
     @IntoMap
-    @com.example.utils.ViewModelKey(RoleDialogViewModel::class)
-    fun bindsRoleDialogViewModel(viewModel: RoleDialogViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @com.example.utils.ViewModelKey(RolePickerViewModel::class)
+    @ViewModelKey(RolePickerViewModel::class)
     fun bindsRolePickerViewModel(viewModel: RolePickerViewModel): ViewModel
 }

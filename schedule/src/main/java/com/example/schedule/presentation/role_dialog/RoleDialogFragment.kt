@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
-import com.example.utils.ViewModelFactory
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.di.ScheduleComponentViewModel
 import com.example.schedule.presentation.role_dialog.ui.RoleDialog
@@ -21,11 +20,10 @@ import javax.inject.Inject
 
 class RoleDialogFragment : DialogFragment() {
 
-    @Inject lateinit var viewModelFactory: com.example.utils.ViewModelFactory
-    private val viewModel: RoleDialogViewModel by viewModels { viewModelFactory }
+    private val roleName: String? by lazy { arguments?.getString(ARG_ROLE_NAME) }
 
-    private val role: String? by lazy { requireArguments().getString(ARG_ROLE) }
-    private val requestKey: String by lazy { requireArguments().getString(ARG_REQUEST_KEY) ?: throw IllegalArgumentException() }
+    @Inject lateinit var viewModelFactory: RoleDialogViewModelFactory.Factory
+    private val viewModel: RoleDialogViewModel by viewModels { viewModelFactory.create(roleName) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -39,16 +37,7 @@ class RoleDialogFragment : DialogFragment() {
                 DarkTheme {
                     RoleDialog(
                         viewModel = viewModel,
-                        onConfirmClick = {
-                            when (requestKey) {
-                                RENAME_ROLE_REQUEST_KEY -> role?.let { viewModel.renameRole(oldName = it) }
-                                ADD_ROLE_REQUEST_KEY -> viewModel.addRole()
-                            }
-                            dismiss()
-                        },
-                        onDismissRequest = {
-                            dismiss()
-                        }
+                        onDismissRequest = { dismiss() }
                     )
                 }
             }
@@ -57,25 +46,12 @@ class RoleDialogFragment : DialogFragment() {
 
     companion object {
         private val TAG = RoleDialogFragment::class.java.simpleName
-        private const val ARG_ROLE = "ARG_ROLE_NAME"
-        private const val ARG_REQUEST_KEY = "ARG_REQUEST_KEY"
+        private const val ARG_ROLE_NAME = "ARG_ROLE_NAME"
 
-        const val ADD_ROLE_REQUEST_KEY = "ADD_ROLE_REQUEST_KEY"
-        const val RENAME_ROLE_REQUEST_KEY = "RENAME_ROLE_REQUEST_KEY"
-
-        fun showForNew(manager: FragmentManager) {
+        fun show(manager: FragmentManager, roleName: String? = null) {
             RoleDialogFragment().apply {
                 arguments = bundleOf(
-                    ARG_REQUEST_KEY to ADD_ROLE_REQUEST_KEY
-                )
-            }.show(manager, TAG)
-        }
-
-        fun showForEdit(manager: FragmentManager, role: String) {
-            RoleDialogFragment().apply {
-                arguments = bundleOf(
-                    ARG_ROLE to role,
-                    ARG_REQUEST_KEY to RENAME_ROLE_REQUEST_KEY
+                    ARG_ROLE_NAME to roleName,
                 )
             }.show(manager, TAG)
         }
