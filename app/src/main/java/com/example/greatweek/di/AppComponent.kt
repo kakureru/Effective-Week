@@ -1,23 +1,18 @@
 package com.example.greatweek.di
 
-import com.example.greatweek.ui.MainActivity
-import com.example.greatweek.ui.screens.goaldialog.GoalDialogFragment
-import com.example.greatweek.ui.screens.goaldialog.rolepicker.RolePickerDialogFragment
-import com.example.greatweek.ui.screens.roledialog.RoleDialogFragment
-import com.example.greatweek.ui.screens.schedule.ScheduleFragment
+import com.example.greatweek.MainActivity
+import com.example.schedule.data.db.GoalDao
+import com.example.schedule.data.db.RoleDao
+import com.example.schedule.di.deps.ScheduleDeps
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, DomainModule::class, DataModule::class, NavigationModule::class])
-interface AppComponent {
+@Component(modules = [AppModule::class, DataModule::class, NavigationModule::class])
+interface AppComponent : ScheduleDeps {
 
-    // Activities
     fun inject(activity: MainActivity)
 
-    // Fragments
-    fun inject(fragment: GoalDialogFragment)
-    fun inject(fragment: RoleDialogFragment)
-    fun inject(fragment: RolePickerDialogFragment)
-    fun inject(fragment: ScheduleFragment)
+    override fun goalDao(): GoalDao
+    override fun roleDao(): RoleDao
 }

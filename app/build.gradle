@@ -15,11 +15,6 @@ android {
         versionName "1.0"
     }
 
-    buildFeatures {
-        dataBinding = true
-        viewBinding = true
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -42,11 +37,13 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':schedule')
+    implementation project(path: ':core')
+    implementation project(path: ':utils')
+
     implementation deps.androidx.core
     implementation deps.androidx.appcompat
-    implementation deps.androidx.constraintlayout
     implementation deps.androidx.fragment
-    implementation deps.androidx.livedata
 
     implementation deps.room.runtime
     implementation deps.room.ktx
@@ -60,8 +57,6 @@ dependencies {
     implementation deps.cicerone
 
     implementation deps.material
-
-    implementation deps.gravitysnaphelper
 
     // Compose
     implementation platform(deps.androidx.compose.bom)

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_goal_placeholder">No goals</string>
+    <string name="my_roles">My roles</string>
+    <string name="priorities">Priorities</string>
+    <string name="appointments">Appointments</string>
+    <string name="choose_role">Choose role</string>
+    <string name="role">Role</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="goal">Goal</string>
+    <string name="description">Description</string>
+    <string name="today">Today</string>
+    <string name="appointment">Appointment</string>
+</resources>

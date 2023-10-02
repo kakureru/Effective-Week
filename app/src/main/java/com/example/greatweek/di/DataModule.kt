@@ -9,21 +9,17 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.room.Room
-import com.example.greatweek.ui.USER_PREFERENCES_NAME
 import com.example.greatweek.data.db.AppDatabase
-import com.example.greatweek.data.db.GoalDao
-import com.example.greatweek.data.db.RoleDao
-import com.example.greatweek.data.repository.GoalRepositoryImpl
-import com.example.greatweek.data.repository.RoleRepositoryImpl
-import com.example.greatweek.domain.repository.GoalRepository
-import com.example.greatweek.domain.repository.RoleRepository
+import com.example.schedule.data.db.GoalDao
+import com.example.schedule.data.db.RoleDao
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
+
+private const val USER_PREFERENCES_NAME = "USER_PREFERENCES"
 
 @Module
 class DataModule(val application: Application) {
@@ -45,13 +41,7 @@ class DataModule(val application: Application) {
     @Singleton
     @Provides
     fun provideDatabase(): AppDatabase {
-        return Room.databaseBuilder(
-            application,
-            AppDatabase::class.java,
-            "app_database"
-        )
-            .fallbackToDestructiveMigration() // TODO migrations
-            .build()
+        return AppDatabase.getInstance(application)
     }
 
     @Singleton
@@ -65,22 +55,4 @@ class DataModule(val application: Application) {
     fun provideRoleDao(database: AppDatabase): RoleDao {
         return database.RoleDao()
     }
-
-    @Singleton
-    @Provides
-    fun provideGoalRepository(
-        goalDao: GoalDao,
-    ): GoalRepository {
-        return GoalRepositoryImpl(
-            goalDao = goalDao,
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideRoleRepository(
-        roleDao: RoleDao,
-    ): RoleRepository = RoleRepositoryImpl(
-        roleDao = roleDao,
-    )
 }

@@ -15,9 +15,7 @@ buildscript {
         'androidx': [
                 'core': 'androidx.core:core-ktx:1.8.0',
                 'appcompat': 'androidx.appcompat:appcompat:1.5.1',
-                'constraintlayout': 'androidx.constraintlayout:constraintlayout:2.1.4',
                 'fragment': 'androidx.fragment:fragment-ktx:1.6.0',
-                'livedata': 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1',
                 'activity_compose': 'androidx.activity:activity-compose:1.5.1',
                 'compose': [
                         'bom': 'androidx.compose:compose-bom:2022.10.00',
