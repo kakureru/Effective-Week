@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -116,6 +118,8 @@ fun ScheduleScreenUi(
         topBar = topBar,
         sheetContent = sheetContent,
         containerColor = MaterialTheme.colorScheme.background,
+//        sheetContainerColor = Color.Transparent,
+        sheetShape = MaterialTheme.shapes.large
     ) { paddingValues ->
         val rowState = rememberLazyListState()
         val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
@@ -126,7 +130,6 @@ fun ScheduleScreenUi(
             contentPadding = PaddingValues(horizontal = 16.dp),
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(top = 16.dp)
                 .fillMaxHeight(),
         ) {
             items(items = state.schedule, key = { item -> item.dateText }) {
@@ -145,7 +148,8 @@ fun ScheduleScreenUi(
                             onLongClick = { },
                             onCheck = { goalCallback.onCompleteClick(goal.id) },
                         )
-                    }
+                    },
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
         }

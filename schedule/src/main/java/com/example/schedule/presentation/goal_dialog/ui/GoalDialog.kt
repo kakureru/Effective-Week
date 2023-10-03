@@ -1,16 +1,22 @@
 package com.example.schedule.presentation.goal_dialog.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -118,11 +124,15 @@ fun GoalDialogUi(
         onDismissRequest = onDismissRequest,
         modifier = modifier
     ) {
-        title()
-        description()
-        roleField()
-        dateTime()
-        appointment()
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            title()
+            description()
+            roleField()
+            dateTime()
+            appointment()
+        }
     }
 }
 
@@ -174,21 +184,22 @@ private fun RolePickField(
     var dialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.clickable { dialogVisible = true }
     ) {
         Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
         Text(text = role ?: stringResource(id = R.string.role))
-    }
-    if (dialogVisible) {
-        RolePickDialog(
-            roles = availableRoles,
-            onRolePicked = { picked ->
-                onRolePicked(picked)
-                dialogVisible = false
-            },
-            onAddRoleClick = onAddRoleClick,
-            onDismissRequest = { dialogVisible = false }
-        )
+        if (dialogVisible) {
+            RolePickDialog(
+                roles = availableRoles,
+                onRolePicked = { picked ->
+                    onRolePicked(picked)
+                    dialogVisible = false
+                },
+                onAddRoleClick = onAddRoleClick,
+                onDismissRequest = { dialogVisible = false }
+            )
+        }
     }
 }
 
@@ -220,6 +231,7 @@ private fun DateField(
     var datePickDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.clickable { datePickDialogVisible = true }
     ) {
         Icon(painter = painterResource(id = R.drawable.ic_calendar), contentDescription = null)
@@ -246,6 +258,7 @@ private fun TimeField(
     var timePickerDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.clickable { timePickerDialogVisible = true }
     ) {
         Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = null)
@@ -264,6 +277,7 @@ private fun TimeField(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppointmentField(
     isAppointment: Boolean,
@@ -272,9 +286,12 @@ private fun AppointmentField(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
-        Checkbox(checked = isAppointment, onCheckedChange = { onValueChange(it) })
+        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+            Checkbox(checked = isAppointment, onCheckedChange = { onValueChange(it) })
+        }
         Text(text = stringResource(id = R.string.appointment))
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +57,10 @@ fun ColumnScope.RolesTab(
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
         ) {
-            Text(text = stringResource(id = R.string.my_roles))
+            Text(
+                text = stringResource(id = R.string.my_roles),
+                style = MaterialTheme.typography.titleMedium
+            )
             Icon(
                 painter = painterResource(id = R.drawable.ic_role_add),
                 contentDescription = "add role",
