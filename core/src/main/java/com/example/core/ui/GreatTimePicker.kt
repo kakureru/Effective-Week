@@ -23,12 +23,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.theme.DarkTheme
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BasicTimePicker(
-    onTimeSelected: (LocalTime) -> Unit,
+fun GreatTimePicker(
+    onTimeSelected: (hour: Int, minute: Int) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     initialHour: Int = 0,
@@ -85,14 +84,7 @@ fun BasicTimePicker(
                     Text(text = stringResource(id = R.string.action_cancel), color = Color.Gray)
                 }
                 TextButton(
-                    onClick = {
-                        onTimeSelected(
-                            LocalTime.of(
-                                timePickerState.hour,
-                                timePickerState.minute
-                            )
-                        )
-                    }
+                    onClick = { onTimeSelected(timePickerState.hour, timePickerState.minute) }
                 ) {
                     Text(
                         text = stringResource(id = R.string.action_confirm),
@@ -108,6 +100,6 @@ fun BasicTimePicker(
 @Composable
 fun BasicTimePickerPreview() {
     DarkTheme {
-        BasicTimePicker(onTimeSelected = {}, onDismissRequest = { /*TODO*/ })
+        GreatTimePicker(onTimeSelected = { h, m -> }, onDismissRequest = { /*TODO*/ })
     }
 }

@@ -16,49 +16,72 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.theme.DarkTheme
 import com.example.core.R
-import com.example.schedule.domain.model.Role
+import com.example.core.ui.theme.DarkTheme
+import com.example.schedule.presentation.schedule.ScheduleEffect
+import com.example.schedule.presentation.schedule.ScheduleEvent
+import com.example.schedule.presentation.schedule.ScheduleNavState
+import com.example.schedule.presentation.schedule.ScheduleNavigation
 import com.example.schedule.presentation.schedule.ScheduleState
 import com.example.schedule.presentation.schedule.ScheduleViewModel
 import com.example.schedule.presentation.schedule.model.GoalCallback
-import java.time.LocalDate
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun ScheduleScreen(
-    goalCallback: GoalCallback,
-    onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
-    onAddGoalToRoleClick: (roleName: String) -> Unit,
-    onDeleteRoleClick: (roleName: String) -> Unit,
-    onEditRoleClick: (roleName: String) -> Unit,
-    onAddRoleClick: () -> Unit,
+    navigation: ScheduleNavigation,
     modifier: Modifier = Modifier,
     viewModel: ScheduleViewModel,
 ) {
+    val goalCallback = remember {
+        object : GoalCallback {
+            override fun onCompleteClick(goalId: Int) = viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
+            override fun onClick(goalId: Int) = viewModel.accept(ScheduleEvent.GoalClick(goalId))
+        }
+    }
     val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(state.navState) {
+        when (val navState = state.navState) {
+            ScheduleNavState.Idle -> Unit
+            is ScheduleNavState.OpenGoalDialogWithDate -> navigation.openGoalDialog(navState.epochDay)
+            is ScheduleNavState.OpenGoalDialogWithGoal -> navigation.openGoalDialog(navState.goalId)
+            is ScheduleNavState.OpenGoalDialogWithRole -> navigation.openGoalDialog(navState.roleName)
+            is ScheduleNavState.OpenRoleDialogWithRole -> navigation.openRoleDialog(navState.roleName)
+            ScheduleNavState.OpenRoleDialog -> navigation.openRoleDialog()
+        }
+    }
     ScheduleScreenUi(
         state = state,
-        onAddGoalToScheduleClick = onAddGoalToScheduleClick,
+        effects = viewModel.uiEffect,
+        onAddGoalToScheduleClick = { epochDay ->
+            viewModel.accept(ScheduleEvent.AddGoalToScheduleDayClick(epochDay))
+        },
         goalCallback = goalCallback,
         modifier = modifier,
-        topBar = {
-            ScheduleTopBar()
-        },
+        topBar = { ScheduleTopBar() },
         sheetContent = {
             RolesTab(
                 roles = state.roles,
                 goalCallback = goalCallback,
-                onAddRoleClick = onAddRoleClick,
-                onDeleteClick = onDeleteRoleClick,
-                onAddGoalClick = onAddGoalToRoleClick,
-                onEditClick = onEditRoleClick
+                onAddRoleClick = { viewModel.accept(ScheduleEvent.AddRoleClick) },
+                onDeleteClick = { roleName -> viewModel.accept(ScheduleEvent.DeleteRoleClick(roleName)) },
+                onAddGoalClick = { roleName -> viewModel.accept(ScheduleEvent.AddGoalToRoleClick(roleName)) },
+                onEditClick = { roleName -> viewModel.accept(ScheduleEvent.EditRoleClick(roleName)) }
             )
         }
     )
@@ -68,13 +91,27 @@ fun ScheduleScreen(
 @Composable
 fun ScheduleScreenUi(
     state: ScheduleState,
+    effects: Flow<ScheduleEffect>,
     onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
     goalCallback: GoalCallback,
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit,
     sheetContent: @Composable ColumnScope.() -> Unit,
 ) {
+    val scaffoldState = rememberBottomSheetScaffoldState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        effects.collect {
+            when (it) {
+                is ScheduleEffect.Error -> scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(context.resources.getString(it.msgResource))
+                }
+            }
+        }
+    }
     BottomSheetScaffold(
+        scaffoldState = scaffoldState,
         modifier = modifier,
         topBar = topBar,
         sheetContent = sheetContent,
@@ -133,6 +170,7 @@ fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
             state = ScheduleState(),
+            effects = emptyFlow(),
             onAddGoalToScheduleClick = {},
             goalCallback = previewGoalCallback,
             sheetContent = {},

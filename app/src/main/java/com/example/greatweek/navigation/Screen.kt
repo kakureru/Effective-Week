@@ -10,5 +10,4 @@ sealed class Screen(val route: String) {
     object RoleDialog : Screen(route = "role_dialog") {
         const val ARG_NAME = "ARG_NAME"
     }
-    object RolePickDialog : Screen(route = "role_pick_dialog")
 }

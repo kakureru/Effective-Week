@@ -78,12 +78,16 @@ fun ColumnScope.RolesTab(
                     goalCallback = goalCallback,
                     onAddGoalClick = { onAddGoalClick(it.name) },
                     onEditClick = { onEditClick(it.name) },
-                    onDeleteClick = {
-                        if (it.goals.isNotEmpty())
-//                        Toast.makeText(context, "Can't delete role with active goals", Toast.LENGTH_SHORT).show()
-                        else
-                            onDeleteClick(it.name)
-                    },
+                    onDeleteClick = { onDeleteClick(it.name) },
+                    goalItem = { goalItem ->
+                        GoalItem(
+                            title = goalItem.title,
+                            role = goalItem.role,
+                            onClick = { goalCallback.onClick(goalItem.id) },
+                            onLongClick = { /*TODO*/ },
+                            onCheck = { goalCallback.onCompleteClick(goalItem.id) }
+                        )
+                    }
                 )
             }
         }

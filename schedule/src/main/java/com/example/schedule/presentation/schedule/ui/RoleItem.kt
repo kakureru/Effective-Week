@@ -43,6 +43,7 @@ fun RoleItem(
     onDeleteClick: () -> Unit,
     onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
+    goalItem: @Composable (GoalItem) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
@@ -78,12 +79,7 @@ fun RoleItem(
                 }
             }
             items(items = goals, key = { item -> item.id }) {
-                GoalItem(
-                    title = it.title,
-                    role = it.role,
-                    onClick = { goalCallback.onClick(it.id) },
-                    onLongClick = { /*TODO*/ },
-                    onCheck = { goalCallback.onCompleteClick(it.id) })
+                goalItem(it)
             }
             item {
                 AddButton(onClick = onAddGoalClick)
@@ -134,6 +130,15 @@ fun RoleItemPreview() {
             goalCallback = previewGoalCallback,
             onDeleteClick = {},
             onEditClick = {},
+            goalItem = {
+                GoalItem(
+                    title = it.title,
+                    role = it.role,
+                    onClick = { },
+                    onLongClick = { /*TODO*/ },
+                    onCheck = { }
+                )
+            }
         )
     }
 }

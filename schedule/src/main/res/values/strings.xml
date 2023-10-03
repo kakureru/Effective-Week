@@ -14,4 +14,5 @@
     <string name="appointment">Appointment</string>
 
     <string name="error_title_and_role_required">Title and role is required</string>
+    <string name="error_cant_delete_role_with_active_goals">Can\'t delete role with active goals</string>
 </resources>

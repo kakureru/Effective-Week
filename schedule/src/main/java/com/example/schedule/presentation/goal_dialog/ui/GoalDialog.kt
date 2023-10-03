@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,25 +24,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.ui.BasicDialog
+import com.example.core.ui.GreatDatePicker
+import com.example.core.ui.GreatTimePicker
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.presentation.goal_dialog.GoalDialogEvent
+import com.example.schedule.presentation.goal_dialog.GoalDialogNavState
+import com.example.schedule.presentation.goal_dialog.GoalDialogNavigation
 import com.example.schedule.presentation.goal_dialog.GoalDialogViewModel
+import com.example.schedule.presentation.role_pick_dialog.RoleItem
+import com.example.schedule.presentation.role_pick_dialog.ui.RolePickDialog
+import java.time.LocalTime
 
 @Composable
 fun GoalDialog(
+    navigation: GoalDialogNavigation,
     viewModel: GoalDialogViewModel,
-    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(state.navState) {
+        when (state.navState) {
+            GoalDialogNavState.Idle -> Unit
+            GoalDialogNavState.Dismiss -> navigation.dismiss()
+        }
+    }
     GoalDialogUi(
-        isSuccess = state.isSuccessful,
-        onConfirmClick = {
-            viewModel.accept(GoalDialogEvent.ConfirmClick)
-            onDismissRequest()
-        },
-        onDismissRequest = onDismissRequest,
+        onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
+        onDismissRequest = { navigation.dismiss() },
         modifier = modifier,
         title = {
             TitleField(
@@ -54,17 +66,27 @@ fun GoalDialog(
             )
         },
         roleField = {
-            RoleField(
+            RolePickField(
                 role = state.role,
-                onClick = { viewModel.accept(GoalDialogEvent.RoleClick) }
+                availableRoles = state.availableRoles,
+                onRolePicked = { roleName -> viewModel.accept(GoalDialogEvent.RolePick(roleName)) },
+                onAddRoleClick = { }
             )
         },
         dateTime = {
             DateTimeFields(
                 date = state.date,
-                time = state.time,
-                onDateClick = { viewModel.accept(GoalDialogEvent.DateClick) },
-                onTimeClick = { viewModel.accept(GoalDialogEvent.TimeClick) },
+                time = state.timePrint,
+                onDateSelected = { dateMillis -> viewModel.accept(GoalDialogEvent.DatePick(dateMillis)) },
+                onTimeSelected = { hour, minute ->
+                    viewModel.accept(
+                        GoalDialogEvent.TimePick(
+                            hour,
+                            minute
+                        )
+                    )
+                },
+                initialTime = state.time,
             )
         },
         appointment = {
@@ -82,7 +104,6 @@ fun GoalDialog(
 
 @Composable
 fun GoalDialogUi(
-    isSuccess: Boolean,
     onConfirmClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
@@ -92,9 +113,6 @@ fun GoalDialogUi(
     dateTime: @Composable () -> Unit,
     appointment: @Composable () -> Unit,
 ) {
-    LaunchedEffect(key1 = isSuccess) {
-        if (isSuccess) onDismissRequest()
-    }
     BasicDialog(
         onConfirmClick = onConfirmClick,
         onDismissRequest = onDismissRequest,
@@ -146,17 +164,31 @@ private fun DescriptionField(
 
 
 @Composable
-private fun RoleField(
+private fun RolePickField(
     role: String?,
-    onClick: () -> Unit,
+    availableRoles: List<RoleItem>,
+    onRolePicked: (roleName: String) -> Unit,
+    onAddRoleClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var dialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { dialogVisible = true }
     ) {
         Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
         Text(text = role ?: stringResource(id = R.string.role))
+    }
+    if (dialogVisible) {
+        RolePickDialog(
+            roles = availableRoles,
+            onRolePicked = { picked ->
+                onRolePicked(picked)
+                dialogVisible = false
+            },
+            onAddRoleClick = onAddRoleClick,
+            onDismissRequest = { dialogVisible = false }
+        )
     }
 }
 
@@ -164,47 +196,71 @@ private fun RoleField(
 private fun DateTimeFields(
     date: String?,
     time: String?,
-    onDateClick: () -> Unit,
-    onTimeClick: () -> Unit,
+    initialTime: LocalTime,
+    onDateSelected: (dateMillis: Long) -> Unit,
+    onTimeSelected: (hour: Int, minute: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        DateField(date = date, onClick = onDateClick)
+        DateField(date = date, onDateSelected = onDateSelected)
         Spacer(modifier = Modifier.width(16.dp))
-        TimeField(time = time, onClick = onTimeClick)
+        TimeField(time = time, onTimeSelected = onTimeSelected, initialTime = initialTime)
     }
 }
 
 @Composable
 private fun DateField(
     date: String?,
-    onClick: () -> Unit,
+    onDateSelected: (dateMillis: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var datePickDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { datePickDialogVisible = true }
     ) {
         Icon(painter = painterResource(id = R.drawable.ic_calendar), contentDescription = null)
         Text(text = date ?: stringResource(id = R.string.date))
+    }
+    if (datePickDialogVisible) {
+        GreatDatePicker(
+            onDismissRequest = { datePickDialogVisible = false },
+            onDatePick = {
+                onDateSelected(it)
+                datePickDialogVisible = false
+            }
+        )
     }
 }
 
 @Composable
 private fun TimeField(
     time: String?,
-    onClick: () -> Unit,
+    onTimeSelected: (hour: Int, minute: Int) -> Unit,
     modifier: Modifier = Modifier,
+    initialTime: LocalTime,
 ) {
+    var timePickerDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.clickable { onClick() }
+        modifier = modifier.clickable { timePickerDialogVisible = true }
     ) {
         Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = null)
         Text(text = time ?: stringResource(id = R.string.time))
+    }
+    if (timePickerDialogVisible) {
+        GreatTimePicker(
+            onTimeSelected = { h, m ->
+                onTimeSelected(h, m)
+                timePickerDialogVisible = false
+            },
+            onDismissRequest = { timePickerDialogVisible = false },
+            initialHour = initialTime.hour,
+            initialMinute = initialTime.minute,
+        )
     }
 }
 
@@ -228,18 +284,25 @@ private fun AppointmentField(
 private fun GoalDialogPreview() {
     DarkTheme {
         GoalDialogUi(
-            isSuccess = false,
             onDismissRequest = {},
             onConfirmClick = {},
             title = { TitleField(value = "", onValueChange = {}) },
             description = { DescriptionField(value = "", onValueChange = {}) },
-            roleField = { RoleField(role = null, onClick = {}) },
+            roleField = {
+                RolePickField(
+                    role = null,
+                    availableRoles = emptyList(),
+                    onAddRoleClick = {},
+                    onRolePicked = {})
+            },
             dateTime = {
                 DateTimeFields(
                     date = null,
                     time = null,
-                    onDateClick = {},
-                    onTimeClick = {})
+                    onDateSelected = {},
+                    onTimeSelected = { h, m -> },
+                    initialTime = LocalTime.MIDNIGHT,
+                )
             },
             appointment = { AppointmentField(isAppointment = false, onValueChange = {}) },
         )

@@ -3,7 +3,6 @@ package com.example.greatweek
 import android.app.Application
 import com.example.greatweek.di.dataModule
 import com.example.greatweek.di.domainModule
-import com.example.greatweek.di.navigationModule
 import com.example.greatweek.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -18,7 +17,7 @@ class App : Application() {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@App)
-            modules(dataModule, navigationModule, viewModelModule, domainModule)
+            modules(dataModule, viewModelModule, domainModule)
         }
     }
 }
