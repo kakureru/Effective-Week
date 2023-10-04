@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,18 +30,21 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.AddButton
-import com.example.core.ui.theme.DarkTheme
 import com.example.core.R
+import com.example.core.ui.AddButton
+import com.example.core.ui.draganddrop.DragAndDropState
+import com.example.core.ui.draganddrop.DragSurface
+import com.example.core.ui.draganddrop.DropSurface
+import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.model.GoalCallback
 import com.example.schedule.presentation.schedule.model.GoalItem
 import kotlin.math.min
 
 @Composable
 fun RoleItem(
+    dndState: DragAndDropState,
     name: String,
     goals: List<GoalItem>,
-    goalCallback: GoalCallback,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onAddGoalClick: () -> Unit,
@@ -54,55 +56,62 @@ fun RoleItem(
     val width = remember(configuration) { min((configuration.screenWidthDp - 32), maxSizeDp).dp }
     var optionsExpanded by remember { mutableStateOf(false) }
     val haveGoals by remember(goals) { derivedStateOf { goals.isNotEmpty() } }
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier.width(width),
-        tonalElevation = 2.dp
-    ) {
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+
+    DropSurface { isInBound, _ ->
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            modifier = modifier.width(width),
+            tonalElevation = 2.dp
         ) {
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 12.dp, top = 16.dp)
-                ) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
-                            contentDescription = "more",
-                            modifier = Modifier.clickable { optionsExpanded = true }
+            LazyColumn(
+                modifier = Modifier
+                    .dragAndDropBackground(isInBound, dndState.isDragging)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 12.dp, top = 16.dp)
+                    ) {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.titleMedium
                         )
-                        RoleOptionsDropdownMenu(
-                            expanded = optionsExpanded,
-                            onDismiss = { optionsExpanded = false },
-                            onEditClick = onEditClick,
-                            onDeleteClick = onDeleteClick
-                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Box {
+                            Icon(
+                                imageVector = Icons.Rounded.MoreVert,
+                                contentDescription = "more",
+                                modifier = Modifier.clickable { optionsExpanded = true }
+                            )
+                            RoleOptionsDropdownMenu(
+                                expanded = optionsExpanded,
+                                onDismiss = { optionsExpanded = false },
+                                onEditClick = onEditClick,
+                                onDeleteClick = onDeleteClick
+                            )
+                        }
                     }
                 }
-            }
-            if (haveGoals) {
-                items(items = goals, key = { item -> item.id }) {
-                    goalItem(it)
-                }
-                item {
-                    Box(contentAlignment = Alignment.CenterEnd, modifier = Modifier.fillMaxWidth()) {
-                        AddButton(onClick = onAddGoalClick, modifier = Modifier.padding(bottom = 12.dp))
+                if (haveGoals) {
+                    items(items = goals, key = { item -> item.id }) { item ->
+                        DragSurface(cardId = item.id) {
+                            goalItem(item)
+                        }
                     }
-                }
-            } else {
-                item {
-                    GoalItemPlaceholder(
-                        onClick = onAddGoalClick,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    item {
+                        Box(contentAlignment = Alignment.CenterEnd, modifier = Modifier.fillMaxWidth()) {
+                            AddButton(onClick = onAddGoalClick, modifier = Modifier.padding(bottom = 12.dp))
+                        }
+                    }
+                } else {
+                    item {
+                        GoalItemPlaceholder(
+                            onClick = onAddGoalClick,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -145,10 +154,10 @@ fun RoleOptionsDropdownMenu(
 fun RoleItemPreview() {
     DarkTheme {
         RoleItem(
+            dndState = DragAndDropState(),
             name = "Sample role",
             onAddGoalClick = {},
             goals = listOf(GoalItem(0, "Sample Goal", "Me"), GoalItem(1, "Sample Goal", "Me")),
-            goalCallback = previewGoalCallback,
             onDeleteClick = {},
             onEditClick = {},
             goalItem = {
@@ -169,10 +178,10 @@ fun RoleItemPreview() {
 fun RoleItemPreviewNoGoals() {
     DarkTheme {
         RoleItem(
+            dndState = DragAndDropState(),
             name = "Sample role",
             onAddGoalClick = {},
             goals = emptyList(),
-            goalCallback = previewGoalCallback,
             onDeleteClick = {},
             onEditClick = {},
             goalItem = {

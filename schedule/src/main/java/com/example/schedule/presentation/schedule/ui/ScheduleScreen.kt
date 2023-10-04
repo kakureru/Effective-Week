@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,12 +25,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.R
+import com.example.core.ui.draganddrop.DragAndDropState
+import com.example.core.ui.draganddrop.DragAndDropSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.ScheduleEffect
 import com.example.schedule.presentation.schedule.ScheduleEvent
@@ -40,7 +41,6 @@ import com.example.schedule.presentation.schedule.ScheduleState
 import com.example.schedule.presentation.schedule.ScheduleViewModel
 import com.example.schedule.presentation.schedule.model.GoalCallback
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
@@ -52,10 +52,13 @@ fun ScheduleScreen(
 ) {
     val goalCallback = remember {
         object : GoalCallback {
-            override fun onCompleteClick(goalId: Int) = viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
+            override fun onCompleteClick(goalId: Int) =
+                viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
+
             override fun onClick(goalId: Int) = viewModel.accept(ScheduleEvent.GoalClick(goalId))
         }
     }
+    val dndState = remember { DragAndDropState() }
     val state by viewModel.uiState.collectAsState()
     LaunchedEffect(state.navState) {
         when (val navState = state.navState) {
@@ -68,6 +71,7 @@ fun ScheduleScreen(
         }
     }
     ScheduleScreenUi(
+        boardState = dndState,
         state = state,
         effects = viewModel.uiEffect,
         onAddGoalToScheduleClick = { epochDay ->
@@ -78,11 +82,24 @@ fun ScheduleScreen(
         topBar = { ScheduleTopBar() },
         sheetContent = {
             RolesTab(
+                boardState = dndState,
                 roles = state.roles,
                 goalCallback = goalCallback,
                 onAddRoleClick = { viewModel.accept(ScheduleEvent.AddRoleClick) },
-                onDeleteClick = { roleName -> viewModel.accept(ScheduleEvent.DeleteRoleClick(roleName)) },
-                onAddGoalClick = { roleName -> viewModel.accept(ScheduleEvent.AddGoalToRoleClick(roleName)) },
+                onDeleteClick = { roleName ->
+                    viewModel.accept(
+                        ScheduleEvent.DeleteRoleClick(
+                            roleName
+                        )
+                    )
+                },
+                onAddGoalClick = { roleName ->
+                    viewModel.accept(
+                        ScheduleEvent.AddGoalToRoleClick(
+                            roleName
+                        )
+                    )
+                },
                 onEditClick = { roleName -> viewModel.accept(ScheduleEvent.EditRoleClick(roleName)) }
             )
         }
@@ -92,6 +109,7 @@ fun ScheduleScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleScreenUi(
+    boardState: DragAndDropState,
     state: ScheduleState,
     effects: Flow<ScheduleEffect>,
     onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
@@ -112,48 +130,50 @@ fun ScheduleScreenUi(
             }
         }
     }
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        modifier = modifier,
-        topBar = topBar,
-        sheetContent = sheetContent,
-        containerColor = MaterialTheme.colorScheme.background,
-//        sheetContainerColor = Color.Transparent,
-        sheetShape = MaterialTheme.shapes.large
-    ) { paddingValues ->
-        val rowState = rememberLazyListState()
-        val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
-        LazyRow(
-            state = rowState,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            flingBehavior = snapBehavior,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxHeight(),
-        ) {
-            items(items = state.schedule, key = { item -> item.dateText }) {
-                ScheduleDay(
-                    weekday = it.weekday,
-                    date = it.dateText,
-                    isToday = it.isToday,
-                    priorities = it.priorities,
-                    appointments = it.appointments,
-                    onAddGoalClick = { onAddGoalToScheduleClick(it.date.toEpochDay()) },
-                    goalItem = { goal ->
-                        GoalItem(
-                            title = goal.title,
-                            role = goal.role,
-                            onClick = { goalCallback.onClick(goal.id) },
-                            onLongClick = { },
-                            onCheck = { goalCallback.onCompleteClick(goal.id) },
-                        )
-                    },
-                    modifier = Modifier.padding(vertical = 16.dp)
-                )
+    DragAndDropSurface(
+        modifier = Modifier.fillMaxSize(),
+        state = boardState
+    ) {
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            modifier = modifier,
+            topBar = topBar,
+            sheetContent = sheetContent,
+            containerColor = MaterialTheme.colorScheme.background,
+            sheetShape = MaterialTheme.shapes.large
+        ) { paddingValues ->
+            val rowState = rememberLazyListState()
+            val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
+            LazyRow(
+                state = rowState,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                flingBehavior = snapBehavior,
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxHeight(),
+            ) {
+                items(items = state.schedule, key = { item -> item.dateText }) {
+                    ScheduleDay(
+                        dndState = boardState,
+                        model = it,
+                        onAddGoalClick = { onAddGoalToScheduleClick(it.date.toEpochDay()) },
+                        goalItem = { goal ->
+                            GoalItem(
+                                title = goal.title,
+                                role = goal.role,
+                                onClick = { goalCallback.onClick(goal.id) },
+                                onLongClick = { },
+                                onCheck = { goalCallback.onCompleteClick(goal.id) },
+                            )
+                        },
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,6 +193,7 @@ fun ScheduleTopBar(
 fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
+            boardState = DragAndDropState(),
             state = ScheduleState(),
             effects = emptyFlow(),
             onAddGoalToScheduleClick = {},

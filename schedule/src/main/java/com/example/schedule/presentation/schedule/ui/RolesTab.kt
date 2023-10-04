@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.domain.model.Role
@@ -38,6 +39,7 @@ import com.example.schedule.presentation.schedule.model.toGoalItem
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ColumnScope.RolesTab(
+    boardState: DragAndDropState,
     roles: List<Role>,
     goalCallback: GoalCallback,
     onAddRoleClick: () -> Unit,
@@ -77,9 +79,9 @@ fun ColumnScope.RolesTab(
         ) {
             items(items = roles, key = { item -> item.name }) {
                 RoleItem(
+                    dndState = boardState,
                     name = it.name,
                     goals = it.goals.map { it.toGoalItem() },
-                    goalCallback = goalCallback,
                     onAddGoalClick = { onAddGoalClick(it.name) },
                     onEditClick = { onEditClick(it.name) },
                     onDeleteClick = { onDeleteClick(it.name) },
@@ -107,6 +109,7 @@ fun RolesTabPreview() {
         ) {
             Column {
                 RolesTab(
+                    boardState = DragAndDropState(),
                     modifier = Modifier.padding(top = 16.dp),
                     roles = emptyList(),
                     goalCallback = previewGoalCallback,

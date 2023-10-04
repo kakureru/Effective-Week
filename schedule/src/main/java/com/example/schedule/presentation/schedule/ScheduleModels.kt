@@ -1,12 +1,12 @@
 package com.example.schedule.presentation.schedule
 
 import com.example.schedule.domain.model.Role
-import com.example.schedule.presentation.schedule.model.ScheduleDayItem
+import com.example.schedule.presentation.schedule.model.ScheduleDayModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import java.time.LocalDate
 
 data class ScheduleState(
-    val schedule: List<ScheduleDayItem> = emptyList(),
+    val schedule: List<ScheduleDayModel> = emptyList(),
     val currentDate: LocalDate = LocalDate.now(),
     val roles: List<Role> = emptyList(),
     val expanded: Int = BottomSheetBehavior.STATE_COLLAPSED,

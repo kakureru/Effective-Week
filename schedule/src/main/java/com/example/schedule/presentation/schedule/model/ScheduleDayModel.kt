@@ -4,7 +4,7 @@ import com.example.schedule.domain.model.ScheduleDay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class ScheduleDayItem(
+class ScheduleDayModel(
     val date: LocalDate,
     val weekday: String,
     val dateText: String,
@@ -13,7 +13,7 @@ class ScheduleDayItem(
     val appointments: List<GoalItem>,
 )
 
-fun ScheduleDay.toScheduleDayItem() = ScheduleDayItem(
+fun ScheduleDay.toScheduleDayItem() = ScheduleDayModel(
     date = date,
     weekday = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() },
     dateText = DateTimeFormatter.ofPattern("MMM d").format(date).replaceFirstChar { it.uppercase() },
