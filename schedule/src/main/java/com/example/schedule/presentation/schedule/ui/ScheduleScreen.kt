@@ -40,6 +40,9 @@ import com.example.schedule.presentation.schedule.ScheduleNavigation
 import com.example.schedule.presentation.schedule.ScheduleState
 import com.example.schedule.presentation.schedule.ScheduleViewModel
 import com.example.schedule.presentation.schedule.model.GoalCallback
+import com.example.schedule.presentation.schedule.model.GoalItem
+import com.example.schedule.presentation.schedule.model.ScheduleDayModel
+import com.example.schedule.presentation.schedule.model.toGoalItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -47,19 +50,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScheduleScreen(
     navigation: ScheduleNavigation,
+    vm: ScheduleViewModel,
     modifier: Modifier = Modifier,
-    viewModel: ScheduleViewModel,
 ) {
-    val goalCallback = remember {
-        object : GoalCallback {
-            override fun onCompleteClick(goalId: Int) =
-                viewModel.accept(ScheduleEvent.CompleteGoal(goalId))
-
-            override fun onClick(goalId: Int) = viewModel.accept(ScheduleEvent.GoalClick(goalId))
-        }
-    }
     val dndState = remember { DragAndDropState() }
-    val state by viewModel.uiState.collectAsState()
+    val state by vm.uiState.collectAsState()
+
     LaunchedEffect(state.navState) {
         when (val navState = state.navState) {
             ScheduleNavState.Idle -> Unit
@@ -70,37 +66,46 @@ fun ScheduleScreen(
             ScheduleNavState.OpenRoleDialog -> navigation.openRoleDialog()
         }
     }
+
+    val goalItem: @Composable (GoalItem) -> Unit = { goalItem ->
+        GoalItem(
+            title = goalItem.title,
+            role = goalItem.role,
+            onClick = { vm.accept(ScheduleEvent.GoalClick(goalItem.id)) },
+            onCheck = { vm.accept(ScheduleEvent.CompleteGoal(goalItem.id)) },
+        )
+    }
+
     ScheduleScreenUi(
-        boardState = dndState,
+        dndState = dndState,
         state = state,
-        effects = viewModel.uiEffect,
-        onAddGoalToScheduleClick = { epochDay ->
-            viewModel.accept(ScheduleEvent.AddGoalToScheduleDayClick(epochDay))
-        },
-        goalCallback = goalCallback,
+        effects = vm.uiEffect,
         modifier = modifier,
         topBar = { ScheduleTopBar() },
         sheetContent = {
             RolesTab(
-                boardState = dndState,
                 roles = state.roles,
-                goalCallback = goalCallback,
-                onAddRoleClick = { viewModel.accept(ScheduleEvent.AddRoleClick) },
-                onDeleteClick = { roleName ->
-                    viewModel.accept(
-                        ScheduleEvent.DeleteRoleClick(
-                            roleName
-                        )
+                onAddRoleClick = { vm.accept(ScheduleEvent.AddRoleClick) },
+                roleItem = { role ->
+                    RoleItem(
+                        dndState = dndState,
+                        name = role.name,
+                        goals = role.goals.map { it.toGoalItem() },
+                        onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToRoleClick(role.name)) },
+                        onEditClick = { vm.accept(ScheduleEvent.EditRoleClick(role.name)) },
+                        onDeleteClick = { vm.accept(ScheduleEvent.DeleteRoleClick(role.name)) },
+                        goalItem = { goalItem -> goalItem(goalItem) }
                     )
-                },
-                onAddGoalClick = { roleName ->
-                    viewModel.accept(
-                        ScheduleEvent.AddGoalToRoleClick(
-                            roleName
-                        )
-                    )
-                },
-                onEditClick = { roleName -> viewModel.accept(ScheduleEvent.EditRoleClick(roleName)) }
+                }
+            )
+        },
+        scheduleDay = {
+            ScheduleDay(
+                dndState = dndState,
+                model = it,
+                onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToScheduleDayClick(it.date.toEpochDay())) },
+                goalItem = { goalItem -> goalItem(goalItem) },
+                modifier = Modifier.padding(vertical = 16.dp)
             )
         }
     )
@@ -109,18 +114,18 @@ fun ScheduleScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleScreenUi(
-    boardState: DragAndDropState,
+    dndState: DragAndDropState,
     state: ScheduleState,
     effects: Flow<ScheduleEffect>,
-    onAddGoalToScheduleClick: (epochDay: Long) -> Unit,
-    goalCallback: GoalCallback,
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit,
     sheetContent: @Composable ColumnScope.() -> Unit,
+    scheduleDay: @Composable (ScheduleDayModel) -> Unit,
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         effects.collect {
             when (it) {
@@ -130,9 +135,10 @@ fun ScheduleScreenUi(
             }
         }
     }
+
     DragAndDropSurface(
         modifier = Modifier.fillMaxSize(),
-        state = boardState
+        state = dndState
     ) {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
@@ -154,21 +160,7 @@ fun ScheduleScreenUi(
                     .fillMaxHeight(),
             ) {
                 items(items = state.schedule, key = { item -> item.dateText }) {
-                    ScheduleDay(
-                        dndState = boardState,
-                        model = it,
-                        onAddGoalClick = { onAddGoalToScheduleClick(it.date.toEpochDay()) },
-                        goalItem = { goal ->
-                            GoalItem(
-                                title = goal.title,
-                                role = goal.role,
-                                onClick = { goalCallback.onClick(goal.id) },
-                                onLongClick = { },
-                                onCheck = { goalCallback.onCompleteClick(goal.id) },
-                            )
-                        },
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
+                   scheduleDay(it)
                 }
             }
         }
@@ -193,13 +185,12 @@ fun ScheduleTopBar(
 fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
-            boardState = DragAndDropState(),
+            dndState = DragAndDropState(),
             state = ScheduleState(),
             effects = emptyFlow(),
-            onAddGoalToScheduleClick = {},
-            goalCallback = previewGoalCallback,
             sheetContent = {},
-            topBar = { ScheduleTopBar() }
+            topBar = { ScheduleTopBar() },
+            scheduleDay = {}
         )
     }
 }

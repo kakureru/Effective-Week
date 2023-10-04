@@ -165,7 +165,6 @@ fun RoleItemPreview() {
                     title = it.title,
                     role = it.role,
                     onClick = { },
-                    onLongClick = { /*TODO*/ },
                     onCheck = { }
                 )
             }
@@ -189,15 +188,9 @@ fun RoleItemPreviewNoGoals() {
                     title = it.title,
                     role = it.role,
                     onClick = { },
-                    onLongClick = { /*TODO*/ },
                     onCheck = { }
                 )
             }
         )
     }
-}
-
-val previewGoalCallback = object : GoalCallback {
-    override fun onCompleteClick(goalId: Int) = Unit
-    override fun onClick(goalId: Int) = Unit
 }

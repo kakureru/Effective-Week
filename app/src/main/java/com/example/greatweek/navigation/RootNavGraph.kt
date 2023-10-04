@@ -11,10 +11,8 @@ import androidx.navigation.navArgument
 import com.example.schedule.presentation.goal_dialog.GoalDialogNavigation
 import com.example.schedule.presentation.goal_dialog.ui.GoalDialog
 import com.example.schedule.presentation.role_dialog.ui.RoleDialog
-import com.example.schedule.presentation.role_pick_dialog.ui.RolePickDialog
 import com.example.schedule.presentation.schedule.ScheduleNavigation
 import com.example.schedule.presentation.schedule.ui.ScheduleScreen
-import com.example.schedule.presentation.schedule.ui.previewGoalCallback
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -60,7 +58,7 @@ private fun NavGraphBuilder.schedule(navController: NavHostController) {
     composable(route = Screen.Schedule.route) {
         ScheduleScreen(
             navigation = scheduleNavigation,
-            viewModel = koinViewModel(),
+            vm = koinViewModel(),
         )
     }
 }

@@ -1,8 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Checkbox
@@ -34,13 +31,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.core.ui.theme.DarkTheme
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GoalItem(
     title: String,
     role: String,
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
     onCheck: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -54,10 +49,7 @@ fun GoalItem(
         ConstraintLayout(
             modifier = Modifier
                 .clip(shape)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                )
+                .clickable { onClick() }
                 .padding(8.dp)
                 .fillMaxWidth()
         ) {
@@ -123,7 +115,6 @@ fun GoalItemPreview() {
                 title = "Sample task",
                 role = "User",
                 onClick = {},
-                onLongClick = {},
                 onCheck = {},
                 modifier = Modifier.padding(16.dp)
             )
@@ -133,9 +124,9 @@ fun GoalItemPreview() {
 
 @Composable
 fun GoalItemPlaceholder(
+    modifier: Modifier = Modifier,
     text: String = "New goal",
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val shape = MaterialTheme.shapes.medium
     Surface(

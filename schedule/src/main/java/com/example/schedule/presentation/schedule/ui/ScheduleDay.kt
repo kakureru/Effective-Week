@@ -42,8 +42,8 @@ import kotlin.math.min
 
 @Composable
 fun ScheduleDay(
-    dndState: DragAndDropState,
     model: ScheduleDayModel,
+    dndState: DragAndDropState,
     onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
     goalItem: @Composable (GoalItem) -> Unit,
@@ -229,7 +229,6 @@ fun ScheduleDayPreview() {
                     title = it.title,
                     role = it.role,
                     onClick = { },
-                    onLongClick = { },
                     onCheck = { },
                 )
             }
@@ -258,7 +257,6 @@ fun ScheduleDayPreviewNoGoals() {
                     title = it.title,
                     role = it.role,
                     onClick = { },
-                    onLongClick = { },
                     onCheck = { },
                 )
             }
@@ -289,7 +287,6 @@ fun ScheduleDayPreviewNoAppointments() {
                     title = it.title,
                     role = it.role,
                     onClick = { },
-                    onLongClick = { },
                     onCheck = { },
                 )
             }

@@ -39,14 +39,10 @@ import com.example.schedule.presentation.schedule.model.toGoalItem
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ColumnScope.RolesTab(
-    boardState: DragAndDropState,
     roles: List<Role>,
-    goalCallback: GoalCallback,
     onAddRoleClick: () -> Unit,
-    onDeleteClick: (roleName: String) -> Unit,
-    onAddGoalClick: (roleName: String) -> Unit,
-    onEditClick: (roleName: String) -> Unit,
     modifier: Modifier = Modifier,
+    roleItem: @Composable (Role) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val rowState = rememberLazyListState()
@@ -78,23 +74,7 @@ fun ColumnScope.RolesTab(
             contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
             items(items = roles, key = { item -> item.name }) {
-                RoleItem(
-                    dndState = boardState,
-                    name = it.name,
-                    goals = it.goals.map { it.toGoalItem() },
-                    onAddGoalClick = { onAddGoalClick(it.name) },
-                    onEditClick = { onEditClick(it.name) },
-                    onDeleteClick = { onDeleteClick(it.name) },
-                    goalItem = { goalItem ->
-                        GoalItem(
-                            title = goalItem.title,
-                            role = goalItem.role,
-                            onClick = { goalCallback.onClick(goalItem.id) },
-                            onLongClick = { /*TODO*/ },
-                            onCheck = { goalCallback.onCompleteClick(goalItem.id) }
-                        )
-                    }
-                )
+                roleItem(it)
             }
         }
     }
@@ -109,14 +89,10 @@ fun RolesTabPreview() {
         ) {
             Column {
                 RolesTab(
-                    boardState = DragAndDropState(),
                     modifier = Modifier.padding(top = 16.dp),
                     roles = emptyList(),
-                    goalCallback = previewGoalCallback,
-                    onDeleteClick = {},
-                    onAddGoalClick = {},
-                    onEditClick = {},
                     onAddRoleClick = {},
+                    roleItem = {}
                 )
             }
         }
