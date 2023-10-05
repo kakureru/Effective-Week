@@ -19,9 +19,10 @@ import androidx.compose.ui.platform.LocalDensity
 fun DragSurface(
     modifier: Modifier = Modifier,
     cardId: Int = 0,
+    dragData: DragData,
     content: @Composable () -> Unit
 ) {
-    val dragNDropState = LocalDragAndDropState.current
+    val dndState = LocalDragAndDropState.current
     var currentPosition by remember { mutableStateOf(Offset.Zero) }
     var targetHeight by remember { mutableStateOf(0) }
 
@@ -34,7 +35,7 @@ fun DragSurface(
             .pointerInput(key1 = cardId) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = {
-                        with(dragNDropState) {
+                        with(dndState) {
                             isDragging = true
                             itemPosition = currentPosition + it
                             draggableItem = content
@@ -45,18 +46,17 @@ fun DragSurface(
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
-                        dragNDropState.dragOffset += Offset(dragAmount.x, dragAmount.y)
+                        dndState.dragOffset += Offset(dragAmount.x, dragAmount.y)
                     },
                     onDragEnd = {
-                        with(dragNDropState) {
+                        with(dndState) {
                             isDragging = false
                             dragOffset = Offset.Zero
-
-
+                            dndState.executeDropCallbacks(dragData)
                         }
                     },
                     onDragCancel = {
-                        with(dragNDropState) {
+                        with(dndState) {
                             isDragging = false
                             dragOffset = Offset.Zero
 
@@ -68,7 +68,7 @@ fun DragSurface(
             }
     ) {
         // Experimental animation to show empty space while dragging
-        if (dragNDropState.isDragging && dragNDropState.cardDraggedId == cardId) {
+        if (dndState.isDragging && dndState.cardDraggedId == cardId) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

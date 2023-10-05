@@ -1,5 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
+import com.example.core.ui.draganddrop.DragData
 import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.draganddrop.DropSurface
 import com.example.core.ui.theme.DarkTheme
@@ -57,7 +59,9 @@ fun RoleItem(
     var optionsExpanded by remember { mutableStateOf(false) }
     val haveGoals by remember(goals) { derivedStateOf { goals.isNotEmpty() } }
 
-    DropSurface { isInBound, _ ->
+    DropSurface(
+        onDrop = { Log.d("MYTAG","Drop on role $name") }
+    ) { isInBound, _ ->
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = modifier.width(width),
@@ -96,13 +100,24 @@ fun RoleItem(
                 }
                 if (haveGoals) {
                     items(items = goals, key = { item -> item.id }) { item ->
-                        DragSurface(cardId = item.id) {
+                        DragSurface(
+                            cardId = item.id,
+                            dragData = object : DragData {
+                                override val id: Int = item.id
+                            }
+                        ) {
                             goalItem(item)
                         }
                     }
                     item {
-                        Box(contentAlignment = Alignment.CenterEnd, modifier = Modifier.fillMaxWidth()) {
-                            AddButton(onClick = onAddGoalClick, modifier = Modifier.padding(bottom = 12.dp))
+                        Box(
+                            contentAlignment = Alignment.CenterEnd,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            AddButton(
+                                onClick = onAddGoalClick,
+                                modifier = Modifier.padding(bottom = 12.dp)
+                            )
                         }
                     }
                 } else {

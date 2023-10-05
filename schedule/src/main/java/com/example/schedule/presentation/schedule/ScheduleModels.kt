@@ -33,7 +33,7 @@ sealed class ScheduleEvent {
     class GoalDropOnSchedule(
         val goalId: Int,
         val date: LocalDate,
-        val isCommitment: Boolean
+        val isAppointment: Boolean
     ) : ScheduleEvent()
 
     object DragRight : ScheduleEvent()

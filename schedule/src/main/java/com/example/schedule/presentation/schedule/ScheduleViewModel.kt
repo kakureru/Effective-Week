@@ -76,7 +76,7 @@ class ScheduleViewModel(
             ScheduleEvent.DragIdle -> Unit
             is ScheduleEvent.GoalClick -> onGoalClick(event.goalId)
             is ScheduleEvent.CompleteGoal -> completeGoal(event.goalId)
-            is ScheduleEvent.GoalDropOnSchedule -> dropGoalOnSchedule(event.goalId, event.date, event.isCommitment)
+            is ScheduleEvent.GoalDropOnSchedule -> dropGoalOnSchedule(event.goalId, event.date, event.isAppointment)
             is ScheduleEvent.GoalDropOnRole -> dropGoalOnRole(event.goalId, event.role)
             is ScheduleEvent.AddGoalToScheduleDayClick -> onAddGoalToScheduleDayClick(event.epochDay)
             is ScheduleEvent.AddGoalToRoleClick -> onAddGoalToRoleClick(event.roleName)

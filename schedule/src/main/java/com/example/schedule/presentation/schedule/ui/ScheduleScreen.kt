@@ -39,7 +39,6 @@ import com.example.schedule.presentation.schedule.ScheduleNavState
 import com.example.schedule.presentation.schedule.ScheduleNavigation
 import com.example.schedule.presentation.schedule.ScheduleState
 import com.example.schedule.presentation.schedule.ScheduleViewModel
-import com.example.schedule.presentation.schedule.model.GoalCallback
 import com.example.schedule.presentation.schedule.model.GoalItem
 import com.example.schedule.presentation.schedule.model.ScheduleDayModel
 import com.example.schedule.presentation.schedule.model.toGoalItem
@@ -105,7 +104,25 @@ fun ScheduleScreen(
                 model = it,
                 onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToScheduleDayClick(it.date.toEpochDay())) },
                 goalItem = { goalItem -> goalItem(goalItem) },
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = 16.dp),
+                onDropGoalToPriorities = { goalId ->
+                    vm.accept(
+                        ScheduleEvent.GoalDropOnSchedule(
+                            goalId = goalId,
+                            date = it.date,
+                            isAppointment = false
+                        )
+                    )
+                },
+                onDropGoalToAppointments = { goalId ->
+                    vm.accept(
+                        ScheduleEvent.GoalDropOnSchedule(
+                            goalId = goalId,
+                            date = it.date,
+                            isAppointment = true,
+                        )
+                    )
+                }
             )
         }
     )
@@ -160,7 +177,7 @@ fun ScheduleScreenUi(
                     .fillMaxHeight(),
             ) {
                 items(items = state.schedule, key = { item -> item.dateText }) {
-                   scheduleDay(it)
+                    scheduleDay(it)
                 }
             }
         }

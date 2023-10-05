@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
+import com.example.core.ui.draganddrop.DragData
 import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.draganddrop.DropSurface
 import com.example.core.ui.theme.DarkTheme
@@ -45,6 +46,8 @@ fun ScheduleDay(
     model: ScheduleDayModel,
     dndState: DragAndDropState,
     onAddGoalClick: () -> Unit,
+    onDropGoalToPriorities: (goalId: Int) -> Unit,
+    onDropGoalToAppointments: (goalId: Int) -> Unit,
     modifier: Modifier = Modifier,
     goalItem: @Composable (GoalItem) -> Unit,
 ) {
@@ -79,7 +82,9 @@ fun ScheduleDay(
                 } else {
                     if (havePriorities) {
                         GoalCategoryTitle(text = stringResource(id = R.string.priorities))
-                        DropSurface { isInBound, _ ->
+                        DropSurface(
+                            onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
+                        ) { isInBound, _ ->
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,
@@ -88,7 +93,12 @@ fun ScheduleDay(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 for (item in model.priorities) {
-                                    DragSurface(cardId = item.id) {
+                                    DragSurface(
+                                        cardId = item.id,
+                                        dragData = object : DragData {
+                                            override val id: Int = item.id
+                                        }
+                                    ) {
                                         goalItem(item)
                                     }
                                 }
@@ -99,7 +109,9 @@ fun ScheduleDay(
                     }
                     if (haveAppointments) {
                         GoalCategoryTitle(text = stringResource(id = R.string.appointments))
-                        DropSurface { isInBound, _ ->
+                        DropSurface(
+                            onDrop = { dragData -> onDropGoalToAppointments(dragData.id) }
+                        ) { isInBound, _ ->
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,
@@ -108,7 +120,12 @@ fun ScheduleDay(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 for (item in model.appointments) {
-                                    DragSurface(cardId = item.id) {
+                                    DragSurface(
+                                        cardId = item.id,
+                                        dragData = object : DragData {
+                                            override val id: Int = item.id
+                                        }
+                                    ) {
                                         goalItem(item)
                                     }
                                 }
@@ -224,6 +241,8 @@ fun ScheduleDayPreview() {
             ),
             dndState = DragAndDropState(),
             onAddGoalClick = {},
+            onDropGoalToPriorities = {},
+            onDropGoalToAppointments = {},
             goalItem = {
                 GoalItem(
                     title = it.title,
@@ -252,6 +271,8 @@ fun ScheduleDayPreviewNoGoals() {
             ),
             dndState = DragAndDropState(),
             onAddGoalClick = {},
+            onDropGoalToPriorities = {},
+            onDropGoalToAppointments = {},
             goalItem = {
                 GoalItem(
                     title = it.title,
@@ -282,6 +303,8 @@ fun ScheduleDayPreviewNoAppointments() {
             ),
             dndState = DragAndDropState(),
             onAddGoalClick = {},
+            onDropGoalToPriorities = {},
+            onDropGoalToAppointments = {},
             goalItem = {
                 GoalItem(
                     title = it.title,

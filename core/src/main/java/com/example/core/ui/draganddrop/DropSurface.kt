@@ -15,22 +15,32 @@ import androidx.compose.ui.layout.onGloballyPositioned
 @Composable
 fun DropSurface(
     modifier: Modifier = Modifier,
+    onDrop: (DragData) -> Unit,
     content: @Composable BoxScope.(isInBound: Boolean, dragOffset: Offset) -> Unit
 ) {
-    val dragNDropState = LocalDragAndDropState.current
-    val dragPosition = dragNDropState.itemPosition
-    val dragOffset = dragNDropState.dragOffset
-    var isCurrentDropTarget by remember {
+    val dndState = LocalDragAndDropState.current
+    val dragPosition = dndState.itemPosition
+    val dragOffset = dndState.dragOffset
+    var isAboveDropSurface by remember {
+        mutableStateOf(false)
+    }
+    var isCurrentDropTarget by remember { // to avoid constant drop callback assignment on drag
         mutableStateOf(false)
     }
     Box(
         modifier = modifier.onGloballyPositioned {
             it.boundsInWindow().let { rect ->
-                isCurrentDropTarget = rect.contains(dragPosition + dragOffset)
-
+                isAboveDropSurface = rect.contains(dragPosition + dragOffset)
+                if (isAboveDropSurface && !isCurrentDropTarget) {
+                    dndState.addDropCallback(onDrop)
+                    isCurrentDropTarget = true
+                } else if (!isAboveDropSurface && isCurrentDropTarget) {
+                    dndState.removeDropCallback(onDrop)
+                    isCurrentDropTarget = false
+                }
             }
         }
     ) {
-        content(isCurrentDropTarget, dragOffset)
+        content(isAboveDropSurface, dragOffset)
     }
 }
