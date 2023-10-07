@@ -10,16 +10,14 @@ data class ScheduleState(
     val currentDate: LocalDate = LocalDate.now(),
     val roles: List<Role> = emptyList(),
     val expanded: Int = BottomSheetBehavior.STATE_COLLAPSED,
-    val navState: ScheduleNavState = ScheduleNavState.Idle,
 )
 
-sealed class ScheduleNavState {
-    object Idle : ScheduleNavState()
-    object OpenRoleDialog : ScheduleNavState()
-    class OpenRoleDialogWithRole(val roleName: String) : ScheduleNavState()
-    class OpenGoalDialogWithGoal(val goalId: Int) : ScheduleNavState()
-    class OpenGoalDialogWithDate(val epochDay: Long) : ScheduleNavState()
-    class OpenGoalDialogWithRole(val roleName: String) : ScheduleNavState()
+sealed class ScheduleNavEvent {
+    object OpenRoleDialog : ScheduleNavEvent()
+    class OpenRoleDialogWithRole(val roleName: String) : ScheduleNavEvent()
+    class OpenGoalDialogWithGoal(val goalId: Int) : ScheduleNavEvent()
+    class OpenGoalDialogWithDate(val epochDay: Long) : ScheduleNavEvent()
+    class OpenGoalDialogWithRole(val roleName: String) : ScheduleNavEvent()
 }
 
 sealed class ScheduleEvent {

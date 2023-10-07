@@ -1,10 +1,12 @@
 package com.example.schedule.presentation.role_dialog.ui
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.core.ui.BasicDialog
 import com.example.core.ui.theme.DarkTheme
@@ -48,7 +50,11 @@ fun RoleDialogUi(
         onDismissRequest = onDismissRequest,
         modifier = modifier
     ) {
-        TextField(value = state.name, onValueChange = { value -> onNameChange(value) })
+        TextField(
+            value = state.name,
+            onValueChange = { value -> onNameChange(value) },
+            keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Sentences),
+        )
     }
 }
 

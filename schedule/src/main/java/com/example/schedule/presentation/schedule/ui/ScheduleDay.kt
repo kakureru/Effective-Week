@@ -83,6 +83,7 @@ fun ScheduleDay(
                     if (havePriorities) {
                         GoalCategoryTitle(text = stringResource(id = R.string.priorities))
                         DropSurface(
+                            zIndex = 1f,
                             onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
                         ) { isInBound, _ ->
                             Column(
@@ -110,6 +111,7 @@ fun ScheduleDay(
                     if (haveAppointments) {
                         GoalCategoryTitle(text = stringResource(id = R.string.appointments))
                         DropSurface(
+                            zIndex = 1f,
                             onDrop = { dragData -> onDropGoalToAppointments(dragData.id) }
                         ) { isInBound, _ ->
                             Column(

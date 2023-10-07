@@ -47,6 +47,7 @@ fun RoleItem(
     dndState: DragAndDropState,
     name: String,
     goals: List<GoalItem>,
+    onDropGoal: (goalId: Int) -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onAddGoalClick: () -> Unit,
@@ -60,7 +61,8 @@ fun RoleItem(
     val haveGoals by remember(goals) { derivedStateOf { goals.isNotEmpty() } }
 
     DropSurface(
-        onDrop = { Log.d("MYTAG","Drop on role $name") }
+        onDrop = { dropData -> onDropGoal(dropData.id) },
+        zIndex = 2f
     ) { isInBound, _ ->
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -175,6 +177,7 @@ fun RoleItemPreview() {
             goals = listOf(GoalItem(0, "Sample Goal", "Me"), GoalItem(1, "Sample Goal", "Me")),
             onDeleteClick = {},
             onEditClick = {},
+            onDropGoal = {},
             goalItem = {
                 GoalItem(
                     title = it.title,
@@ -198,6 +201,7 @@ fun RoleItemPreviewNoGoals() {
             goals = emptyList(),
             onDeleteClick = {},
             onEditClick = {},
+            onDropGoal = {},
             goalItem = {
                 GoalItem(
                     title = it.title,

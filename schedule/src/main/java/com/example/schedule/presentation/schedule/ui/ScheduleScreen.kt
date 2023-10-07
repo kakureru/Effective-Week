@@ -1,5 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +36,7 @@ import com.example.core.ui.draganddrop.DragAndDropSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.ScheduleEffect
 import com.example.schedule.presentation.schedule.ScheduleEvent
-import com.example.schedule.presentation.schedule.ScheduleNavState
+import com.example.schedule.presentation.schedule.ScheduleNavEvent
 import com.example.schedule.presentation.schedule.ScheduleNavigation
 import com.example.schedule.presentation.schedule.ScheduleState
 import com.example.schedule.presentation.schedule.ScheduleViewModel
@@ -55,14 +56,15 @@ fun ScheduleScreen(
     val dndState = remember { DragAndDropState() }
     val state by vm.uiState.collectAsState()
 
-    LaunchedEffect(state.navState) {
-        when (val navState = state.navState) {
-            ScheduleNavState.Idle -> Unit
-            is ScheduleNavState.OpenGoalDialogWithDate -> navigation.openGoalDialog(navState.epochDay)
-            is ScheduleNavState.OpenGoalDialogWithGoal -> navigation.openGoalDialog(navState.goalId)
-            is ScheduleNavState.OpenGoalDialogWithRole -> navigation.openGoalDialog(navState.roleName)
-            is ScheduleNavState.OpenRoleDialogWithRole -> navigation.openRoleDialog(navState.roleName)
-            ScheduleNavState.OpenRoleDialog -> navigation.openRoleDialog()
+    LaunchedEffect(Unit) {
+        vm.navigationEvents.collect { event ->
+            when (event) {
+                is ScheduleNavEvent.OpenGoalDialogWithDate -> navigation.openGoalDialog(event.epochDay)
+                is ScheduleNavEvent.OpenGoalDialogWithGoal -> navigation.openGoalDialog(event.goalId)
+                is ScheduleNavEvent.OpenGoalDialogWithRole -> navigation.openGoalDialog(event.roleName)
+                is ScheduleNavEvent.OpenRoleDialogWithRole -> navigation.openRoleDialog(event.roleName)
+                ScheduleNavEvent.OpenRoleDialog -> navigation.openRoleDialog()
+            }
         }
     }
 
@@ -90,6 +92,7 @@ fun ScheduleScreen(
                         dndState = dndState,
                         name = role.name,
                         goals = role.goals.map { it.toGoalItem() },
+                        onDropGoal = { goalId -> vm.accept(ScheduleEvent.GoalDropOnRole(goalId, role.name))},
                         onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToRoleClick(role.name)) },
                         onEditClick = { vm.accept(ScheduleEvent.EditRoleClick(role.name)) },
                         onDeleteClick = { vm.accept(ScheduleEvent.DeleteRoleClick(role.name)) },

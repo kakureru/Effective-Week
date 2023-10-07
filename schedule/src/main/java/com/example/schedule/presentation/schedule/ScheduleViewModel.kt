@@ -49,25 +49,25 @@ class ScheduleViewModel(
         emptyList()
     )
     private val _currentDate = MutableStateFlow(LocalDate.now())
-    private val _navState = MutableStateFlow<ScheduleNavState>(ScheduleNavState.Idle)
 
     val uiState: StateFlow<ScheduleState> = combine(
         _rolesWithGoals,
         _schedule,
         _currentDate,
-        _navState,
-    ) { roles, schedule, currentDate, navState ->
+    ) { roles, schedule, currentDate ->
         ScheduleState(
             schedule = schedule.map { it.toScheduleDayItem() },
             roles = roles,
             currentDate = currentDate,
-            navState = navState
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(3000),
         ScheduleState()
     )
+
+    private val _navigationEvents = MutableSharedFlow<ScheduleNavEvent>()
+    val navigationEvents: SharedFlow<ScheduleNavEvent> = _navigationEvents.asSharedFlow()
 
     fun accept(event: ScheduleEvent) {
         when (event) {
@@ -86,20 +86,20 @@ class ScheduleViewModel(
         }
     }
 
-    private fun onGoalClick(goalId: Int) {
-        _navState.value = ScheduleNavState.OpenGoalDialogWithGoal(goalId = goalId)
+    private fun onGoalClick(goalId: Int) = viewModelScope.launch {
+        _navigationEvents.emit(ScheduleNavEvent.OpenGoalDialogWithGoal(goalId = goalId))
     }
 
-    private fun onAddGoalToScheduleDayClick(epochDay: Long) {
-        _navState.value = ScheduleNavState.OpenGoalDialogWithDate(epochDay = epochDay)
+    private fun onAddGoalToScheduleDayClick(epochDay: Long) = viewModelScope.launch {
+        _navigationEvents.emit(ScheduleNavEvent.OpenGoalDialogWithDate(epochDay = epochDay))
     }
 
-    private fun onAddGoalToRoleClick(roleName: String) {
-        _navState.value = ScheduleNavState.OpenGoalDialogWithRole(roleName = roleName)
+    private fun onAddGoalToRoleClick(roleName: String) = viewModelScope.launch {
+        _navigationEvents.emit(ScheduleNavEvent.OpenGoalDialogWithRole(roleName = roleName))
     }
 
-    private fun onAddRoleClick() {
-        _navState.value = ScheduleNavState.OpenRoleDialog
+    private fun onAddRoleClick() = viewModelScope.launch {
+        _navigationEvents.emit(ScheduleNavEvent.OpenRoleDialog)
     }
 
     private fun onDeleteRoleClick(roleName: String) = viewModelScope.launch {
@@ -110,8 +110,8 @@ class ScheduleViewModel(
             roleRepository.deleteRole(roleName)
     }
 
-    private fun onEditRoleClick(roleName: String) {
-        _navState.value = ScheduleNavState.OpenRoleDialogWithRole(roleName = roleName)
+    private fun onEditRoleClick(roleName: String) = viewModelScope.launch {
+        _navigationEvents.emit(ScheduleNavEvent.OpenRoleDialogWithRole(roleName = roleName))
     }
 
     private fun completeGoal(goalId: Int) = viewModelScope.launch {

@@ -52,7 +52,7 @@ fun DragSurface(
                         with(dndState) {
                             isDragging = false
                             dragOffset = Offset.Zero
-                            dndState.executeDropCallbacks(dragData)
+                            dndState.onDrop(dragData)
                         }
                     },
                     onDragCancel = {

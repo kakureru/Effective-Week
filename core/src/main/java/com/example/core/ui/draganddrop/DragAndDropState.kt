@@ -1,12 +1,19 @@
 package com.example.core.ui.draganddrop
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+
+interface DragData {
+    val id: Int
+}
+
+typealias DropCallback = (DragData) -> Unit
+
+internal val LocalDragAndDropState = compositionLocalOf { DragAndDropState() }
 
 class DragAndDropState {
 
@@ -33,40 +40,45 @@ class DragAndDropState {
     var dragOffset by mutableStateOf(Offset.Zero)
 
 
-    private var dropCallbacks: MutableSet<DropCallback> = mutableSetOf()
-
-    fun addDropCallback(callback: DropCallback) {
-        synchronized(lock) {
-            dropCallbacks.add(callback)
-            Log.d("MYTAG", "add ${dropCallbacks.size}")
-        }
+    fun onDropZoneEnter(callback: DropCallback, zIndex: Float) {
+        addDropCallback(callback, zIndex)
     }
 
-    fun removeDropCallback(callback: DropCallback) {
-        synchronized(lock) {
-            dropCallbacks.remove(callback)
-            Log.d("MYTAG", "remove ${dropCallbacks.size}")
-        }
+    fun onDropZoneLeave(callback: DropCallback, zIndex: Float) {
+        removeDropCallback(callback, zIndex)
     }
 
-    fun executeDropCallbacks(dragData: DragData) {
+    fun onDrop(dragData: DragData) {
+        executeDropCallbacks(dragData)
+    }
+
+    private var dropCallbacks: MutableMap<Float, MutableSet<DropCallback>> = mutableMapOf()
+
+    private fun addDropCallback(callback: DropCallback, zIndex: Float) {
         synchronized(lock) {
-            Log.d("MYTAG", "execute ${dropCallbacks.size}")
-            dropCallbacks.forEach {
-                it.invoke(dragData)
+            dropCallbacks[zIndex]?.add(callback) ?: run {
+                dropCallbacks[zIndex] = mutableSetOf(callback)
             }
+        }
+    }
+
+    private fun removeDropCallback(callback: DropCallback, zIndex: Float) {
+        synchronized(lock) {
+            dropCallbacks[zIndex]?.remove(callback)
+        }
+    }
+
+    private fun executeDropCallbacks(dragData: DragData) {
+        synchronized(lock) {
+            dropCallbacks
+                .filter { it.value.isNotEmpty() }
+                .maxBy { it.key }
+                .value
+                .forEach { it.invoke(dragData) }
             dropCallbacks.clear()
-            Log.d("MYTAG", "clear ${dropCallbacks.size}")
         }
     }
 
     // Metadata
     var cardDraggedId by mutableStateOf(-1)
-}
-
-internal val LocalDragAndDropState = compositionLocalOf { DragAndDropState() }
-
-typealias DropCallback = (DragData) -> Unit
-interface DragData {
-    val id: Int
 }
