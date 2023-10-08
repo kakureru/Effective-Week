@@ -10,16 +10,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun DropSurface(
+fun DragListenerSurface(
+    onAbove: suspend CoroutineScope.() -> Unit,
     modifier: Modifier = Modifier,
-    onDrop: (DragData) -> Unit,
-    zIndex: Float,
-    content: @Composable BoxScope.(isInBound: Boolean, dragOffset: Offset) -> Unit
+    content: @Composable BoxScope.(isInBound: Boolean) -> Unit = {}
 ) {
     val dndState = LocalDragAndDropState.current
     val dragOffset = dndState.dragPosition
@@ -27,8 +26,9 @@ fun DropSurface(
         mutableStateOf(false)
     }
     LaunchedEffect(isAboveDropSurface) {
-        if (isAboveDropSurface) dndState.onDropZoneEnter(onDrop, zIndex)
-        else dndState.onDropZoneLeave(onDrop, zIndex)
+        while (isAboveDropSurface) {
+            onAbove()
+        }
     }
     Box(
         modifier = modifier.onGloballyPositioned {
@@ -37,6 +37,6 @@ fun DropSurface(
             }
         }
     ) {
-        content(isAboveDropSurface, dragOffset)
+        content(isAboveDropSurface)
     }
 }

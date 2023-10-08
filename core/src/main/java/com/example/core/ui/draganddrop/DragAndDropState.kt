@@ -30,15 +30,11 @@ class DragAndDropState {
     var isDragging by mutableStateOf(false)
 
     /**
-     * Current position of the item to be dragged
-     */
-    var itemPosition by mutableStateOf(Offset.Zero)
-
-    /**
      * Current position of the drag pointer after drag is started
      */
-    var dragOffset by mutableStateOf(Offset.Zero)
+    var dragPosition by mutableStateOf(Offset.Zero)
 
+    var dragData by mutableStateOf<DragData?>(null)
 
     fun onDropZoneEnter(callback: DropCallback, zIndex: Float) {
         addDropCallback(callback, zIndex)
@@ -48,8 +44,11 @@ class DragAndDropState {
         removeDropCallback(callback, zIndex)
     }
 
-    fun onDrop(dragData: DragData) {
-        executeDropCallbacks(dragData)
+    fun onDrop() {
+        dragData?.let {
+            executeDropCallbacks(it)
+        }
+        dragData = null
     }
 
     private var dropCallbacks: MutableMap<Float, MutableSet<DropCallback>> = mutableMapOf()
@@ -72,9 +71,9 @@ class DragAndDropState {
         synchronized(lock) {
             dropCallbacks
                 .filter { it.value.isNotEmpty() }
-                .maxBy { it.key }
-                .value
-                .forEach { it.invoke(dragData) }
+                .maxByOrNull { it.key }
+                ?.value
+                ?.forEach { it.invoke(dragData) }
             dropCallbacks.clear()
         }
     }

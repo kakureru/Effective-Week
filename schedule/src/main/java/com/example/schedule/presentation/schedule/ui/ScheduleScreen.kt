@@ -1,14 +1,17 @@
 package com.example.schedule.presentation.schedule.ui
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,7 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragAndDropSurface
+import com.example.core.ui.draganddrop.DragListenerSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.ScheduleEffect
 import com.example.schedule.presentation.schedule.ScheduleEvent
@@ -43,6 +50,7 @@ import com.example.schedule.presentation.schedule.ScheduleViewModel
 import com.example.schedule.presentation.schedule.model.GoalItem
 import com.example.schedule.presentation.schedule.model.ScheduleDayModel
 import com.example.schedule.presentation.schedule.model.toGoalItem
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -92,7 +100,14 @@ fun ScheduleScreen(
                         dndState = dndState,
                         name = role.name,
                         goals = role.goals.map { it.toGoalItem() },
-                        onDropGoal = { goalId -> vm.accept(ScheduleEvent.GoalDropOnRole(goalId, role.name))},
+                        onDropGoal = { goalId ->
+                            vm.accept(
+                                ScheduleEvent.GoalDropOnRole(
+                                    goalId,
+                                    role.name
+                                )
+                            )
+                        },
                         onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToRoleClick(role.name)) },
                         onEditClick = { vm.accept(ScheduleEvent.EditRoleClick(role.name)) },
                         onDeleteClick = { vm.accept(ScheduleEvent.DeleteRoleClick(role.name)) },
@@ -158,7 +173,7 @@ fun ScheduleScreenUi(
 
     DragAndDropSurface(
         modifier = Modifier.fillMaxSize(),
-        state = dndState
+        dndState = dndState
     ) {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
@@ -170,22 +185,49 @@ fun ScheduleScreenUi(
         ) { paddingValues ->
             val rowState = rememberLazyListState()
             val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
-            LazyRow(
-                state = rowState,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                flingBehavior = snapBehavior,
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxHeight(),
+            val scrollAmount = 50f
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(items = state.schedule, key = { item -> item.dateText }) {
-                    scheduleDay(it)
+                DragListenerSurface(
+                    onAbove = {
+                        rowState.scrollBy(-scrollAmount)
+                        delay(10)
+                    },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(100.dp)
+                        .background(Color.Red.copy(alpha = 0.1f))
+                        .align(Alignment.CenterStart)
+                        .alpha(0.5f),
+                )
+                DragListenerSurface(
+                    onAbove = {
+                        rowState.scrollBy(scrollAmount)
+                        delay(10)
+                    },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(100.dp)
+                        .background(Color.Blue.copy(alpha = 0.1f))
+                        .align(Alignment.CenterEnd),
+                )
+                LazyRow(
+                    state = rowState,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    flingBehavior = snapBehavior,
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxHeight(),
+                ) {
+                    items(items = state.schedule, key = { item -> item.dateText }) {
+                        scheduleDay(it)
+                    }
                 }
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
