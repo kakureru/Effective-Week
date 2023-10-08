@@ -86,7 +86,7 @@ class GoalDialogViewModel (
             GoalDialogEvent.ConfirmClick -> onConfirmClick()
             is GoalDialogEvent.DescriptionChanged -> onDescriptionChanged(event.newDescription)
             is GoalDialogEvent.TitleChanged -> onTitleChanged(event.newTitle)
-            is GoalDialogEvent.AppointmentValueChanged -> onAppointmentChanged(event.isChecked)
+            GoalDialogEvent.IsAppointmentClick -> onAppointmentChanged()
         }
     }
 
@@ -118,8 +118,8 @@ class GoalDialogViewModel (
         _goalState.update { it.copy(time = LocalTime.of(hour, minute)) }
     }
 
-    private fun onAppointmentChanged(isChecked: Boolean) {
-        _goalState.update { it.copy(appointment = isChecked) }
+    private fun onAppointmentChanged() {
+        _goalState.update { it.copy(appointment = !it.appointment) }
     }
 
     private suspend fun onConfirmClick() {

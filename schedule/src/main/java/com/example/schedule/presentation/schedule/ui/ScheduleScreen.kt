@@ -177,7 +177,7 @@ fun ScheduleScreenUi(
             modifier = modifier,
             topBar = topBar,
             sheetDragHandle = null,
-            sheetPeekHeight = 55.dp,
+            sheetPeekHeight = 70.dp,
             sheetContent = {
                 DragListenSurface(
                     onEnter = {

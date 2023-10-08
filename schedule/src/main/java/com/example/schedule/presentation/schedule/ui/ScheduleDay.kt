@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragData
-import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.draganddrop.DragListenSurface
+import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.presentation.schedule.model.GoalItem

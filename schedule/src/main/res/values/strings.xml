@@ -5,6 +5,7 @@
     <string name="priorities">Priorities</string>
     <string name="appointments">Appointments</string>
     <string name="choose_role">Choose role</string>
+    <string name="name">Name</string>
     <string name="role">Role</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
@@ -15,4 +16,5 @@
 
     <string name="error_title_and_role_required">Title and role is required</string>
     <string name="error_cant_delete_role_with_active_goals">Can\'t delete role with active goals</string>
+    <string name="error_name_required">Name is required</string>
 </resources>

@@ -35,8 +35,8 @@ import com.example.core.R
 import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragData
-import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.draganddrop.DragListenSurface
+import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.model.GoalItem
 import kotlin.math.min

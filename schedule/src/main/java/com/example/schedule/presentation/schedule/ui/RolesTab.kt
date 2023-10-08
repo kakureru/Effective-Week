@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,11 +35,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.domain.model.Role
-import com.example.schedule.presentation.schedule.model.GoalCallback
 import com.example.schedule.presentation.schedule.model.toGoalItem
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -55,27 +54,10 @@ fun ColumnScope.RolesTab(
     val rowState = rememberLazyListState()
     val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
     Column(modifier = Modifier.height((configuration.screenHeightDp / 2).dp)) {
-        DragHandle(modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 20.dp, bottom = 30.dp))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-        ) {
-            Text(
-                text = stringResource(id = R.string.my_roles),
-                style = MaterialTheme.typography.titleMedium
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_role_add),
-                contentDescription = "add role",
-                modifier = Modifier.clickable { onAddRoleClick() }
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+        RolesTabHeader(
+            onAddRoleClick = onAddRoleClick,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize(),
@@ -87,6 +69,38 @@ fun ColumnScope.RolesTab(
                 roleItem(it)
             }
         }
+    }
+}
+
+@Composable
+fun RolesTabHeader(
+    modifier: Modifier = Modifier,
+    onAddRoleClick: () -> Unit,
+) {
+    ConstraintLayout(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+    ) {
+        val (rHandle, rBtnAdd) = createRefs()
+        DragHandle(
+            modifier = Modifier
+                .padding(top = 30.dp, bottom = 30.dp)
+                .constrainAs(rHandle) {
+                    linkTo(start = parent.start, end = parent.end)
+                    linkTo(top = parent.top, bottom = parent.bottom)
+                }
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.ic_role_add),
+            contentDescription = "add role",
+            modifier = Modifier
+                .clickable { onAddRoleClick() }
+                .constrainAs(rBtnAdd) {
+                    linkTo(start = rHandle.end, end = parent.end, bias = 1f)
+                    linkTo(top = parent.top, bottom = parent.bottom)
+                }
+        )
     }
 }
 

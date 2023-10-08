@@ -1,7 +1,5 @@
 package com.example.schedule.presentation.goal_dialog
 
-import com.example.greatweek.ui.screens.goaldialog.dialogdata.DateDialogData
-import com.example.greatweek.ui.screens.goaldialog.dialogdata.TimeDialogData
 import com.example.schedule.presentation.role_pick_dialog.RoleItem
 import java.time.LocalTime
 
@@ -27,13 +25,11 @@ sealed class GoalDialogEvent {
     class TimePick(val hour: Int, val minute: Int) : GoalDialogEvent()
     class DatePick(val dateMillis: Long) : GoalDialogEvent()
     object ConfirmClick : GoalDialogEvent()
-    class AppointmentValueChanged(val isChecked: Boolean) : GoalDialogEvent()
+    object IsAppointmentClick : GoalDialogEvent()
     class TitleChanged(val newTitle: String) : GoalDialogEvent()
     class DescriptionChanged(val newDescription: String) : GoalDialogEvent()
 }
 
 sealed class GoalDialogEffect {
-    class Error(val msg: Int) : GoalDialogEffect()
-    class TimeDialog(val dialogData: TimeDialogData) : GoalDialogEffect()
-    class DateDialog(val dialogData: DateDialogData) : GoalDialogEffect()
+    class Error(val msgResource: Int) : GoalDialogEffect()
 }

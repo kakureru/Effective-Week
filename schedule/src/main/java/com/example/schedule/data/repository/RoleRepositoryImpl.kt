@@ -28,6 +28,7 @@ class RoleRepositoryImpl(
     }
 
     private fun RoleEntity.toDomain() = Role(
-        name = name
+        name = name,
+        goals = emptyList(),
     )
 }
