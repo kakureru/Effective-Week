@@ -1,5 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +34,7 @@ import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragData
 import com.example.core.ui.draganddrop.DragSurface
-import com.example.core.ui.draganddrop.DropSurface
+import com.example.core.ui.draganddrop.DragListenSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.presentation.schedule.model.GoalItem
@@ -53,7 +54,7 @@ fun ScheduleDay(
 ) {
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
-    val width = remember(configuration) { min((configuration.screenWidthDp - 32), maxSizeDp).dp }
+    val width = remember(configuration) { min((configuration.screenWidthDp - 16), maxSizeDp).dp }
     val havePriorities by remember(model.priorities) {
         derivedStateOf { model.priorities.isNotEmpty() }
     }
@@ -68,8 +69,10 @@ fun ScheduleDay(
             shape = MaterialTheme.shapes.medium,
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .animateContentSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ScheduleDayHeader(
                     weekday = model.weekday,
@@ -78,14 +81,24 @@ fun ScheduleDay(
                     modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
                 )
                 if (!havePriorities && !haveAppointments) {
-                    GoalItemPlaceholder(onClick = onAddGoalClick)
+                    DragListenSurface(
+                        zIndex = 1f,
+                        onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
+                    ) { isInBounds ->
+                        GoalItemPlaceholder(
+                            onClick = onAddGoalClick,
+                            modifier = Modifier
+                                .dragAndDropBackground(isInBounds, dndState.isDragging)
+                                .padding(bottom = 4.dp)
+                        )
+                    }
                 } else {
                     if (havePriorities) {
                         GoalCategoryTitle(text = stringResource(id = R.string.priorities))
-                        DropSurface(
+                        DragListenSurface(
                             zIndex = 1f,
                             onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
-                        ) { isInBound, _ ->
+                        ) { isInBound ->
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,
@@ -110,10 +123,10 @@ fun ScheduleDay(
                     }
                     if (haveAppointments) {
                         GoalCategoryTitle(text = stringResource(id = R.string.appointments))
-                        DropSurface(
+                        DragListenSurface(
                             zIndex = 1f,
                             onDrop = { dragData -> onDropGoalToAppointments(dragData.id) }
-                        ) { isInBound, _ ->
+                        ) { isInBound ->
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,

@@ -1,9 +1,11 @@
 package com.example.schedule.presentation.schedule.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +55,9 @@ fun ColumnScope.RolesTab(
     val rowState = rememberLazyListState()
     val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
     Column(modifier = Modifier.height((configuration.screenHeightDp / 2).dp)) {
+        DragHandle(modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(top = 20.dp, bottom = 30.dp))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -71,13 +81,24 @@ fun ColumnScope.RolesTab(
             modifier = Modifier.fillMaxSize(),
             state = rowState,
             flingBehavior = snapBehavior,
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp),
         ) {
             items(items = roles, key = { item -> item.name }) {
                 roleItem(it)
             }
         }
     }
+}
+
+@Composable
+fun DragHandle(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(40.dp, 5.dp)
+            .alpha(0.5f)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(MaterialTheme.colorScheme.onSurface)
+    )
 }
 
 @Preview

@@ -1,6 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
-import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,9 +36,8 @@ import com.example.core.ui.AddButton
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragData
 import com.example.core.ui.draganddrop.DragSurface
-import com.example.core.ui.draganddrop.DropSurface
+import com.example.core.ui.draganddrop.DragListenSurface
 import com.example.core.ui.theme.DarkTheme
-import com.example.schedule.presentation.schedule.model.GoalCallback
 import com.example.schedule.presentation.schedule.model.GoalItem
 import kotlin.math.min
 
@@ -56,14 +55,14 @@ fun RoleItem(
 ) {
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
-    val width = remember(configuration) { min((configuration.screenWidthDp - 32), maxSizeDp).dp }
+    val width = remember(configuration) { min((configuration.screenWidthDp - 16), maxSizeDp).dp }
     var optionsExpanded by remember { mutableStateOf(false) }
     val haveGoals by remember(goals) { derivedStateOf { goals.isNotEmpty() } }
 
-    DropSurface(
+    DragListenSurface(
         onDrop = { dropData -> onDropGoal(dropData.id) },
         zIndex = 2f
-    ) { isInBound, _ ->
+    ) { isInBound ->
         Surface(
             shape = MaterialTheme.shapes.medium,
             modifier = modifier.width(width),
@@ -72,6 +71,7 @@ fun RoleItem(
             LazyColumn(
                 modifier = Modifier
                     .dragAndDropBackground(isInBound, dndState.isDragging)
+                    .animateContentSize()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {

@@ -1,6 +1,5 @@
 package com.example.core.ui.draganddrop
 
-import android.util.Log
 import androidx.compose.foundation.gestures.awaitDragOrCancellation
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -24,6 +23,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
+private const val topAppBarHeight = 160f // TODO find workaround
+
 @Composable
 fun DragAndDropSurface(
     modifier: Modifier = Modifier,
@@ -43,13 +44,14 @@ fun DragAndDropSurface(
                         if (dndState.isDragging) {
                             if (change != null && change.pressed) {
                                 change.consume()
-                                dndState.dragPosition = change.position
+
+                                dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
                             }
                             while (change != null && change.pressed) {
                                 change = awaitDragOrCancellation(change.id)
                                 if (change != null && change.pressed) {
                                     change.consume()
-                                    dndState.dragPosition =  change.position
+                                    dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
                                 }
                             }
                             if (change != null) {
@@ -91,8 +93,7 @@ fun DragShadow(
                 scaleY = 0.9f
                 alpha = if (targetSize == IntSize.Zero) 0f else 1f
                 translationX = position.x.minus(targetSize.width / 2)
-                // 160f is the height adjustment for top app bar, need to find a way to calculate this height
-                translationY = position.y.minus((targetSize.height / 2 + 160f))
+                translationY = position.y.minus((targetSize.height / 2 + topAppBarHeight))
                 spotShadowColor = Color(0xFF111111)
                 ambientShadowColor = Color(0xFF111111)
             }

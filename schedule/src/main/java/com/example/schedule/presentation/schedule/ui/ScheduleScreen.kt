@@ -1,7 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -30,8 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragAndDropSurface
-import com.example.core.ui.draganddrop.DragListenerSurface
+import com.example.core.ui.draganddrop.DragListenSurface
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.presentation.schedule.ScheduleEffect
 import com.example.schedule.presentation.schedule.ScheduleEvent
@@ -179,44 +176,63 @@ fun ScheduleScreenUi(
             scaffoldState = scaffoldState,
             modifier = modifier,
             topBar = topBar,
-            sheetContent = sheetContent,
+            sheetDragHandle = null,
+            sheetPeekHeight = 55.dp,
+            sheetContent = {
+                DragListenSurface(
+                    onEnter = {
+                        scope.launch {
+                            scaffoldState.bottomSheetState.expand()
+                        }
+                    },
+                    onExit = {
+
+                    },
+                ) { isInBound ->
+                    this@BottomSheetScaffold.sheetContent()
+                }
+            },
             containerColor = MaterialTheme.colorScheme.background,
             sheetShape = MaterialTheme.shapes.large
         ) { paddingValues ->
             val rowState = rememberLazyListState()
             val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
             val scrollAmount = 50f
+            val dragListenerWidth = 70.dp
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                DragListenerSurface(
-                    onAbove = {
-                        rowState.scrollBy(-scrollAmount)
-                        delay(10)
-                    },
+                DragListenSurface(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(100.dp)
-                        .background(Color.Red.copy(alpha = 0.1f))
-                        .align(Alignment.CenterStart)
-                        .alpha(0.5f),
-                )
-                DragListenerSurface(
-                    onAbove = {
-                        rowState.scrollBy(scrollAmount)
-                        delay(10)
-                    },
+                        .width(dragListenerWidth)
+                        .align(Alignment.CenterStart),
+                ) { isInBound ->
+                    LaunchedEffect(isInBound) {
+                        while (isInBound) {
+                            rowState.scrollBy(-scrollAmount)
+                            delay(10)
+                        }
+                    }
+                }
+                DragListenSurface(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(100.dp)
-                        .background(Color.Blue.copy(alpha = 0.1f))
+                        .width(dragListenerWidth)
                         .align(Alignment.CenterEnd),
-                )
+                ) { isInBound ->
+                    LaunchedEffect(isInBound) {
+                        while (isInBound) {
+                            rowState.scrollBy(scrollAmount)
+                            delay(10)
+                        }
+                    }
+                }
                 LazyRow(
                     state = rowState,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     flingBehavior = snapBehavior,
-                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxHeight(),

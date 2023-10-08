@@ -1,6 +1,5 @@
 package com.example.core.ui.draganddrop
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
@@ -10,16 +9,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 
 @Composable
-fun DropSurface(
+fun DragListenSurface(
     modifier: Modifier = Modifier,
-    onDrop: (DragData) -> Unit,
-    zIndex: Float,
-    content: @Composable BoxScope.(isInBound: Boolean, dragOffset: Offset) -> Unit
+    onDrop: ((DragData) -> Unit)? = null,
+    onEnter: (() -> Unit)? = null,
+    onExit: (() -> Unit)? = null,
+    zIndex: Float = 1f,
+    content: @Composable BoxScope.(isInBound: Boolean) -> Unit
 ) {
     val dndState = LocalDragAndDropState.current
     val dragOffset = dndState.dragPosition
@@ -27,8 +27,14 @@ fun DropSurface(
         mutableStateOf(false)
     }
     LaunchedEffect(isAboveDropSurface) {
-        if (isAboveDropSurface) dndState.onDropZoneEnter(onDrop, zIndex)
-        else dndState.onDropZoneLeave(onDrop, zIndex)
+        if (isAboveDropSurface) {
+            onDrop?.let { dndState.onDropZoneEnter(it, zIndex) }
+            onEnter?.invoke()
+        }
+        else {
+            onDrop?.let { dndState.onDropZoneLeave(it, zIndex) }
+            onExit?.invoke()
+        }
     }
     Box(
         modifier = modifier.onGloballyPositioned {
@@ -37,6 +43,6 @@ fun DropSurface(
             }
         }
     ) {
-        content(isAboveDropSurface, dragOffset)
+        content(isAboveDropSurface)
     }
 }
