@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,11 +45,8 @@ import kotlin.math.min
 @Composable
 fun RoleItem(
     dndState: DragAndDropState,
-    name: String,
     goals: List<GoalItem>,
     onDropGoal: (goalId: Int) -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
     onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
     goalItem: @Composable (GoalItem) -> Unit,
@@ -56,17 +54,14 @@ fun RoleItem(
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
     val width = remember(configuration) { min((configuration.screenWidthDp - 16), maxSizeDp).dp }
-    var optionsExpanded by remember { mutableStateOf(false) }
     val haveGoals by remember(goals) { derivedStateOf { goals.isNotEmpty() } }
 
     DragListenSurface(
         onDrop = { dropData -> onDropGoal(dropData.id) },
         zIndex = 2f
     ) { isInBound ->
-        Surface(
-            shape = MaterialTheme.shapes.medium,
+        Box(
             modifier = modifier.width(width),
-            tonalElevation = 2.dp
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -76,29 +71,7 @@ fun RoleItem(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 12.dp, top = 16.dp)
-                    ) {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Box {
-                            Icon(
-                                imageVector = Icons.Rounded.MoreVert,
-                                contentDescription = "more",
-                                modifier = Modifier.clickable { optionsExpanded = true }
-                            )
-                            RoleOptionsDropdownMenu(
-                                expanded = optionsExpanded,
-                                onDismiss = { optionsExpanded = false },
-                                onEditClick = onEditClick,
-                                onDeleteClick = onDeleteClick
-                            )
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 if (haveGoals) {
                     items(items = goals, key = { item -> item.id }) { item ->
@@ -172,11 +145,8 @@ fun RoleItemPreview() {
     DarkTheme {
         RoleItem(
             dndState = DragAndDropState(),
-            name = "Sample role",
             onAddGoalClick = {},
             goals = listOf(GoalItem(0, "Sample Goal", "Me"), GoalItem(1, "Sample Goal", "Me")),
-            onDeleteClick = {},
-            onEditClick = {},
             onDropGoal = {},
             goalItem = {
                 GoalItem(
@@ -196,11 +166,8 @@ fun RoleItemPreviewNoGoals() {
     DarkTheme {
         RoleItem(
             dndState = DragAndDropState(),
-            name = "Sample role",
             onAddGoalClick = {},
             goals = emptyList(),
-            onDeleteClick = {},
-            onEditClick = {},
             onDropGoal = {},
             goalItem = {
                 GoalItem(

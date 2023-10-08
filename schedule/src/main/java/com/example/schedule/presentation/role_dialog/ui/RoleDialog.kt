@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.ui.BasicDialog
 import com.example.core.ui.ConfirmButton
 import com.example.core.ui.theme.DarkTheme
 import com.example.core.ui.theme.greatTextFieldColors

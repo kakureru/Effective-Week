@@ -42,11 +42,12 @@ fun GoalItem(
     modifier: Modifier = Modifier,
 ) {
     var checked by rememberSaveable { mutableStateOf(false) }
-    val shape = MaterialTheme.shapes.medium
+    val shape = MaterialTheme.shapes.small
     Surface(
         modifier = modifier,
         shape = shape,
-        shadowElevation = 8.dp
+        shadowElevation = 4.dp,
+        tonalElevation = 0.5.dp
     ) {
         ConstraintLayout(
             modifier = Modifier

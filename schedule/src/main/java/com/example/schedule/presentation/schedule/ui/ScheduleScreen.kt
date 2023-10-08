@@ -1,5 +1,6 @@
 package com.example.schedule.presentation.schedule.ui
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -14,9 +15,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -52,6 +56,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreen(
     navigation: ScheduleNavigation,
@@ -81,21 +86,25 @@ fun ScheduleScreen(
             onCheck = { vm.accept(ScheduleEvent.CompleteGoal(goalItem.id)) },
         )
     }
+    val scaffoldState = rememberBottomSheetScaffoldState()
 
     ScheduleScreenUi(
         dndState = dndState,
+        scaffoldState = scaffoldState,
         state = state,
         effects = vm.uiEffect,
         modifier = modifier,
         topBar = { ScheduleTopBar() },
         sheetContent = {
             RolesTab(
+                expanded = scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded,
                 roles = state.roles,
                 onAddRoleClick = { vm.accept(ScheduleEvent.AddRoleClick) },
+                onEditClick = { roleName -> vm.accept(ScheduleEvent.EditRoleClick(roleName)) },
+                onDeleteClick = { roleName -> vm.accept(ScheduleEvent.DeleteRoleClick(roleName)) },
                 roleItem = { role ->
                     RoleItem(
                         dndState = dndState,
-                        name = role.name,
                         goals = role.goals.map { it.toGoalItem() },
                         onDropGoal = { goalId ->
                             vm.accept(
@@ -106,8 +115,6 @@ fun ScheduleScreen(
                             )
                         },
                         onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToRoleClick(role.name)) },
-                        onEditClick = { vm.accept(ScheduleEvent.EditRoleClick(role.name)) },
-                        onDeleteClick = { vm.accept(ScheduleEvent.DeleteRoleClick(role.name)) },
                         goalItem = { goalItem -> goalItem(goalItem) }
                     )
                 }
@@ -148,13 +155,13 @@ fun ScheduleScreen(
 fun ScheduleScreenUi(
     dndState: DragAndDropState,
     state: ScheduleState,
+    scaffoldState: BottomSheetScaffoldState,
     effects: Flow<ScheduleEffect>,
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit,
     sheetContent: @Composable ColumnScope.() -> Unit,
     scheduleDay: @Composable (ScheduleDayModel) -> Unit,
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -177,7 +184,7 @@ fun ScheduleScreenUi(
             modifier = modifier,
             topBar = topBar,
             sheetDragHandle = null,
-            sheetPeekHeight = 70.dp,
+            sheetPeekHeight = 56.dp,
             sheetContent = {
                 DragListenSurface(
                     onEnter = {
@@ -185,15 +192,15 @@ fun ScheduleScreenUi(
                             scaffoldState.bottomSheetState.expand()
                         }
                     },
-                    onExit = {
-
-                    },
                 ) { isInBound ->
                     this@BottomSheetScaffold.sheetContent()
                 }
             },
             containerColor = MaterialTheme.colorScheme.background,
-            sheetShape = MaterialTheme.shapes.large
+            sheetShape = MaterialTheme.shapes.large.copy(
+                bottomEnd = CornerSize(0.dp),
+                bottomStart = CornerSize(0.dp)
+            )
         ) { paddingValues ->
             val rowState = rememberLazyListState()
             val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
@@ -258,12 +265,14 @@ fun ScheduleTopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
             dndState = DragAndDropState(),
+            scaffoldState = rememberBottomSheetScaffoldState(),
             state = ScheduleState(),
             effects = emptyFlow(),
             sheetContent = {},
