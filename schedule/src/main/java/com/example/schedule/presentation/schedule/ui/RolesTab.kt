@@ -1,8 +1,11 @@
 package com.example.schedule.presentation.schedule.ui
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,13 +49,14 @@ import com.example.schedule.R
 import com.example.schedule.domain.model.Role
 import kotlin.math.abs
 
-
+enum class ExpandedType {
+    HALF, FULL, COLLAPSED
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ColumnScope.RolesTab(
     roles: List<Role>,
-    expanded: Boolean,
     onAddRoleClick: () -> Unit,
     onEditClick: (roleName: String) -> Unit,
     onDeleteClick: (roleName: String) -> Unit,
@@ -67,32 +72,69 @@ fun ColumnScope.RolesTab(
         }
     }
 
-    Column(modifier = modifier
-        .height((configuration.screenHeightDp / 2).dp)
-        .fillMaxWidth()) {
-        DragHandle(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 8.dp, bottom = 8.dp)
-        )
-        RolesTabHeader(
-            title = name,
-            onAddRoleClick = onAddRoleClick,
-            onDeleteClick = { onDeleteClick(name) },
-            onEditClick = { onEditClick(name) },
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .alpha(if (expanded) 1f else 0f)
-        )
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize(),
-            state = rowState,
-            flingBehavior = snapBehavior,
-            contentPadding = PaddingValues(horizontal = 8.dp),
+    var expandedType by remember {
+        mutableStateOf(ExpandedType.HALF)
+    }
+    val height by remember(expandedType) {
+       derivedStateOf {
+           when (expandedType) {
+               ExpandedType.HALF -> configuration.screenHeightDp / 2
+               ExpandedType.FULL -> configuration.screenHeightDp
+               ExpandedType.COLLAPSED -> 50
+           }
+       }
+    }
+    var isUpdated = false
+
+    Box(modifier = Modifier.animateContentSize(animationSpec = tween(200))) {
+        Column(
+            modifier = modifier
+                .height(height.dp)
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures(
+                        onVerticalDrag = { change, dragAmount ->
+                            change.consume()
+                            if (!isUpdated) {
+                                expandedType = when {
+                                    dragAmount < 0 && expandedType == ExpandedType.COLLAPSED -> ExpandedType.HALF
+                                    dragAmount < 0 && expandedType == ExpandedType.HALF -> ExpandedType.FULL
+                                    dragAmount > 0 && expandedType == ExpandedType.FULL -> ExpandedType.HALF
+                                    dragAmount > 0 && expandedType == ExpandedType.HALF -> ExpandedType.COLLAPSED
+                                    else -> ExpandedType.FULL
+                                }
+                                isUpdated = true
+                            }
+                        },
+                        onDragEnd = {
+                            isUpdated = false
+                        }
+                    )
+                }
         ) {
-            items(items = roles, key = { item -> item.name }) {
-                roleItem(it)
+            DragHandle(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 8.dp, bottom = 16.dp)
+            )
+            RolesTabHeader(
+                title = name,
+                onAddRoleClick = onAddRoleClick,
+                onDeleteClick = { onDeleteClick(name) },
+                onEditClick = { onEditClick(name) },
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+            )
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize(),
+                state = rowState,
+                flingBehavior = snapBehavior,
+                contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
+                items(items = roles, key = { item -> item.name }) {
+                    roleItem(it)
+                }
             }
         }
     }
@@ -165,7 +207,6 @@ fun RolesTabPreview() {
         ) {
             Column {
                 RolesTab(
-                    expanded = true,
                     roles = emptyList(),
                     onAddRoleClick = {},
                     roleItem = {},
