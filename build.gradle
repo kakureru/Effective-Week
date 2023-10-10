@@ -1,14 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.buldConfig = [
+    ext.buildConfig = [
         'compileSdk': 33,
         'minSdk': 26,
         'targetSdk': 33,
+        'kotlinCompilerExtension': '1.4.0'
     ]
 
     ext.versions = [
-        'room': '2.4.3',
-        'koin': '3.4.3',
+        'room': '2.5.2',
+        'koin': '3.5.0',
     ]
 
     ext.deps = [
@@ -18,13 +19,13 @@ buildscript {
                 'fragment': 'androidx.fragment:fragment-ktx:1.6.0',
                 'activity_compose': 'androidx.activity:activity-compose:1.5.1',
                 'navigation_compose': "androidx.navigation:navigation-compose:2.6.0",
+                'constraintlayout_compose': "androidx.constraintlayout:constraintlayout-compose:1.0.1",
                 'compose': [
                         'bom': 'androidx.compose:compose-bom:2023.04.01',
                         'runtime': "androidx.compose.runtime:runtime",
                         'foundation': "androidx.compose.foundation:foundation",
                         'foundation_layout': "androidx.compose.foundation:foundation-layout",
                         'material3': 'androidx.compose.material3:material3:1.1.0-alpha08',
-                        'constraintlayout': "androidx.constraintlayout:constraintlayout-compose:1.0.1",
                         'ui': [
                                 'ui': "androidx.compose.ui:ui",
                                 'graphics': 'androidx.compose.ui:ui-graphics',
@@ -33,7 +34,6 @@ buildscript {
                         ]
                 ],
         ],
-        'material': "com.google.android.material:material:1.7.0",
         'koin': [
                 'android': "io.insert-koin:koin-android:${versions.koin}",
                 'compose': "io.insert-koin:koin-androidx-compose:${versions.koin}",
@@ -43,16 +43,12 @@ buildscript {
                 'ktx': "androidx.room:room-ktx:${versions.room}",
                 'kapt': "androidx.room:room-compiler:${versions.room}"
         ],
-        'okhttp': [
-                'okhttp': "com.squareup.okhttp3:okhttp:${versions.okhttp}",
-                'logginginterceptor': "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}",
-        ],
     ]
 }
 
 plugins {
-    id 'com.android.application' version '7.2.2' apply false
-    id 'com.android.library' version '7.2.2' apply false
+    id 'com.android.application' version '8.1.2' apply false
+    id 'com.android.library' version '8.1.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
 }
 

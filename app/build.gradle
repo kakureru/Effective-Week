@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk buldConfig.compileSdk
+    compileSdk buildConfig.compileSdk
 
     defaultConfig {
         applicationId "com.example.greatweek"
-        minSdk buldConfig.minSdk
-        targetSdk buldConfig.targetSdk
+        minSdk buildConfig.minSdk
+        targetSdk buildConfig.targetSdk
         versionCode 1
         versionName "1.0"
     }
@@ -22,18 +22,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+        kotlinCompilerExtensionVersion buildConfig.kotlinCompilerExtension
     }
+    namespace 'com.example.greatweek'
 }
 
 dependencies {
@@ -52,14 +53,11 @@ dependencies {
     implementation deps.koin.android
     implementation deps.koin.compose
 
-    implementation deps.material
-
     // Compose
-    implementation platform(deps.androidx.compose.bom)
-    androidTestImplementation platform(deps.androidx.compose.bom)
-
     implementation deps.androidx.activity_compose
     implementation deps.androidx.navigation_compose
+
+    implementation platform(deps.androidx.compose.bom)
     implementation deps.androidx.compose.runtime
     implementation deps.androidx.compose.ui.ui
     implementation deps.androidx.compose.ui.graphics

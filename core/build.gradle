@@ -6,12 +6,11 @@ plugins {
 
 android {
     namespace 'com.example.core'
-    compileSdk buldConfig.compileSdk
+    compileSdk buildConfig.compileSdk
 
     defaultConfig {
-        minSdk buldConfig.minSdk
+        minSdk buildConfig.minSdk
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
@@ -22,17 +21,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+        kotlinCompilerExtensionVersion buildConfig.kotlinCompilerExtension
     }
 }
 
@@ -42,14 +41,11 @@ dependencies {
     implementation deps.androidx.appcompat
     implementation deps.androidx.fragment
 
-    implementation deps.material
-
     // Compose
-    implementation platform(deps.androidx.compose.bom)
-    androidTestImplementation platform(deps.androidx.compose.bom)
-
     implementation deps.androidx.activity_compose
-    implementation deps.androidx.compose.constraintlayout
+    implementation deps.androidx.constraintlayout_compose
+
+    implementation platform(deps.androidx.compose.bom)
     implementation deps.androidx.compose.runtime
     implementation deps.androidx.compose.ui.ui
     implementation deps.androidx.compose.ui.graphics

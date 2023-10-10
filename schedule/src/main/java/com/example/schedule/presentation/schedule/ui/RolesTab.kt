@@ -1,7 +1,5 @@
 package com.example.schedule.presentation.schedule.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,12 +40,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.domain.model.Role
 import kotlin.math.abs
+
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -64,7 +61,6 @@ fun ColumnScope.RolesTab(
     val configuration = LocalConfiguration.current
     val rowState = rememberLazyListState()
     val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
-    val headerVisibility by animateFloatAsState(targetValue = if (expanded) 1f else 0f, label = "")
     val name by remember {
         derivedStateOf {
             rowState.layoutInfo.visibleItemsInfo.minByOrNull { abs(it.offset) }?.key.toString()
@@ -86,7 +82,7 @@ fun ColumnScope.RolesTab(
             onEditClick = { onEditClick(name) },
             modifier = Modifier
                 .padding(vertical = 16.dp)
-                .alpha(headerVisibility)
+                .alpha(if (expanded) 1f else 0f)
         )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),

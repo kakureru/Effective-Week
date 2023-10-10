@@ -1,7 +1,10 @@
 package com.example.schedule.presentation.schedule.ui
 
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -29,13 +32,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.draganddrop.DragAndDropState
@@ -88,6 +96,17 @@ fun ScheduleScreen(
     }
     val scaffoldState = rememberBottomSheetScaffoldState()
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.toFloat()
+    var expandedType by remember { mutableStateOf(ExpandedType.FULL) }
+    val height by animateFloatAsState(
+        when (expandedType) {
+            ExpandedType.HALF -> screenHeight / 2
+            ExpandedType.FULL -> screenHeight
+            ExpandedType.COLLAPSED -> 56f
+        }, label = ""
+    )
+
     ScheduleScreenUi(
         dndState = dndState,
         scaffoldState = scaffoldState,
@@ -96,8 +115,9 @@ fun ScheduleScreen(
         modifier = modifier,
         topBar = { ScheduleTopBar() },
         sheetContent = {
+            var isUpdated = false
             RolesTab(
-                expanded = scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded,
+                expanded = expandedType != ExpandedType.COLLAPSED,
                 roles = state.roles,
                 onAddRoleClick = { vm.accept(ScheduleEvent.AddRoleClick) },
                 onEditClick = { roleName -> vm.accept(ScheduleEvent.EditRoleClick(roleName)) },
@@ -117,9 +137,30 @@ fun ScheduleScreen(
                         onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToRoleClick(role.name)) },
                         goalItem = { goalItem -> goalItem(goalItem) }
                     )
+                },
+                modifier = Modifier.pointerInput(Unit) {
+                    detectVerticalDragGestures(
+                        onVerticalDrag = { change, dragAmount ->
+                            change.consume()
+                            if (!isUpdated) {
+                                expandedType = when {
+                                    dragAmount < 0 && expandedType == ExpandedType.COLLAPSED -> ExpandedType.HALF
+                                    dragAmount < 0 && expandedType == ExpandedType.HALF -> ExpandedType.FULL
+                                    dragAmount > 0 && expandedType == ExpandedType.FULL -> ExpandedType.HALF
+                                    dragAmount > 0 && expandedType == ExpandedType.HALF -> ExpandedType.COLLAPSED
+                                    else -> ExpandedType.FULL
+                                }
+                                isUpdated = true
+                            }
+                        },
+                        onDragEnd = {
+                            isUpdated = false
+                        }
+                    )
                 }
             )
         },
+        sheetPeekHeight = height.dp,
         scheduleDay = {
             ScheduleDay(
                 dndState = dndState,
@@ -150,6 +191,10 @@ fun ScheduleScreen(
     )
 }
 
+enum class ExpandedType {
+    HALF, FULL, COLLAPSED
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleScreenUi(
@@ -158,6 +203,7 @@ fun ScheduleScreenUi(
     scaffoldState: BottomSheetScaffoldState,
     effects: Flow<ScheduleEffect>,
     modifier: Modifier = Modifier,
+    sheetPeekHeight: Dp,
     topBar: @Composable () -> Unit,
     sheetContent: @Composable ColumnScope.() -> Unit,
     scheduleDay: @Composable (ScheduleDayModel) -> Unit,
@@ -184,7 +230,7 @@ fun ScheduleScreenUi(
             modifier = modifier,
             topBar = topBar,
             sheetDragHandle = null,
-            sheetPeekHeight = 56.dp,
+            sheetPeekHeight = sheetPeekHeight,
             sheetContent = {
                 DragListenSurface(
                     onEnter = {
@@ -202,6 +248,11 @@ fun ScheduleScreenUi(
                 bottomStart = CornerSize(0.dp)
             )
         ) { paddingValues ->
+            LaunchedEffect(key1 = Unit) {
+                scope.launch {
+                    scaffoldState.bottomSheetState.partialExpand()
+                }
+            }
             val rowState = rememberLazyListState()
             val snapBehavior = rememberSnapFlingBehavior(lazyListState = rowState)
             val scrollAmount = 50f
@@ -277,7 +328,8 @@ fun ScheduleScreenUiPreview() {
             effects = emptyFlow(),
             sheetContent = {},
             topBar = { ScheduleTopBar() },
-            scheduleDay = {}
+            scheduleDay = {},
+            sheetPeekHeight = 56.dp
         )
     }
 }
