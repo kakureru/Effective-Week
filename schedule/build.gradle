@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -31,7 +31,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion buildConfig.kotlinCompilerExtension
+        kotlinCompilerExtensionVersion versions.compose
     }
 }
 
@@ -45,7 +45,7 @@ dependencies {
 
     implementation deps.room.runtime
     implementation deps.room.ktx
-    kapt deps.room.kapt
+    ksp deps.room.kapt
 
     implementation deps.koin.android
     implementation deps.koin.compose
