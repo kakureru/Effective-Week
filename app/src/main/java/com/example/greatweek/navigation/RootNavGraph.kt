@@ -1,6 +1,12 @@
 package com.example.greatweek.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -83,18 +89,21 @@ private fun NavGraphBuilder.goalDialog(navController: NavHostController) {
                     type = NavType.StringType
                     nullable = true
                 }
-            )
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
         ) { entry ->
-            GoalDialog(
-                navigation = navigation,
-                viewModel = koinViewModel {
-                    parametersOf(
-                        entry.arguments?.getInt(ARG_ID),
-                        entry.arguments?.getLong(ARG_DATE),
-                        entry.arguments?.getString(ARG_ROLE),
-                    )
-                },
-            )
+            Box(modifier = Modifier.fillMaxSize()) { // to fix bug with weird animation when dialog appear off screen
+                GoalDialog(
+                    navigation = navigation,
+                    viewModel = koinViewModel {
+                        parametersOf(
+                            entry.arguments?.getInt(ARG_ID),
+                            entry.arguments?.getLong(ARG_DATE),
+                            entry.arguments?.getString(ARG_ROLE),
+                        )
+                    },
+                )
+            }
         }
     }
 }
@@ -108,12 +117,15 @@ private fun NavGraphBuilder.roleDialog(navController: NavHostController) {
                     type = NavType.StringType
                     nullable = true
                 }
-            )
+            ),
+            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
         ) { entry ->
-            RoleDialog(
-                onDismissRequest = { navController.popBackStack() },
-                viewModel = koinViewModel { parametersOf(entry.arguments?.getString(ARG_NAME)) }
-            )
+            Box(modifier = Modifier.fillMaxSize()) { // to fix bug with weird animation when dialog appear off screen
+                RoleDialog(
+                    onDismissRequest = { navController.popBackStack() },
+                    viewModel = koinViewModel { parametersOf(entry.arguments?.getString(ARG_NAME)) }
+                )
+            }
         }
     }
 }
