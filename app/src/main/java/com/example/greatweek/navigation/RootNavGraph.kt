@@ -72,6 +72,7 @@ private fun NavGraphBuilder.schedule(navController: NavHostController) {
 private fun NavGraphBuilder.goalDialog(navController: NavHostController) {
     val navigation = object : GoalDialogNavigation {
         override fun dismiss() { navController.popBackStack() }
+        override fun openRoleDialog() { navController.navigate(Screen.RoleDialog.route)}
     }
     with(Screen.GoalDialog) {
         dialog(

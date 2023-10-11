@@ -111,7 +111,7 @@ fun GoalDialog(
                 role = state.role,
                 availableRoles = state.availableRoles,
                 onRolePicked = { roleName -> viewModel.accept(GoalDialogEvent.RolePick(roleName)) },
-                onAddRoleClick = { }
+                onAddRoleClick = { navigation.openRoleDialog() }
             )
         },
         date = {
@@ -179,7 +179,6 @@ fun GoalDialogUi(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TitleField(
     value: String,
