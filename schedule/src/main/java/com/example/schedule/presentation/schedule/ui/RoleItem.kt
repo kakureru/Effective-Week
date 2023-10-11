@@ -44,10 +44,10 @@ import kotlin.math.min
 
 @Composable
 fun RoleItem(
-    dndState: DragAndDropState,
     goals: List<GoalItem>,
     onDropGoal: (goalId: Int) -> Unit,
     onAddGoalClick: () -> Unit,
+    isDragging: Boolean,
     modifier: Modifier = Modifier,
     goalItem: @Composable (GoalItem) -> Unit,
 ) {
@@ -65,7 +65,7 @@ fun RoleItem(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .dragAndDropBackground(isInBound, dndState.isDragging)
+                    .dragAndDropBackground(isInBound, isDragging)
                     .animateContentSize()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -144,7 +144,7 @@ fun RoleOptionsDropdownMenu(
 fun RoleItemPreview() {
     DarkTheme {
         RoleItem(
-            dndState = DragAndDropState(),
+            isDragging = false,
             onAddGoalClick = {},
             goals = listOf(GoalItem(0, "Sample Goal", "Me"), GoalItem(1, "Sample Goal", "Me")),
             onDropGoal = {},
@@ -165,7 +165,7 @@ fun RoleItemPreview() {
 fun RoleItemPreviewNoGoals() {
     DarkTheme {
         RoleItem(
-            dndState = DragAndDropState(),
+            isDragging = false,
             onAddGoalClick = {},
             goals = emptyList(),
             onDropGoal = {},

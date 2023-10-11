@@ -45,7 +45,7 @@ import kotlin.math.min
 @Composable
 fun ScheduleDay(
     model: ScheduleDayModel,
-    dndState: DragAndDropState,
+    isDragging: Boolean,
     onAddGoalClick: () -> Unit,
     onDropGoalToPriorities: (goalId: Int) -> Unit,
     onDropGoalToAppointments: (goalId: Int) -> Unit,
@@ -88,7 +88,7 @@ fun ScheduleDay(
                         GoalItemPlaceholder(
                             onClick = onAddGoalClick,
                             modifier = Modifier
-                                .dragAndDropBackground(isInBounds, dndState.isDragging)
+                                .dragAndDropBackground(isInBounds, isDragging)
                                 .padding(bottom = 4.dp)
                         )
                     }
@@ -102,7 +102,7 @@ fun ScheduleDay(
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,
-                                    dndState.isDragging
+                                    isDragging
                                 ),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
@@ -130,7 +130,7 @@ fun ScheduleDay(
                             Column(
                                 modifier = Modifier.dragAndDropBackground(
                                     isInBound,
-                                    dndState.isDragging
+                                    isDragging
                                 ),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
@@ -254,7 +254,7 @@ fun ScheduleDayPreview() {
                 ),
                 appointments = listOf(GoalItem(2, "Sample Goal", "Me")),
             ),
-            dndState = DragAndDropState(),
+            isDragging = false,
             onAddGoalClick = {},
             onDropGoalToPriorities = {},
             onDropGoalToAppointments = {},
@@ -284,7 +284,7 @@ fun ScheduleDayPreviewNoGoals() {
                 priorities = emptyList(),
                 appointments = emptyList(),
             ),
-            dndState = DragAndDropState(),
+            isDragging = false,
             onAddGoalClick = {},
             onDropGoalToPriorities = {},
             onDropGoalToAppointments = {},
@@ -316,7 +316,7 @@ fun ScheduleDayPreviewNoAppointments() {
                 ),
                 appointments = emptyList(),
             ),
-            dndState = DragAndDropState(),
+            isDragging = false,
             onAddGoalClick = {},
             onDropGoalToPriorities = {},
             onDropGoalToAppointments = {},
