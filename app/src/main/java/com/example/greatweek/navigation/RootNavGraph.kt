@@ -1,11 +1,9 @@
 package com.example.greatweek.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -14,11 +12,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
+import com.example.schedule.presentation.ScheduleWithRolesTabScreen
 import com.example.schedule.presentation.goal_dialog.GoalDialogNavigation
 import com.example.schedule.presentation.goal_dialog.ui.GoalDialog
 import com.example.schedule.presentation.role_dialog.ui.RoleDialog
+import com.example.schedule.presentation.roles_tab.RolesNavigation
 import com.example.schedule.presentation.schedule.ScheduleNavigation
-import com.example.schedule.presentation.schedule.ui.ScheduleScreen
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -33,16 +32,6 @@ fun RootNavGraph(navHostController: NavHostController, startDestination: String)
 
 private fun NavGraphBuilder.schedule(navController: NavHostController) {
     val scheduleNavigation = object : ScheduleNavigation {
-        override fun openRoleDialog() {
-            navController.navigate(Screen.RoleDialog.route)
-        }
-
-        override fun openRoleDialog(roleName: String) {
-            with(Screen.RoleDialog) {
-                navController.navigate("$route?$ARG_NAME=$roleName")
-            }
-        }
-
         override fun openGoalDialog(goalId: Int) {
             with(Screen.GoalDialog) {
                 navController.navigate("$route?$ARG_ID=$goalId")
@@ -54,25 +43,47 @@ private fun NavGraphBuilder.schedule(navController: NavHostController) {
                 navController.navigate("$route?$ARG_DATE=$epochDay")
             }
         }
+    }
+    val rolesNavigation = object : RolesNavigation {
+        override fun openRoleDialog() {
+            navController.navigate(Screen.RoleDialog.route)
+        }
+
+        override fun openRoleDialog(roleName: String) {
+            with(Screen.RoleDialog) {
+                navController.navigate("$route?$ARG_NAME=$roleName")
+            }
+        }
 
         override fun openGoalDialog(roleName: String) {
             with(Screen.GoalDialog) {
                 navController.navigate("$route?$ARG_ROLE=$roleName")
             }
         }
+
+        override fun openGoalDialog(goalId: Int) {
+            with(Screen.GoalDialog) {
+                navController.navigate("$route?$ARG_ID=$goalId")
+            }
+        }
     }
     composable(route = Screen.Schedule.route) {
-        ScheduleScreen(
-            navigation = scheduleNavigation,
-            vm = koinViewModel(),
+        ScheduleWithRolesTabScreen(
+            scheduleNavigation = scheduleNavigation,
+            rolesNavigation = rolesNavigation
         )
     }
 }
 
 private fun NavGraphBuilder.goalDialog(navController: NavHostController) {
     val navigation = object : GoalDialogNavigation {
-        override fun dismiss() { navController.popBackStack() }
-        override fun openRoleDialog() { navController.navigate(Screen.RoleDialog.route)}
+        override fun dismiss() {
+            navController.popBackStack()
+        }
+
+        override fun openRoleDialog() {
+            navController.navigate(Screen.RoleDialog.route)
+        }
     }
     with(Screen.GoalDialog) {
         dialog(

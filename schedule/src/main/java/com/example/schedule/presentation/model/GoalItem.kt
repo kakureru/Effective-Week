@@ -1,4 +1,4 @@
-package com.example.schedule.presentation.schedule.model
+package com.example.schedule.presentation.model
 
 import com.example.schedule.domain.model.Goal
 

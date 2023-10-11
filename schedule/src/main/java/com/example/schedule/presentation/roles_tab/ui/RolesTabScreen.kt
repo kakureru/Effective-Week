@@ -1,5 +1,6 @@
-package com.example.schedule.presentation.schedule.ui
+package com.example.schedule.presentation.roles_tab.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,17 +27,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,11 +48,77 @@ import androidx.compose.ui.unit.dp
 import com.example.core.ui.theme.DarkTheme
 import com.example.schedule.R
 import com.example.schedule.domain.model.Role
+import com.example.schedule.presentation.GoalItem
+import com.example.schedule.presentation.model.toGoalItem
+import com.example.schedule.presentation.roles_tab.RolesEffect
+import com.example.schedule.presentation.roles_tab.RolesEvent
+import com.example.schedule.presentation.roles_tab.RolesNavEvent
+import com.example.schedule.presentation.roles_tab.RolesNavigation
+import com.example.schedule.presentation.roles_tab.RolesViewModel
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import kotlin.math.abs
+
+@Composable
+fun RolesTabScreen(
+    navigation: RolesNavigation,
+    isDragging: Boolean,
+    vm: RolesViewModel = koinViewModel(),
+) {
+    val state by vm.uiState.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        vm.uiEffect.collect {
+            when (it) {
+                is RolesEffect.Error -> scope.launch {
+                    Toast.makeText(context, context.resources.getString(it.msgResource), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        vm.navigationEvents.collect { event ->
+            when (event) {
+                is RolesNavEvent.OpenGoalDialogWithGoal -> navigation.openGoalDialog(event.goalId)
+                is RolesNavEvent.OpenGoalDialogWithRole -> navigation.openGoalDialog(event.roleName)
+                is RolesNavEvent.OpenRoleDialogWithRole -> navigation.openRoleDialog(event.roleName)
+                RolesNavEvent.OpenRoleDialog -> navigation.openRoleDialog()
+            }
+        }
+    }
+
+    RolesTabUi(
+        roles = state.roles,
+        onAddRoleClick = { vm.accept(RolesEvent.AddRoleClick) },
+        onEditClick = { roleName -> vm.accept(RolesEvent.EditRoleClick(roleName)) },
+        onDeleteClick = { roleName -> vm.accept(RolesEvent.DeleteRoleClick(roleName)) },
+        roleItem = { role ->
+            RoleItem(
+                isDragging = isDragging,
+                goals = role.goals.map { it.toGoalItem() },
+                onDropGoal = { goalId ->
+                    vm.accept(RolesEvent.GoalDropOnRole(goalId, role.name))
+                },
+                onAddGoalClick = { vm.accept(RolesEvent.AddGoalToRoleClick(role.name)) },
+                goalItem = { goalItem ->
+                    GoalItem(
+                        title = goalItem.title,
+                        role = goalItem.role,
+                        onClick = { vm.accept(RolesEvent.GoalClick(goalItem.id)) },
+                        onCheck = { vm.accept(RolesEvent.CompleteGoal(goalItem.id)) },
+                    )
+                }
+            )
+        },
+    )
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RolesTab(
+fun RolesTabUi(
     roles: List<Role>,
     onAddRoleClick: () -> Unit,
     onEditClick: (roleName: String) -> Unit,
@@ -178,7 +247,7 @@ fun RolesTabPreview() {
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             Column {
-                RolesTab(
+                RolesTabUi(
                     roles = emptyList(),
                     onAddRoleClick = {},
                     roleItem = {},

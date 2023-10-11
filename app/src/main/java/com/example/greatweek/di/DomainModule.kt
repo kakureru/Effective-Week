@@ -1,6 +1,7 @@
 package com.example.greatweek.di
 
 import com.example.schedule.domain.usecase.GetScheduleForDatesUseCase
+import com.example.schedule.domain.usecase.goal.CompleteGoalUseCase
 import com.example.schedule.domain.usecase.goal.DropGoalToRoleUseCase
 import com.example.schedule.domain.usecase.goal.DropGoalToWeekUseCase
 import com.example.schedule.domain.usecase.role.GetRolesWithGoalsUseCase
@@ -25,5 +26,9 @@ val domainModule = module {
 
     factory {
         GetScheduleForDatesUseCase(goalRepository = get())
+    }
+
+    factory {
+        CompleteGoalUseCase(goalRepository = get())
     }
 }

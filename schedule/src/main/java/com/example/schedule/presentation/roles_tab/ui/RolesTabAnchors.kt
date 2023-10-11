@@ -1,4 +1,4 @@
-package com.example.schedule.presentation.schedule.ui
+package com.example.schedule.presentation.roles_tab.ui
 
 enum class RolesTabAnchors(val fraction: Float) {
     COLLAPSED(1f),

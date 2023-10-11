@@ -1,6 +1,8 @@
 package com.example.schedule.presentation.schedule.model
 
 import com.example.schedule.domain.model.ScheduleDay
+import com.example.schedule.presentation.model.GoalItem
+import com.example.schedule.presentation.model.toGoalItem
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

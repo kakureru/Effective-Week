@@ -1,10 +1,8 @@
-package com.example.schedule.presentation.schedule.ui
+package com.example.schedule.presentation.roles_tab.ui
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,20 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -34,12 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.AddButton
-import com.example.core.ui.draganddrop.DragAndDropState
 import com.example.core.ui.draganddrop.DragData
 import com.example.core.ui.draganddrop.DragListenSurface
 import com.example.core.ui.draganddrop.DragSurface
 import com.example.core.ui.theme.DarkTheme
-import com.example.schedule.presentation.schedule.model.GoalItem
+import com.example.schedule.presentation.model.GoalItem
+import com.example.schedule.presentation.GoalItem
+import com.example.schedule.presentation.GoalItemPlaceholder
+import com.example.schedule.presentation.schedule.ui.dragAndDropBackground
 import kotlin.math.min
 
 @Composable
