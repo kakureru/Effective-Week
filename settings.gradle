@@ -16,4 +16,3 @@ rootProject.name = "GreatWeek"
 include ':app'
 include ':schedule'
 include ':core'
-include ':utils'

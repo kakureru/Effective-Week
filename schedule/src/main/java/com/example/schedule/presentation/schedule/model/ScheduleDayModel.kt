@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 class ScheduleDayModel(
     val date: LocalDate,
     val weekday: String,
-    val dateText: String,
+    val dateNumber: String,
     val isToday: Boolean,
     val priorities: List<GoalItem>,
     val appointments: List<GoalItem>,
@@ -18,7 +18,7 @@ class ScheduleDayModel(
 fun ScheduleDay.toScheduleDayItem() = ScheduleDayModel(
     date = date,
     weekday = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() },
-    dateText = DateTimeFormatter.ofPattern("MMM d").format(date).replaceFirstChar { it.uppercase() },
+    dateNumber = date.dayOfMonth.toString(),
     isToday = date == LocalDate.now(),
     priorities = goals.filter { !it.appointment }.map { it.toGoalItem() },
     appointments = goals.filter { it.appointment }.map { it.toGoalItem() },

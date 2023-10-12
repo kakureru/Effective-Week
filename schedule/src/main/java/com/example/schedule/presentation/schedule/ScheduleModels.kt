@@ -3,7 +3,8 @@ package com.example.schedule.presentation.schedule
 import com.example.schedule.presentation.schedule.model.ScheduleDayModel
 import java.time.LocalDate
 
-data class ScheduleState(
+data class ScheduleUiState(
+    val month: String = "",
     val schedule: List<ScheduleDayModel> = emptyList(),
 )
 
@@ -21,8 +22,12 @@ sealed class ScheduleEvent {
         val date: LocalDate,
         val isAppointment: Boolean
     ) : ScheduleEvent()
+    class FirstVisibleDayIndexChange(val newIndex: Int) : ScheduleEvent()
+    class LastVisibleDayIndexChange(val newIndex: Int) : ScheduleEvent()
+    data object TodayClick : ScheduleEvent()
 }
 
 sealed class ScheduleEffect {
     class Error(val msgResource: Int) : ScheduleEffect()
+    class ScrollToDay(val index: Int) : ScheduleEffect()
 }

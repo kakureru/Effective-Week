@@ -37,7 +37,6 @@ android {
 
 dependencies {
     implementation project(path: ':core')
-    implementation project(path: ':utils')
 
     implementation deps.androidx.core
     implementation deps.androidx.appcompat

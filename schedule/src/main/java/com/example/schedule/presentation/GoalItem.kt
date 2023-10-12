@@ -46,7 +46,6 @@ fun GoalItem(
         modifier = modifier,
         shape = shape,
         shadowElevation = 4.dp,
-        tonalElevation = 0.5.dp
     ) {
         ConstraintLayout(
             modifier = Modifier
