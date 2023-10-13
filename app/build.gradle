@@ -1,25 +1,18 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
 }
 
 android {
-    compileSdk 32
+    compileSdk buildConfig.compileSdk
 
     defaultConfig {
         applicationId "com.example.greatweek"
-        minSdk 26
-        targetSdk 32
+        minSdk buildConfig.minSdk
+        targetSdk buildConfig.targetSdk
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildFeatures {
-        dataBinding = true
-        viewBinding = true
     }
 
     buildTypes {
@@ -29,54 +22,47 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.compose
+    }
+    namespace 'com.example.greatweek'
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation project(path: ':schedule')
+    implementation project(path: ':core')
 
-    // Kotlin components
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    implementation deps.androidx.core
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.fragment
 
-    // UI
-    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
-    implementation "androidx.fragment:fragment-ktx:$fragment_version"
-    implementation "com.google.android.material:material:$material_version"
+    implementation deps.room.runtime
+    implementation deps.room.ktx
+    ksp deps.room.kapt
 
-    // Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation deps.koin.android
+    implementation deps.koin.compose
 
-    // Room
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-    androidTestImplementation "androidx.room:room-testing:$room_version"
+    // Compose
+    implementation deps.androidx.activity_compose
+    implementation deps.androidx.navigation_compose
 
-    // Koin
-    implementation "io.insert-koin:koin-core:$koin_version"
-    testImplementation "io.insert-koin:koin-test:$koin_version"
-    implementation "io.insert-koin:koin-android:$koin_android_version"
-
-    // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-
-    // Testing
-    testImplementation "junit:junit:$junit_version"
-    androidTestImplementation "androidx.arch.core:core-testing:$core_testing_version"
-    androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-
-    implementation 'com.github.rubensousa:gravitysnaphelper:2.2.2'
-
-    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation platform(deps.androidx.compose.bom)
+    implementation deps.androidx.compose.runtime
+    implementation deps.androidx.compose.ui.ui
+    implementation deps.androidx.compose.ui.graphics
+    implementation deps.androidx.compose.ui.tooling_preview
+    debugImplementation deps.androidx.compose.ui.tooling
+    implementation deps.androidx.compose.foundation
+    implementation deps.androidx.compose.foundation_layout
+    implementation deps.androidx.compose.material3
 }
