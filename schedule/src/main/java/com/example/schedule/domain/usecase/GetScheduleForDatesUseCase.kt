@@ -16,7 +16,7 @@ class GetScheduleForDatesUseCase(
         return goalRepository.getGoals(startDate, endDate).map { goals ->
             IntStream
                 .iterate(0) { i -> i + 1 }
-                .limit(ChronoUnit.DAYS.between(startDate, endDate))
+                .limit(ChronoUnit.DAYS.between(startDate, endDate) + 1)
                 .mapToObj { i ->
                     val date = startDate.plusDays(i.toLong())
                     ScheduleDay(

@@ -32,7 +32,7 @@ class RolesViewModel(
 
     private val _rolesWithGoals = getRolesWithGoalsUseCase().stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.WhileSubscribed(5000),
         emptyList()
     )
 
@@ -42,7 +42,7 @@ class RolesViewModel(
         )
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(3000),
+        SharingStarted.WhileSubscribed(5000),
         RolesState()
     )
 

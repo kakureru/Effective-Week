@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,18 +29,16 @@ class ScheduleViewModel(
 ) : ViewModel() {
 
     private val startDate = MutableStateFlow(LocalDate.now())
-    private val endDate = MutableStateFlow(LocalDate.now().plusDays(1))
+    private val endDate = MutableStateFlow(LocalDate.now())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val scheduleFlow = combine(
         startDate,
         endDate,
     ) { start, end ->
-        getScheduleForDatesUseCase(start, end)
-    }.flatMapLatest { flow ->
-        flow.map { schedule ->
-            schedule
-        }
+        Pair(start, end)
+    }.flatMapLatest {
+        getScheduleForDatesUseCase(it.first, it.second)
     }
 
     private val _uiState = MutableStateFlow(ScheduleUiState())
@@ -55,7 +52,7 @@ class ScheduleViewModel(
         )
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(3000),
+        SharingStarted.WhileSubscribed(5000),
         ScheduleUiState()
     )
 
@@ -80,7 +77,7 @@ class ScheduleViewModel(
     private fun onTodayClick() = viewModelScope.launch {
         val todayIndex = uiState.value.schedule.indexOfFirst { it.isToday }.takeIf { it > -1 }
         todayIndex?.let {
-            _uiEffect.emit(ScheduleEffect.ScrollToDay(todayIndex))
+            _uiEffect.emit(ScheduleEffect.ScrollToDay(it))
         }
     }
 
