@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GreatWeek</string>
+    <string name="app_name">Effective Week</string>
 
     <string name="empty_value">Value is empty</string>
     <string name="invalid_value">Invalid value</string>

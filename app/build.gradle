@@ -6,9 +6,10 @@ plugins {
 
 android {
     compileSdk buildConfig.compileSdk
+    namespace 'com.effectiveweek.app'
 
     defaultConfig {
-        applicationId "com.example.greatweek"
+        applicationId "com.effectiveweek.app"
         minSdk buildConfig.minSdk
         targetSdk buildConfig.targetSdk
         versionCode 1
@@ -34,7 +35,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion versions.compose
     }
-    namespace 'com.example.greatweek'
 }
 
 dependencies {
