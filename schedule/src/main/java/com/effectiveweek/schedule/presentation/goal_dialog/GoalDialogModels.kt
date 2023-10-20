@@ -12,6 +12,7 @@ data class GoalDialogState(
     val timePrint: String? = "",
     val time: LocalTime = LocalTime.MIDNIGHT,
     val appointment: Boolean = false,
+    val isAddingDescription: Boolean = false,
     val navState: GoalDialogNavState = GoalDialogNavState.Idle,
 )
 
@@ -24,6 +25,7 @@ sealed class GoalDialogEvent {
     class RolePick(val roleName: String) : GoalDialogEvent()
     class TimePick(val hour: Int, val minute: Int) : GoalDialogEvent()
     class DatePick(val dateMillis: Long) : GoalDialogEvent()
+    object DescriptionPickerClick : GoalDialogEvent()
     object ConfirmClick : GoalDialogEvent()
     object IsAppointmentClick : GoalDialogEvent()
     class TitleChanged(val newTitle: String) : GoalDialogEvent()

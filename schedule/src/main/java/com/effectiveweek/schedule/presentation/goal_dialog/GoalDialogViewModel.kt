@@ -48,17 +48,17 @@ class GoalDialogViewModel (
         emptyList()
     )
     private val _goalState = MutableStateFlow(defaultGoal)
-    private val _navState = MutableStateFlow<GoalDialogNavState>(GoalDialogNavState.Idle)
 
     init {
         if (goalId > -1) loadGoal(goalId)
     }
 
+    private val _uiState = MutableStateFlow(GoalDialogState())
     val uiState: StateFlow<GoalDialogState> = combine(
         _goalState,
-        _navState,
+        _uiState,
         _roles,
-    ) { goalState, navState, roles ->
+    ) { goalState, uiState, roles ->
         GoalDialogState(
             title = goalState.title,
             description = goalState.description,
@@ -67,7 +67,8 @@ class GoalDialogViewModel (
             date = goalState.date?.let { DateTimeFormatter.ofPattern("MMM d").format(it) },
             timePrint = goalState.time?.let { DateTimeFormatter.ofPattern("HH:mm").format(it) },
             appointment = goalState.appointment,
-            navState = navState
+            navState = uiState.navState,
+            isAddingDescription = if (goalState.description.isNotBlank()) true else uiState.isAddingDescription
         )
     }.stateIn(
         viewModelScope,
@@ -87,11 +88,16 @@ class GoalDialogViewModel (
             is GoalDialogEvent.DescriptionChanged -> onDescriptionChanged(event.newDescription)
             is GoalDialogEvent.TitleChanged -> onTitleChanged(event.newTitle)
             GoalDialogEvent.IsAppointmentClick -> onAppointmentChanged()
+            GoalDialogEvent.DescriptionPickerClick -> onDescriptionPickerClick()
         }
     }
 
     private val isInputCorrect: Boolean get() = with(_goalState.value) {
         title.isNotEmpty() && role != null
+    }
+
+    private fun onDescriptionPickerClick() {
+        _uiState.update { it.copy(isAddingDescription = true) }
     }
 
     private fun loadGoal(goalId: Int) = viewModelScope.launch {
@@ -130,7 +136,7 @@ class GoalDialogViewModel (
                 goalRepository.addGoal(_goalState.value)
             else
                 goalRepository.editGoal(_goalState.value)
-            _navState.value = GoalDialogNavState.Dismiss
+            _uiState.update { it.copy(navState = GoalDialogNavState.Dismiss) }
         }
     }
 }

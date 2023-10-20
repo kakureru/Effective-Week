@@ -1,27 +1,36 @@
 package com.effectiveweek.schedule.presentation.goal_dialog.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,11 +40,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.effectiveweek.core.ui.ConfirmButton
@@ -54,6 +69,7 @@ import com.effectiveweek.schedule.presentation.role_pick_dialog.ui.RolePickDialo
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalDialog(
     navigation: GoalDialogNavigation,
@@ -82,91 +98,111 @@ fun GoalDialog(
             }
         }
     }
-    GoalDialogUi(
-        onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
+    ModalBottomSheet(
         onDismissRequest = { navigation.dismiss() },
-        modifier = modifier,
-        title = {
-            TitleField(
-                value = state.title,
-                onValueChange = { value -> viewModel.accept(GoalDialogEvent.TitleChanged(value)) }
-            )
-        },
-        description = {
-            DescriptionField(
-                value = state.description,
-                onValueChange = { value -> viewModel.accept(GoalDialogEvent.DescriptionChanged(value)) }
-            )
-        },
-        role = {
-            RolePickField(
-                role = state.role,
-                availableRoles = state.availableRoles,
-                onRolePicked = { roleName -> viewModel.accept(GoalDialogEvent.RolePick(roleName)) },
-                onAddRoleClick = { navigation.openRoleDialog() }
-            )
-        },
-        date = {
-            DateField(
-                date = state.date,
-                onDateSelected = { dateMillis ->
-                    viewModel.accept(GoalDialogEvent.DatePick(dateMillis))
+        dragHandle = null,
+        shape = MaterialTheme.shapes.large.copy(
+            bottomStart = CornerSize(0.dp),
+            bottomEnd = CornerSize(0.dp)
+        )
+    ) {
+        GoalDialogUi(
+            onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
+            modifier = modifier,
+            isAddingDescription = state.isAddingDescription,
+            title = {
+                TitleField(
+                    value = state.title,
+                    onValueChange = { value -> viewModel.accept(GoalDialogEvent.TitleChanged(value)) },
+                )
+            },
+            description = {
+                DescriptionField(
+                    value = state.description,
+                    onValueChange = { value ->
+                        viewModel.accept(GoalDialogEvent.DescriptionChanged(value))
+                    }
+                )
+            },
+            pickers = {
+                item {
+                    RolePicker(
+                        role = state.role,
+                        availableRoles = state.availableRoles,
+                        onRolePicked = { roleName ->
+                            viewModel.accept(GoalDialogEvent.RolePick(roleName))
+                        },
+                        onAddRoleClick = { navigation.openRoleDialog() }
+                    )
                 }
-            )
-        },
-        time = {
-            TimeField(
-                time = state.timePrint,
-                onTimeSelected = { h, m -> viewModel.accept(GoalDialogEvent.TimePick(h, m)) },
-                initialTime = state.time
-            )
-        },
-        appointment = {
-            AppointmentField(
-                isAppointment = state.appointment,
-                onValueChange = {
-                    viewModel.accept(GoalDialogEvent.IsAppointmentClick)
+                if (state.isAddingDescription.not()) {
+                    item {
+                        DescriptionPicker(onClick = { viewModel.accept(GoalDialogEvent.DescriptionPickerClick) })
+                    }
                 }
-            )
-        },
-    )
+                item {
+                    DatePicker(
+                        date = state.date,
+                        onDateSelected = { dateMillis ->
+                            viewModel.accept(GoalDialogEvent.DatePick(dateMillis))
+                        }
+                    )
+                }
+                item {
+                    TimePicker(
+                        time = state.timePrint,
+                        onTimeSelected = { h, m ->
+                            viewModel.accept(GoalDialogEvent.TimePick(h, m))
+                        },
+                        initialTime = state.time
+                    )
+                }
+                item {
+                    AppointmentPicker(
+                        isAppointment = state.appointment,
+                        onValueChange = {
+                            viewModel.accept(GoalDialogEvent.IsAppointmentClick)
+                        }
+                    )
+                }
+            },
+        )
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalDialogUi(
     onConfirmClick: () -> Unit,
-    onDismissRequest: () -> Unit,
+    isAddingDescription: Boolean,
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     description: @Composable () -> Unit,
-    role: @Composable () -> Unit,
-    date: @Composable () -> Unit,
-    time: @Composable () -> Unit,
-    appointment: @Composable () -> Unit,
+    pickers: LazyListScope.() -> Unit,
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        dragHandle = null,
+    Column(
+        modifier = modifier
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 32.dp)
+        LazyRow(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
-            title()
-            description()
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
+            pickers()
+        }
+        HorizontalDivider()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                role()
-                date()
-                time()
+                title()
+                if (isAddingDescription) {
+                    description()
+                }
             }
-            appointment()
-            ConfirmButton(onClick = onConfirmClick, modifier = Modifier.align(Alignment.End))
+            ConfirmButton(onClick = onConfirmClick)
         }
     }
 }
@@ -177,15 +213,23 @@ private fun TitleField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     TextField(
         value = value,
+        textStyle = MaterialTheme.typography.titleLarge,
         onValueChange = { onValueChange(it) },
         placeholder = {
             Text(
-                text = stringResource(id = R.string.goal)
+                text = stringResource(id = R.string.goal),
+                style = MaterialTheme.typography.titleLarge,
             )
         },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth(),
         keyboardOptions = KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.Sentences,
             imeAction = ImeAction.Done
@@ -203,7 +247,8 @@ private fun DescriptionField(
     TextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth(),
         placeholder = {
             Text(
                 text = stringResource(id = R.string.description)
@@ -214,9 +259,20 @@ private fun DescriptionField(
     )
 }
 
+@Composable
+fun DescriptionPicker(
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_short_text),
+            contentDescription = "add description"
+        )
+    }
+}
 
 @Composable
-private fun RolePickField(
+private fun RolePicker(
     role: String?,
     availableRoles: List<RoleItem>,
     onRolePicked: (roleName: String) -> Unit,
@@ -224,7 +280,9 @@ private fun RolePickField(
     modifier: Modifier = Modifier,
 ) {
     var dialogVisible by remember { mutableStateOf(false) }
-    Box {
+    Box(
+        modifier = modifier
+    ) {
         if (dialogVisible) {
             RolePickDialog(
                 roles = availableRoles,
@@ -238,19 +296,20 @@ private fun RolePickField(
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier
-                .clickable { dialogVisible = true }
-                .padding(vertical = 8.dp)
+            modifier = Modifier.clickable { dialogVisible = true }
         ) {
-            Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
-            Text(text = role ?: stringResource(id = R.string.role))
+            IconButton(onClick = { dialogVisible = true }) {
+                Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
+            }
+            role?.let {
+                Text(text = role, modifier = Modifier.padding(end = 8.dp))
+            }
         }
     }
 }
 
 @Composable
-private fun DateField(
+private fun DatePicker(
     date: String?,
     onDateSelected: (dateMillis: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -258,13 +317,14 @@ private fun DateField(
     var datePickDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .clickable { datePickDialogVisible = true }
+        modifier = modifier.clickable { datePickDialogVisible = true }
     ) {
-        Icon(painter = painterResource(id = R.drawable.ic_calendar), contentDescription = null)
-        Text(text = date ?: stringResource(id = R.string.date))
+        IconButton(onClick = { datePickDialogVisible = true }) {
+            Icon(painter = painterResource(id = R.drawable.ic_calendar), contentDescription = null)
+        }
+        date?.let {
+            Text(text = date, modifier = Modifier.padding(end = 8.dp))
+        }
     }
     if (datePickDialogVisible) {
         GreatDatePicker(
@@ -278,7 +338,7 @@ private fun DateField(
 }
 
 @Composable
-private fun TimeField(
+private fun TimePicker(
     time: String?,
     onTimeSelected: (hour: Int, minute: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -287,13 +347,14 @@ private fun TimeField(
     var timePickerDialogVisible by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .clickable { timePickerDialogVisible = true }
+        modifier = modifier.clickable { timePickerDialogVisible = true }
     ) {
-        Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = null)
-        Text(text = time ?: stringResource(id = R.string.time))
+        IconButton(onClick = { timePickerDialogVisible = true }) {
+            Icon(painter = painterResource(id = R.drawable.ic_time), contentDescription = null)
+        }
+        time?.let {
+            Text(text = time, modifier = Modifier.padding(end = 8.dp))
+        }
     }
     if (timePickerDialogVisible) {
         GreatTimePicker(
@@ -308,22 +369,75 @@ private fun TimeField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppointmentField(
+private fun AppointmentPicker(
     isAppointment: Boolean,
     onValueChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.clickable { onValueChange() }
     ) {
-        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-            Checkbox(checked = isAppointment, onCheckedChange = { onValueChange() })
+        Checkbox(checked = isAppointment, onCheckedChange = { onValueChange() })
+        Text(
+            text = stringResource(id = R.string.appointment),
+            modifier = Modifier.padding(end = 12.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GoalDialogPreviewNewGoal() {
+    DarkTheme {
+        Surface(
+            shape = MaterialTheme.shapes.large.copy(
+                bottomStart = CornerSize(0.dp),
+                bottomEnd = CornerSize(0.dp)
+            )
+        ) {
+            GoalDialogUi(
+                onConfirmClick = {},
+                title = {
+                    TitleField(
+                        value = "",
+                        onValueChange = {},
+                    )
+                },
+                description = { DescriptionField(value = "", onValueChange = {}) },
+                isAddingDescription = false,
+                pickers = {
+                    item {
+                        RolePicker(
+                            role = null,
+                            availableRoles = emptyList(),
+                            onAddRoleClick = {},
+                            onRolePicked = {}
+                        )
+                    }
+                    item {
+                        DescriptionPicker(onClick = {})
+                    }
+                    item {
+                        DatePicker(
+                            date = null,
+                            onDateSelected = { }
+                        )
+                    }
+                    item {
+                        TimePicker(
+                            time = null,
+                            onTimeSelected = { h, m -> },
+                            initialTime = LocalTime.MIN
+                        )
+                    }
+                    item {
+                        AppointmentPicker(isAppointment = false, onValueChange = {})
+                    }
+                },
+            )
         }
-        Text(text = stringResource(id = R.string.appointment))
     }
 }
 
@@ -331,23 +445,48 @@ private fun AppointmentField(
 @Composable
 private fun GoalDialogPreview() {
     DarkTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            shape = MaterialTheme.shapes.large.copy(
+                bottomStart = CornerSize(0.dp),
+                bottomEnd = CornerSize(0.dp)
+            )
+        ) {
             GoalDialogUi(
-                onDismissRequest = {},
                 onConfirmClick = {},
-                title = { TitleField(value = "", onValueChange = {}) },
+                title = {
+                    TitleField(
+                        value = "Sample goal",
+                        onValueChange = {},
+                    )
+                },
                 description = { DescriptionField(value = "", onValueChange = {}) },
-                role = {
-                    RolePickField(
-                        role = null,
-                        availableRoles = emptyList(),
-                        onAddRoleClick = {},
-                        onRolePicked = {})
+                isAddingDescription = true,
+                pickers = {
+                    item {
+                        RolePicker(
+                            role = "Sample role",
+                            availableRoles = emptyList(),
+                            onAddRoleClick = {},
+                            onRolePicked = {}
+                        )
+                    }
+                    item {
+                        DatePicker(
+                            date = "Oct 20",
+                            onDateSelected = { }
+                        )
+                    }
+                    item {
+                        TimePicker(
+                            time = "12:00",
+                            onTimeSelected = { h, m -> },
+                            initialTime = LocalTime.MIN
+                        )
+                    }
+                    item {
+                        AppointmentPicker(isAppointment = false, onValueChange = {})
+                    }
                 },
-                date = {
-                },
-                time = {},
-                appointment = { AppointmentField(isAppointment = false, onValueChange = {}) },
             )
         }
     }
