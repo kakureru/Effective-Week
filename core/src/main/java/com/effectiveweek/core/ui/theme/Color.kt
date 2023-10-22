@@ -8,6 +8,7 @@ val Green = Color(0XFF61BD50)
 val Orange = Color(0xFFF9A33A)
 
 val Neutral = Color(0xFF232323)
+val NeutralVariant = Color(0xFF18181A)
 
 @Composable
 fun greatTextFieldColors() = TextFieldDefaults.colors(

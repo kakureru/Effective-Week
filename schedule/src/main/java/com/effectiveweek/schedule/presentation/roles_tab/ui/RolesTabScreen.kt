@@ -133,7 +133,8 @@ fun RolesTabUi(
         shape = MaterialTheme.shapes.large.copy(
             bottomEnd = CornerSize(0.dp),
             bottomStart = CornerSize(0.dp)
-        )
+        ),
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Box {
             Column(
@@ -145,7 +146,6 @@ fun RolesTabUi(
                     modifier = Modifier.fillMaxSize(),
                     state = rowState,
                     flingBehavior = rememberSnapFlingBehavior(lazyListState = rowState), // FIXME crash on swipe on empty list
-                    contentPadding = PaddingValues(horizontal = 8.dp),
                 ) {
                     items(items = roles, key = { item -> item.name }) {
                         roleItem(it)
@@ -156,7 +156,7 @@ fun RolesTabUi(
                 onClick = onAddRoleClick,
                 modifier = Modifier
                     .padding(20.dp)
-                    .size(48.dp)
+                    .size(52.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 Icon(

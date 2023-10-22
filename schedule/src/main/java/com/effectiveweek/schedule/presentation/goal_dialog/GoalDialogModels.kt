@@ -34,4 +34,5 @@ sealed class GoalDialogEvent {
 
 sealed class GoalDialogEffect {
     class Error(val msgResource: Int) : GoalDialogEffect()
+    object ShowRolePickDialog : GoalDialogEffect()
 }

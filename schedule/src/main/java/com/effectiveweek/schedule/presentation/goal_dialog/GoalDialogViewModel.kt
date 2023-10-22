@@ -92,10 +92,6 @@ class GoalDialogViewModel (
         }
     }
 
-    private val isInputCorrect: Boolean get() = with(_goalState.value) {
-        title.isNotEmpty() && role != null
-    }
-
     private fun onDescriptionPickerClick() {
         _uiState.update { it.copy(isAddingDescription = true) }
     }
@@ -129,14 +125,18 @@ class GoalDialogViewModel (
     }
 
     private suspend fun onConfirmClick() {
-        if (isInputCorrect.not())
-            _uiEffect.emit(GoalDialogEffect.Error(R.string.error_title_and_role_required))
-        else {
-            if (goalId == -1)
-                goalRepository.addGoal(_goalState.value)
-            else
-                goalRepository.editGoal(_goalState.value)
-            _uiState.update { it.copy(navState = GoalDialogNavState.Dismiss) }
+        if (_goalState.value.title.isBlank()) {
+            _uiEffect.emit(GoalDialogEffect.Error(R.string.error_title_is_required))
+            return
         }
+        if (_goalState.value.role == null) {
+            _uiEffect.emit(GoalDialogEffect.ShowRolePickDialog)
+            return
+        }
+        if (goalId == -1)
+            goalRepository.addGoal(_goalState.value)
+        else
+            goalRepository.editGoal(_goalState.value)
+        _uiState.update { it.copy(navState = GoalDialogNavState.Dismiss) }
     }
 }

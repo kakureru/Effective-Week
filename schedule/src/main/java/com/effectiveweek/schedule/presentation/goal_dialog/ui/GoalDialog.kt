@@ -69,6 +69,20 @@ fun GoalDialog(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+
+    var dialogVisible by remember { mutableStateOf(false) }
+    if (dialogVisible) {
+        RolePickDialog(
+            roles = state.availableRoles,
+            onRolePicked = { picked ->
+                viewModel.accept(GoalDialogEvent.RolePick(picked))
+                dialogVisible = false
+            },
+            onAddRoleClick = { navigation.openRoleDialog() },
+            onDismissRequest = { dialogVisible = false }
+        )
+    }
+
     LaunchedEffect(state.navState) {
         when (state.navState) {
             GoalDialogNavState.Idle -> Unit
@@ -84,6 +98,9 @@ fun GoalDialog(
                         context.resources.getString(it.msgResource),
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+                GoalDialogEffect.ShowRolePickDialog -> {
+                    dialogVisible = true
                 }
             }
         }
@@ -118,11 +135,7 @@ fun GoalDialog(
                 item {
                     RolePicker(
                         role = state.role,
-                        availableRoles = state.availableRoles,
-                        onRolePicked = { roleName ->
-                            viewModel.accept(GoalDialogEvent.RolePick(roleName))
-                        },
-                        onAddRoleClick = { navigation.openRoleDialog() }
+                        onClick = { dialogVisible = true }
                     )
                 }
                 if (state.isAddingDescription.not()) {
@@ -264,31 +277,17 @@ fun DescriptionPicker(
 @Composable
 private fun RolePicker(
     role: String?,
-    availableRoles: List<RoleItem>,
-    onRolePicked: (roleName: String) -> Unit,
-    onAddRoleClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var dialogVisible by remember { mutableStateOf(false) }
     Box(
         modifier = modifier
     ) {
-        if (dialogVisible) {
-            RolePickDialog(
-                roles = availableRoles,
-                onRolePicked = { picked ->
-                    onRolePicked(picked)
-                    dialogVisible = false
-                },
-                onAddRoleClick = onAddRoleClick,
-                onDismissRequest = { dialogVisible = false }
-            )
-        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { dialogVisible = true }
+            modifier = Modifier.clickable { onClick() }
         ) {
-            IconButton(onClick = { dialogVisible = true }) {
+            IconButton(onClick = onClick) {
                 Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
             }
             role?.let {
@@ -401,9 +400,7 @@ private fun GoalDialogPreviewNewGoal() {
                     item {
                         RolePicker(
                             role = null,
-                            availableRoles = emptyList(),
-                            onAddRoleClick = {},
-                            onRolePicked = {}
+                            onClick = {}
                         )
                     }
                     item {
@@ -455,9 +452,7 @@ private fun GoalDialogPreview() {
                     item {
                         RolePicker(
                             role = "Sample role",
-                            availableRoles = emptyList(),
-                            onAddRoleClick = {},
-                            onRolePicked = {}
+                            onClick = {}
                         )
                     }
                     item {

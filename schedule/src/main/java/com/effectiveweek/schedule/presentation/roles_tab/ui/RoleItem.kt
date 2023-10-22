@@ -59,7 +59,7 @@ fun RoleItem(
 ) {
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
-    val width = remember(configuration) { min((configuration.screenWidthDp - 16), maxSizeDp).dp }
+    val width = remember(configuration) { min((configuration.screenWidthDp), maxSizeDp).dp }
 
     DragListenSurface(
         onDrop = { dropData -> onDropGoal(dropData.id) },
@@ -72,7 +72,6 @@ fun RoleItem(
                 modifier = Modifier
                     .dragAndDropBackground(isInBound, isDragging)
                     .animateContentSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
@@ -171,7 +170,7 @@ fun RoleOptionsDropdownMenu(
 @Composable
 fun RoleItemPreview() {
     DarkTheme {
-        Surface {
+        Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
             RoleItem(
                 isDragging = false,
                 onAddGoalClick = {},
