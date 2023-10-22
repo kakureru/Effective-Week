@@ -56,7 +56,7 @@ fun ScheduleWithRolesTabScreen(
             },
         dndState = dndState,
     ) {
-        ScheduleScreen(isDragging = dndState.isDragging, navigation = scheduleNavigation)
+        ScheduleScreen(dragStateProvider = { dndState.isDragging }, navigation = scheduleNavigation)
         DraggableBottomSheet(
             bottomSheetState = bottomSheetState,
             content = {

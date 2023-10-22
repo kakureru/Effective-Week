@@ -43,8 +43,7 @@ android {
 dependencies {
 
     implementation(Dependencies.core)
-    implementation(Dependencies.appcompat)
-    implementation(Dependencies.fragment)
+    implementation(Dependencies.lifecycleRuntime)
 
     compose()
 }

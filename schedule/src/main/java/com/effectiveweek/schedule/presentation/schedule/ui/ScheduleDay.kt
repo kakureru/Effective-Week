@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -36,7 +37,6 @@ import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.core.ui.draganddrop.DragSurface
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
-import com.effectiveweek.schedule.presentation.GoalItemPlaceholder
 import com.effectiveweek.schedule.presentation.GoalItem
 import com.effectiveweek.schedule.presentation.model.GoalItem
 import com.effectiveweek.schedule.presentation.schedule.model.ScheduleDayModel
@@ -45,8 +45,8 @@ import kotlin.math.min
 
 @Composable
 fun ScheduleDay(
-    model: ScheduleDayModel,
-    isDragging: Boolean,
+    modelProvider: () -> ScheduleDayModel,
+    dragStateProvider: () -> Boolean,
     onAddGoalClick: () -> Unit,
     onDropGoalToPriorities: (goalId: Int) -> Unit,
     onDropGoalToAppointments: (goalId: Int) -> Unit,
@@ -56,11 +56,11 @@ fun ScheduleDay(
     val configuration = LocalConfiguration.current
     val maxSizeDp = 500
     val width = remember(configuration) { min((configuration.screenWidthDp), maxSizeDp).dp }
-    val havePriorities by remember(model.priorities) {
-        derivedStateOf { model.priorities.isNotEmpty() }
+    val havePriorities by remember(modelProvider().priorities) {
+        derivedStateOf { modelProvider().priorities.isNotEmpty() }
     }
-    val haveAppointments by remember(model.appointments) {
-        derivedStateOf { model.appointments.isNotEmpty() }
+    val haveAppointments by remember(modelProvider().appointments) {
+        derivedStateOf { modelProvider().appointments.isNotEmpty() }
     }
     Box(
         modifier = modifier
@@ -75,89 +75,70 @@ fun ScheduleDay(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             ScheduleDayHeader(
-                weekday = model.weekday,
-                date = model.dateNumber,
-                isToday = model.isToday,
-                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+                weekday = modelProvider().weekday,
+                date = modelProvider().dateNumber,
+                isToday = modelProvider().isToday,
+                modifier = Modifier.padding(top = 4.dp),
+                onAddGoalClick = onAddGoalClick
             )
-            if (!havePriorities && !haveAppointments) {
+            if (havePriorities) {
+                GoalCategoryTitle(text = stringResource(id = R.string.priorities))
                 DragListenSurface(
                     zIndex = 1f,
                     onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
-                ) { isInBounds ->
-                    GoalItemPlaceholder(
-                        onClick = onAddGoalClick,
-                        modifier = Modifier
-                            .dragAndDropBackground(isInBounds, isDragging)
-                            .padding(bottom = 4.dp)
-                    )
-                }
-            } else {
-                if (havePriorities) {
-                    GoalCategoryTitle(text = stringResource(id = R.string.priorities))
-                    DragListenSurface(
-                        zIndex = 1f,
-                        onDrop = { dragData -> onDropGoalToPriorities(dragData.id) }
-                    ) { isInBound ->
-                        Column(
-                            modifier = Modifier.dragAndDropBackground(
-                                isInBound,
-                                isDragging
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            for (item in model.priorities) {
-                                key(item.id) {
-                                    DragSurface(
-                                        cardId = item.id,
-                                        dragData = object : DragData {
-                                            override val id: Int = item.id
-                                        }
-                                    ) {
-                                        goalItem(item)
+                ) { isInBound ->
+                    Column(
+                        modifier = Modifier.dragAndDropBackground(
+                            isInBound,
+                            dragStateProvider()
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (item in modelProvider().priorities) {
+                            key(item.id) {
+                                DragSurface(
+                                    cardId = item.id,
+                                    dragData = object : DragData {
+                                        override val id: Int = item.id
                                     }
-                                }
-                            }
-                            if (model.appointments.isNotEmpty())
-                                Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-                if (haveAppointments) {
-                    GoalCategoryTitle(text = stringResource(id = R.string.appointments))
-                    DragListenSurface(
-                        zIndex = 1f,
-                        onDrop = { dragData -> onDropGoalToAppointments(dragData.id) }
-                    ) { isInBound ->
-                        Column(
-                            modifier = Modifier.dragAndDropBackground(
-                                isInBound,
-                                isDragging
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            for (item in model.appointments) {
-                                key(item.id) {
-                                    DragSurface(
-                                        cardId = item.id,
-                                        dragData = object : DragData {
-                                            override val id: Int = item.id
-                                        }
-                                    ) {
-                                        goalItem(item)
-                                    }
+                                ) {
+                                    goalItem(item)
                                 }
                             }
                         }
+                        if (modelProvider().appointments.isNotEmpty())
+                            Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-                AddButton(
-                    onClick = onAddGoalClick,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                )
             }
-
+            if (haveAppointments) {
+                GoalCategoryTitle(text = stringResource(id = R.string.appointments))
+                DragListenSurface(
+                    zIndex = 1f,
+                    onDrop = { dragData -> onDropGoalToAppointments(dragData.id) }
+                ) { isInBound ->
+                    Column(
+                        modifier = Modifier.dragAndDropBackground(
+                            isInBound,
+                            dragStateProvider()
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (item in modelProvider().appointments) {
+                            key(item.id) {
+                                DragSurface(
+                                    cardId = item.id,
+                                    dragData = object : DragData {
+                                        override val id: Int = item.id
+                                    }
+                                ) {
+                                    goalItem(item)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -180,6 +161,7 @@ private fun ScheduleDayHeader(
     weekday: String,
     date: String,
     isToday: Boolean,
+    onAddGoalClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -190,13 +172,11 @@ private fun ScheduleDayHeader(
         Text(
             text = weekday,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.alignByBaseline()
         )
         DotSeparator()
         Text(
             text = date,
             modifier = Modifier
-                .alignByBaseline()
                 .alpha(0.5f),
             style = MaterialTheme.typography.titleMedium
         )
@@ -205,11 +185,12 @@ private fun ScheduleDayHeader(
             Text(
                 text = stringResource(id = R.string.today),
                 modifier = Modifier
-                    .alignByBaseline()
                     .alpha(0.5f),
                 style = MaterialTheme.typography.titleMedium
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
+        AddButton(onClick = onAddGoalClick)
     }
 }
 
@@ -235,7 +216,6 @@ fun DotSeparator(
         painter = painterResource(id = com.effectiveweek.core.R.drawable.ic_circle),
         contentDescription = null,
         modifier = modifier
-            .padding(top = 4.dp)
             .size(7.dp)
             .alpha(0.5f),
     )
@@ -245,92 +225,70 @@ fun DotSeparator(
 @Composable
 fun ScheduleDayPreview() {
     DarkTheme {
-        ScheduleDay(
-            model = ScheduleDayModel(
-                weekday = "Friday",
-                date = LocalDate.now(),
-                dateNumber = "25",
-                isToday = true,
-                priorities = listOf(
-                    GoalItem(0, "Sample Goal", "Me"),
-                    GoalItem(1, "Sample Goal", "Me")
-                ),
-                appointments = listOf(GoalItem(2, "Sample Goal", "Me")),
-            ),
-            isDragging = false,
-            onAddGoalClick = {},
-            onDropGoalToPriorities = {},
-            onDropGoalToAppointments = {},
-            goalItem = {
-                GoalItem(
-                    title = it.title,
-                    role = it.role,
-                    onClick = { },
-                    onCheck = { },
-                )
-            }
-        )
+        Surface(color = MaterialTheme.colorScheme.background) {
+            ScheduleDay(
+                modelProvider = {
+                    ScheduleDayModel(
+                        weekday = "Friday",
+                        date = LocalDate.now(),
+                        dateNumber = "25",
+                        isToday = true,
+                        priorities = listOf(
+                            GoalItem(0, "Sample Goal", "Me"),
+                            GoalItem(1, "Sample Goal", "Me")
+                        ),
+                        appointments = listOf(GoalItem(2, "Sample Goal", "Me")),
+                    )
+                },
+                dragStateProvider = { false },
+                onAddGoalClick = {},
+                onDropGoalToPriorities = {},
+                onDropGoalToAppointments = {},
+                goalItem = {
+                    GoalItem(
+                        title = it.title,
+                        role = it.role,
+                        onClick = { },
+                        onCheck = { },
+                    )
+                }
+            )
+        }
     }
 }
 
-
-@Preview
-@Composable
-fun ScheduleDayPreviewNoGoals() {
-    DarkTheme {
-        ScheduleDay(
-            model = ScheduleDayModel(
-                weekday = "Friday",
-                date = LocalDate.now(),
-                dateNumber = "25",
-                isToday = true,
-                priorities = emptyList(),
-                appointments = emptyList(),
-            ),
-            isDragging = false,
-            onAddGoalClick = {},
-            onDropGoalToPriorities = {},
-            onDropGoalToAppointments = {},
-            goalItem = {
-                GoalItem(
-                    title = it.title,
-                    role = it.role,
-                    onClick = { },
-                    onCheck = { },
-                )
-            }
-        )
-    }
-}
-
-@Preview
+@Preview(backgroundColor = 0xFF000000)
 @Composable
 fun ScheduleDayPreviewNoAppointments() {
     DarkTheme {
-        ScheduleDay(
-            model = ScheduleDayModel(
-                weekday = "Friday",
-                date = LocalDate.now(),
-                dateNumber = "25",
-                isToday = true,
-                priorities = listOf(
-                    GoalItem(0, "Sample Goal", "Me"),
-                    GoalItem(1, "Sample Goal", "Me")
-                ),
-                appointments = emptyList(),
-            ),
-            isDragging = false,
-            onAddGoalClick = {},
-            onDropGoalToPriorities = {},
-            onDropGoalToAppointments = {},
-            goalItem = {
-                GoalItem(
-                    title = it.title,
-                    role = it.role,
-                    onClick = { },
-                    onCheck = { },
-                )
-            }
-        )
+       Surface(color = MaterialTheme.colorScheme.background) {
+           ScheduleDay(
+               modelProvider = {
+                   ScheduleDayModel(
+                       weekday = "Friday",
+                       date = LocalDate.now(),
+                       dateNumber = "25",
+                       isToday = true,
+                       priorities = listOf(
+                           GoalItem(0, "Sample Goal", "Me"),
+                           GoalItem(1, "Sample Goal", "Me")
+                       ),
+                       appointments = emptyList(),
+                   )
+               },
+               dragStateProvider = { false },
+               onAddGoalClick = {},
+               onDropGoalToPriorities = {},
+               onDropGoalToAppointments = {},
+               goalItem = {
+                   GoalItem(
+                       title = it.title,
+                       role = it.role,
+                       onClick = { },
+                       onCheck = { },
+                   )
+               }
+           )
+       }
     }
 }

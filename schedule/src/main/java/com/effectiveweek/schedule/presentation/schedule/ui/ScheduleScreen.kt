@@ -1,5 +1,6 @@
 package com.effectiveweek.schedule.presentation.schedule.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -39,12 +41,12 @@ import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEffect
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEvent
-import com.effectiveweek.schedule.presentation.schedule.ScheduleNavEvent
-import com.effectiveweek.schedule.presentation.schedule.ScheduleNavigation
 import com.effectiveweek.schedule.presentation.schedule.ScheduleUiState
 import com.effectiveweek.schedule.presentation.schedule.ScheduleViewModel
 import com.effectiveweek.schedule.presentation.schedule.model.ScheduleDayModel
 import com.effectiveweek.schedule.presentation.GoalItem
+import com.effectiveweek.schedule.presentation.schedule.ScheduleNavEvent
+import com.effectiveweek.schedule.presentation.schedule.ScheduleNavigation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -55,7 +57,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ScheduleScreen(
     navigation: ScheduleNavigation,
-    isDragging: Boolean,
+    dragStateProvider: () -> Boolean,
     modifier: Modifier = Modifier,
     vm: ScheduleViewModel = koinViewModel(),
 ) {
@@ -71,12 +73,12 @@ fun ScheduleScreen(
     }
 
     ScheduleScreenUi(
-        state = state,
+        stateProvider = { state },
         effects = vm.uiEffect,
         modifier = modifier,
         topBar = {
             ScheduleTopBar(
-                month = state.month,
+                month = { state.month },
                 onTodayClick = { vm.accept(ScheduleEvent.TodayClick) }
             )
         },
@@ -96,8 +98,8 @@ fun ScheduleScreen(
         },
         scheduleDay = {
             ScheduleDay(
-                isDragging = isDragging,
-                model = it,
+                dragStateProvider = dragStateProvider,
+                modelProvider = { it },
                 onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToScheduleDayClick(it.date.toEpochDay())) },
                 goalItem = { goalItem ->
                     GoalItem(
@@ -133,7 +135,7 @@ fun ScheduleScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleScreenUi(
-    state: ScheduleUiState,
+    stateProvider: () -> ScheduleUiState,
     effects: Flow<ScheduleEffect>,
     onFirstVisibleDayIndexChange: (index: Int) -> Unit,
     onLastVisibleDayIndexChange: (index: Int) -> Unit,
@@ -223,7 +225,8 @@ fun ScheduleScreenUi(
                     .padding(paddingValues)
                     .fillMaxHeight(),
             ) {
-                items(items = state.schedule, key = { item -> item.dateNumber }) {
+                Log.d("MYTAG", "LazyRow composed")
+                items(items = stateProvider().schedule, key = { item -> item.dateNumber }) {
                     scheduleDay(it)
                 }
             }
@@ -234,16 +237,16 @@ fun ScheduleScreenUi(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleTopBar(
-    month: String,
+    month: () -> String,
     onTodayClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TopAppBar(
-        title = { Text(text = month, modifier = Modifier.alpha(0.5f)) },
+        title = { Text(text = month(), modifier = Modifier.alpha(0.5f)) },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier,
         actions = {
-            IconButton(onClick = onTodayClick, modifier = modifier) {
+            IconButton(onClick = onTodayClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_today),
                     contentDescription = null
@@ -258,9 +261,9 @@ fun ScheduleTopBar(
 fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
-            state = ScheduleUiState(),
+            stateProvider = { ScheduleUiState() },
             effects = emptyFlow(),
-            topBar = { ScheduleTopBar(onTodayClick = {}, month = "November") },
+            topBar = { ScheduleTopBar(onTodayClick = {}, month = { "November" }) },
             scheduleDay = {},
             onFirstVisibleDayIndexChange = {},
             onLastVisibleDayIndexChange = {}

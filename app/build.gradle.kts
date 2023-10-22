@@ -47,8 +47,7 @@ dependencies {
     implementation(project(path = ":core"))
 
     implementation(Dependencies.core)
-    implementation(Dependencies.appcompat)
-    implementation(Dependencies.fragment)
+    implementation(Dependencies.lifecycleRuntime)
 
     room()
     koin()
