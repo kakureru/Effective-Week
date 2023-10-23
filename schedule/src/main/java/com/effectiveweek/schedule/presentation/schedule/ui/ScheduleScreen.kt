@@ -225,7 +225,6 @@ fun ScheduleScreenUi(
                     .padding(paddingValues)
                     .fillMaxHeight(),
             ) {
-                Log.d("MYTAG", "LazyRow composed")
                 items(items = stateProvider().schedule, key = { item -> item.dateNumber }) {
                     scheduleDay(it)
                 }

@@ -8,6 +8,8 @@ import com.effectiveweek.schedule.domain.model.Role
 import com.effectiveweek.schedule.domain.repository.GoalRepository
 import com.effectiveweek.schedule.domain.repository.RoleRepository
 import com.effectiveweek.schedule.presentation.role_pick_dialog.toRoleItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,11 +45,7 @@ class GoalDialogViewModel (
         appointment = false,
     )
 
-    private val _roles: StateFlow<List<Role>> = roleRepository.getRoles().stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(3000L),
-        emptyList()
-    )
+    private val _roles: StateFlow<List<Role>> = roleRepository.getRoles().stateInViewModel(emptyList())
     private val _goalState = MutableStateFlow(defaultGoal)
 
     init {
@@ -60,8 +59,6 @@ class GoalDialogViewModel (
         _roles,
     ) { goalState, uiState, roles ->
         GoalDialogState(
-            title = goalState.title,
-            description = goalState.description,
             role = goalState.role,
             availableRoles = roles.map { it.toRoleItem() },
             date = goalState.date?.let { DateTimeFormatter.ofPattern("MMM d").format(it) },
@@ -70,11 +67,19 @@ class GoalDialogViewModel (
             navState = uiState.navState,
             isAddingDescription = if (goalState.description.isNotBlank()) true else uiState.isAddingDescription
         )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(3000L),
-        GoalDialogState()
-    )
+    }.stateInViewModel(GoalDialogState())
+
+    val titleState: StateFlow<GoalDialogTitleState> = _goalState.map {
+        GoalDialogTitleState(
+            text = it.title
+        )
+    }.stateInViewModel(GoalDialogTitleState())
+
+    val descriptionState: StateFlow<GoalDialogDescriptionState> = _goalState.map {
+        GoalDialogDescriptionState(
+            text = it.description
+        )
+    }.stateInViewModel(GoalDialogDescriptionState())
 
     private val _uiEffect = MutableSharedFlow<GoalDialogEffect>()
     val uiEffect: SharedFlow<GoalDialogEffect> = _uiEffect.asSharedFlow()
@@ -139,4 +144,10 @@ class GoalDialogViewModel (
             goalRepository.editGoal(_goalState.value)
         _uiState.update { it.copy(navState = GoalDialogNavState.Dismiss) }
     }
+
+    private fun <T> Flow<T>.stateInViewModel(
+        initialValue: T,
+        scope: CoroutineScope = viewModelScope,
+        started: SharingStarted = SharingStarted.WhileSubscribed(5000)
+    ): StateFlow<T> = stateIn(scope, started, initialValue)
 }
