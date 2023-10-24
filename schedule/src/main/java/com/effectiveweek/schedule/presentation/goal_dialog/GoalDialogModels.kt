@@ -4,8 +4,6 @@ import com.effectiveweek.schedule.presentation.role_pick_dialog.RoleItem
 import java.time.LocalTime
 
 data class GoalDialogState(
-    val title: String = "",
-    val description: String = "",
     val role: String? = "",
     val availableRoles: List<RoleItem> = emptyList(),
     val date: String? = "",
@@ -14,6 +12,14 @@ data class GoalDialogState(
     val appointment: Boolean = false,
     val isAddingDescription: Boolean = false,
     val navState: GoalDialogNavState = GoalDialogNavState.Idle,
+)
+
+data class GoalDialogTitleState(
+    val text: String = ""
+)
+
+data class GoalDialogDescriptionState(
+    val text: String = ""
 )
 
 sealed class GoalDialogNavState {

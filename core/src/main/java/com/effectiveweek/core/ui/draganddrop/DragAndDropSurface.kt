@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
@@ -37,41 +38,41 @@ fun DragAndDropSurface(
         Box(
             modifier = modifier
                 .wrapContentWidth()
-                .pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        var change = awaitDragOrCancellation(down.id)
-                        if (dndState.isDragging) {
-                            if (change != null && change.pressed) {
-                                change.consume()
-
-                                dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
-                            }
-                            while (change != null && change.pressed) {
-                                change = awaitDragOrCancellation(change.id)
-                                if (change != null && change.pressed) {
-                                    change.consume()
-                                    dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
-                                }
-                            }
-                            if (change != null) {
-                                change.consume()
-                                with(dndState) {
-                                    isDragging = false
-                                    dragPosition = Offset.Zero
-                                    dndState.onDrop()
-                                    // Metadata
-                                    cardDraggedId = -1
-                                }
-                            }
-                        }
-                    }
-                }
+                .pointerInput(Unit) { handleDragAndDrop(dndState) }
         ) {
             content()
             if (dndState.isDragging) {
                 DragShadow(dndState.dragPosition, dndState.draggableItem)
             }
+        }
+    }
+}
+
+suspend fun PointerInputScope.handleDragAndDrop(
+    dndState: DragAndDropState,
+) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        var change = awaitDragOrCancellation(down.id)
+        if (change != null && change.pressed && dndState.isDragging) {
+            change.consume()
+            dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
+        }
+        while (change != null && change.pressed) {
+            change = awaitDragOrCancellation(change.id)
+            if (change != null && change.pressed && dndState.isDragging) {
+                change.consume()
+                dndState.dragPosition = Offset(change.position.x, change.position.y + topAppBarHeight)
+            }
+        }
+        if (change != null) {
+            change.consume()
+            dndState.onDrop()
+        }
+        with(dndState) {
+            isDragging = false
+            dragPosition = Offset.Zero
+            cardDraggedId = -1 // Metadata
         }
     }
 }

@@ -49,12 +49,13 @@ import com.effectiveweek.core.ui.GreatTimePicker
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.core.ui.theme.greatTextFieldColors
 import com.effectiveweek.schedule.R
+import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogDescriptionState
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogEffect
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogEvent
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogNavState
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogNavigation
+import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogTitleState
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogViewModel
-import com.effectiveweek.schedule.presentation.role_pick_dialog.RoleItem
 import com.effectiveweek.schedule.presentation.role_pick_dialog.ui.RolePickDialog
 import kotlinx.coroutines.launch
 import java.time.LocalTime
@@ -69,6 +70,8 @@ fun GoalDialog(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+    val titleState by viewModel.titleState.collectAsState()
+    val descriptionState by viewModel.descriptionState.collectAsState()
 
     var dialogVisible by remember { mutableStateOf(false) }
     if (dialogVisible) {
@@ -116,16 +119,16 @@ fun GoalDialog(
         GoalDialogUi(
             onConfirmClick = { viewModel.accept(GoalDialogEvent.ConfirmClick) },
             modifier = modifier,
-            isAddingDescription = state.isAddingDescription,
+            isAddingDescription = { state.isAddingDescription },
             title = {
                 TitleField(
-                    value = state.title,
+                    state = titleState,
                     onValueChange = { value -> viewModel.accept(GoalDialogEvent.TitleChanged(value)) },
                 )
             },
             description = {
                 DescriptionField(
-                    value = state.description,
+                    state = descriptionState,
                     onValueChange = { value ->
                         viewModel.accept(GoalDialogEvent.DescriptionChanged(value))
                     }
@@ -176,7 +179,7 @@ fun GoalDialog(
 @Composable
 fun GoalDialogUi(
     onConfirmClick: () -> Unit,
-    isAddingDescription: Boolean,
+    isAddingDescription: () -> Boolean,
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     description: @Composable () -> Unit,
@@ -201,7 +204,7 @@ fun GoalDialogUi(
                 modifier = Modifier.weight(1f)
             ) {
                 title()
-                if (isAddingDescription) {
+                if (isAddingDescription()) {
                     description()
                 }
             }
@@ -212,7 +215,7 @@ fun GoalDialogUi(
 
 @Composable
 private fun TitleField(
-    value: String,
+    state: GoalDialogTitleState,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -221,7 +224,7 @@ private fun TitleField(
         focusRequester.requestFocus()
     }
     TextField(
-        value = value,
+        value = state.text,
         textStyle = MaterialTheme.typography.titleLarge,
         onValueChange = { onValueChange(it) },
         placeholder = {
@@ -243,12 +246,12 @@ private fun TitleField(
 
 @Composable
 private fun DescriptionField(
-    value: String,
+    state: GoalDialogDescriptionState,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TextField(
-        value = value,
+        value = state.text,
         onValueChange = { onValueChange(it) },
         modifier = modifier
             .fillMaxWidth(),
@@ -390,12 +393,12 @@ private fun GoalDialogPreviewNewGoal() {
                 onConfirmClick = {},
                 title = {
                     TitleField(
-                        value = "",
+                        state = GoalDialogTitleState(),
                         onValueChange = {},
                     )
                 },
-                description = { DescriptionField(value = "", onValueChange = {}) },
-                isAddingDescription = false,
+                description = { DescriptionField(state = GoalDialogDescriptionState(), onValueChange = {}) },
+                isAddingDescription = { false },
                 pickers = {
                     item {
                         RolePicker(
@@ -442,12 +445,12 @@ private fun GoalDialogPreview() {
                 onConfirmClick = {},
                 title = {
                     TitleField(
-                        value = "Sample goal",
+                        state = GoalDialogTitleState(),
                         onValueChange = {},
                     )
                 },
-                description = { DescriptionField(value = "", onValueChange = {}) },
-                isAddingDescription = true,
+                description = { DescriptionField(state = GoalDialogDescriptionState(), onValueChange = {}) },
+                isAddingDescription = { true },
                 pickers = {
                     item {
                         RolePicker(

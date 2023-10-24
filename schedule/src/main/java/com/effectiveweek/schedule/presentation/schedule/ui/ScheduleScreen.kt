@@ -1,6 +1,5 @@
 package com.effectiveweek.schedule.presentation.schedule.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.scrollBy
@@ -26,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -37,16 +35,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.effectiveweek.core.ui.draganddrop.DragListenSurface
+import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
+import com.effectiveweek.schedule.presentation.GoalItem
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEffect
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEvent
+import com.effectiveweek.schedule.presentation.schedule.ScheduleNavEvent
+import com.effectiveweek.schedule.presentation.schedule.ScheduleNavigation
 import com.effectiveweek.schedule.presentation.schedule.ScheduleUiState
 import com.effectiveweek.schedule.presentation.schedule.ScheduleViewModel
 import com.effectiveweek.schedule.presentation.schedule.model.ScheduleDayModel
-import com.effectiveweek.schedule.presentation.GoalItem
-import com.effectiveweek.schedule.presentation.schedule.ScheduleNavEvent
-import com.effectiveweek.schedule.presentation.schedule.ScheduleNavigation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -222,8 +221,8 @@ fun ScheduleScreenUi(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxHeight(),
+                userScrollEnabled = LocalDragAndDropState.current.isDragging.not()
             ) {
-                Log.d("MYTAG", "LazyRow composed")
                 items(items = stateProvider().schedule, key = { item -> item.dateNumber }) {
                     scheduleDay(it)
                 }

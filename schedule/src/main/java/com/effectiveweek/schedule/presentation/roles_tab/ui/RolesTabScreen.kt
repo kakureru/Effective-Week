@@ -57,7 +57,8 @@ import java.time.LocalTime
 @Composable
 fun RolesTabScreen(
     navigation: RolesNavigation,
-    vm: RolesViewModel = koinViewModel(),
+    modifier: Modifier = Modifier,
+    vm: RolesViewModel = koinViewModel()
 ) {
     val state by vm.uiState.collectAsState()
 
@@ -73,6 +74,7 @@ fun RolesTabScreen(
     }
 
     RolesTabUi(
+        modifier = modifier,
         roles = state.roles,
         effects = vm.uiEffect,
         onAddRoleClick = { vm.accept(RolesEvent.AddRoleClick) },
@@ -132,11 +134,12 @@ fun RolesTabUi(
             bottomEnd = CornerSize(0.dp),
             bottomStart = CornerSize(0.dp)
         ),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
     ) {
         Box {
             Column(
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 BottomSheetPeekHeader(height = 50.dp)
                 LazyRow(
