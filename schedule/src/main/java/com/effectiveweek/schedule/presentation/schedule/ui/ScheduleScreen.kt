@@ -57,7 +57,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ScheduleScreen(
     navigation: ScheduleNavigation,
-    dragStateProvider: () -> Boolean,
     modifier: Modifier = Modifier,
     vm: ScheduleViewModel = koinViewModel(),
 ) {
@@ -98,7 +97,6 @@ fun ScheduleScreen(
         },
         scheduleDay = {
             ScheduleDay(
-                dragStateProvider = dragStateProvider,
                 modelProvider = { it },
                 onAddGoalClick = { vm.accept(ScheduleEvent.AddGoalToScheduleDayClick(it.date.toEpochDay())) },
                 goalItem = { goalItem ->

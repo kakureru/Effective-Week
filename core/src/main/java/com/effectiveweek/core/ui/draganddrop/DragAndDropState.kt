@@ -13,7 +13,7 @@ interface DragData {
 
 typealias DropCallback = (DragData) -> Unit
 
-internal val LocalDragAndDropState = compositionLocalOf { DragAndDropState() }
+val LocalDragAndDropState = compositionLocalOf { DragAndDropState() }
 
 class DragAndDropState {
 

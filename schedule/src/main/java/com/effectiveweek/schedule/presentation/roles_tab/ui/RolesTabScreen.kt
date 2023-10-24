@@ -3,13 +3,10 @@ package com.effectiveweek.schedule.presentation.roles_tab.ui
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,13 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -41,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
 import com.effectiveweek.schedule.domain.model.Goal
@@ -52,6 +47,8 @@ import com.effectiveweek.schedule.presentation.roles_tab.RolesEvent
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavEvent
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavigation
 import com.effectiveweek.schedule.presentation.roles_tab.RolesViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -60,26 +57,9 @@ import java.time.LocalTime
 @Composable
 fun RolesTabScreen(
     navigation: RolesNavigation,
-    isDragging: Boolean,
     vm: RolesViewModel = koinViewModel(),
 ) {
     val state by vm.uiState.collectAsState()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        vm.uiEffect.collect {
-            when (it) {
-                is RolesEffect.Error -> scope.launch {
-                    Toast.makeText(
-                        context,
-                        context.resources.getString(it.msgResource),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-    }
 
     LaunchedEffect(Unit) {
         vm.navigationEvents.collect { event ->
@@ -94,10 +74,11 @@ fun RolesTabScreen(
 
     RolesTabUi(
         roles = state.roles,
+        effects = vm.uiEffect,
         onAddRoleClick = { vm.accept(RolesEvent.AddRoleClick) },
         roleItem = { role ->
             RoleItem(
-                isDragging = isDragging,
+                isDragging = LocalDragAndDropState.current.isDragging,
                 goals = role.goals.map { it.toGoalItem() },
                 onDropGoal = { goalId ->
                     vm.accept(RolesEvent.GoalDropOnRole(goalId, role.name))
@@ -123,11 +104,28 @@ fun RolesTabScreen(
 @Composable
 fun RolesTabUi(
     roles: List<Role>,
+    effects: Flow<RolesEffect>,
     onAddRoleClick: () -> Unit,
     modifier: Modifier = Modifier,
     roleItem: @Composable (Role) -> Unit,
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val rowState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        effects.collect {
+            when (it) {
+                is RolesEffect.Error -> scope.launch {
+                    Toast.makeText(
+                        context,
+                        context.resources.getString(it.msgResource),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
 
     Surface(
         shape = MaterialTheme.shapes.large.copy(
@@ -203,6 +201,7 @@ fun RolesTabPreview() {
             Column {
                 RolesTabUi(
                     roles = listOf(previewRole),
+                    effects = emptyFlow(),
                     onAddRoleClick = {},
                     roleItem = {
                         RoleItem(

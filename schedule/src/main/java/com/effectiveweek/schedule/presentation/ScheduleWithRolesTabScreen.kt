@@ -14,7 +14,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.effectiveweek.core.ui.DraggableBottomSheet
-import com.effectiveweek.core.ui.draganddrop.DragAndDropState
 import com.effectiveweek.core.ui.draganddrop.DragAndDropSurface
 import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavigation
@@ -41,7 +40,6 @@ fun ScheduleWithRolesTabScreen(
             animationSpec = tween(150),
         )
     }
-    val dndState = remember { DragAndDropState() }
 
     DragAndDropSurface(
         modifier = Modifier
@@ -54,9 +52,8 @@ fun ScheduleWithRolesTabScreen(
                     }
                 )
             },
-        dndState = dndState,
     ) {
-        ScheduleScreen(dragStateProvider = { dndState.isDragging }, navigation = scheduleNavigation)
+        ScheduleScreen(navigation = scheduleNavigation)
         DraggableBottomSheet(
             bottomSheetState = bottomSheetState,
             content = {
@@ -67,7 +64,7 @@ fun ScheduleWithRolesTabScreen(
                         }
                     },
                 ) { _ ->
-                    RolesTabScreen(isDragging = dndState.isDragging, navigation = rolesNavigation)
+                    RolesTabScreen(navigation = rolesNavigation)
                 }
             }
         )

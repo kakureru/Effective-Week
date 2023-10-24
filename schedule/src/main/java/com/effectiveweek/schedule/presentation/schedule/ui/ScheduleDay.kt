@@ -3,7 +3,6 @@ package com.effectiveweek.schedule.presentation.schedule.ui
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,6 +33,7 @@ import com.effectiveweek.core.ui.AddButton
 import com.effectiveweek.core.ui.draganddrop.DragData
 import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.core.ui.draganddrop.DragSurface
+import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
 import com.effectiveweek.schedule.presentation.GoalItem
@@ -47,7 +45,6 @@ import kotlin.math.min
 @Composable
 fun ScheduleDay(
     modelProvider: () -> ScheduleDayModel,
-    dragStateProvider: () -> Boolean,
     onAddGoalClick: () -> Unit,
     onDropGoalToPriorities: (goalId: Int) -> Unit,
     onDropGoalToAppointments: (goalId: Int) -> Unit,
@@ -64,7 +61,7 @@ fun ScheduleDay(
         derivedStateOf { modelProvider().appointments.isNotEmpty() }
     }
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 16.dp)
             .width(width)
             .animateContentSize(),
@@ -96,7 +93,7 @@ fun ScheduleDay(
                             .padding(horizontal = 8.dp)
                             .dragAndDropBackground(
                                 isInBound,
-                                dragStateProvider()
+                                LocalDragAndDropState.current.isDragging
                             ),
 //                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -135,7 +132,7 @@ fun ScheduleDay(
                             .padding(horizontal = 8.dp)
                             .dragAndDropBackground(
                                 isInBound,
-                                dragStateProvider()
+                                LocalDragAndDropState.current.isDragging
                             ),
 //                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -255,7 +252,6 @@ fun ScheduleDayPreview() {
                         appointments = listOf(GoalItem(2, "Sample Goal", "Me")),
                     )
                 },
-                dragStateProvider = { false },
                 onAddGoalClick = {},
                 onDropGoalToPriorities = {},
                 onDropGoalToAppointments = {},
@@ -291,7 +287,6 @@ fun ScheduleDayPreviewNoAppointments() {
                         appointments = emptyList(),
                     )
                 },
-                dragStateProvider = { false },
                 onAddGoalClick = {},
                 onDropGoalToPriorities = {},
                 onDropGoalToAppointments = {},
