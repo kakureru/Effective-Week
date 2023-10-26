@@ -2,7 +2,7 @@ package com.effectiveweek.schedule.domain.model
 
 import java.time.LocalDate
 
-data class ScheduleDay(
+internal data class ScheduleDay(
     val date: LocalDate,
     var goals: List<Goal>
 )

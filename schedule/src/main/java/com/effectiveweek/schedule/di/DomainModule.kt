@@ -1,4 +1,4 @@
-package com.effectiveweek.app.di
+package com.effectiveweek.schedule.di
 
 import com.effectiveweek.schedule.domain.usecase.GetScheduleForDatesUseCase
 import com.effectiveweek.schedule.domain.usecase.goal.CompleteGoalUseCase
@@ -7,7 +7,7 @@ import com.effectiveweek.schedule.domain.usecase.goal.DropGoalToWeekUseCase
 import com.effectiveweek.schedule.domain.usecase.role.GetRolesWithGoalsUseCase
 import org.koin.dsl.module
 
-val domainModule = module {
+internal val domainModule = module {
 
     factory {
         DropGoalToRoleUseCase(goalRepository = get())

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.TypeConverters
 import androidx.room.Update
+import com.effectiveweek.core.data.Converters
 import com.effectiveweek.schedule.data.db.model.GoalEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate

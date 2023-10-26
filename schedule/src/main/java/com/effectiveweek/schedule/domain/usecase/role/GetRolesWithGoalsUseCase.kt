@@ -6,7 +6,7 @@ import com.effectiveweek.schedule.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
-class GetRolesWithGoalsUseCase(
+internal class GetRolesWithGoalsUseCase(
     private val roleRepository: RoleRepository,
     private val goalRepository: GoalRepository
 ) {

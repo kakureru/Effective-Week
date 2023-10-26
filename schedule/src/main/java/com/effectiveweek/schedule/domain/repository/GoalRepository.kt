@@ -4,7 +4,7 @@ import com.effectiveweek.schedule.domain.model.Goal
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
-interface GoalRepository {
+internal interface GoalRepository {
 
     fun getGoals(): Flow<List<Goal>>
 

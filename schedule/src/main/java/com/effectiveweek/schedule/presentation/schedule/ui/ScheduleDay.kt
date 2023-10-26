@@ -36,14 +36,14 @@ import com.effectiveweek.core.ui.draganddrop.DragSurface
 import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
-import com.effectiveweek.schedule.presentation.GoalItem
-import com.effectiveweek.schedule.presentation.model.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.model.GoalItem
 import com.effectiveweek.schedule.presentation.schedule.model.ScheduleDayModel
 import java.time.LocalDate
 import kotlin.math.min
 
 @Composable
-fun ScheduleDay(
+internal fun ScheduleDay(
     modelProvider: () -> ScheduleDayModel,
     onAddGoalClick: () -> Unit,
     onDropGoalToPriorities: (goalId: Int) -> Unit,
@@ -221,7 +221,7 @@ private fun GoalCategoryTitle(
 }
 
 @Composable
-fun DotSeparator(
+private fun DotSeparator(
     modifier: Modifier = Modifier,
 ) {
     Icon(
@@ -235,7 +235,7 @@ fun DotSeparator(
 
 @Preview
 @Composable
-fun ScheduleDayPreview() {
+private fun ScheduleDayPreview() {
     DarkTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ScheduleDay(
@@ -270,7 +270,7 @@ fun ScheduleDayPreview() {
 
 @Preview(backgroundColor = 0xFF000000)
 @Composable
-fun ScheduleDayPreviewNoAppointments() {
+private fun ScheduleDayPreviewNoAppointments() {
     DarkTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ScheduleDay(

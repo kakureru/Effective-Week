@@ -6,7 +6,7 @@ import com.effectiveweek.schedule.domain.model.Role
 import com.effectiveweek.schedule.domain.repository.RoleRepository
 import kotlinx.coroutines.flow.map
 
-class RoleRepositoryImpl(
+internal class RoleRepositoryImpl(
     private val roleDao: RoleDao,
 ) : RoleRepository {
 

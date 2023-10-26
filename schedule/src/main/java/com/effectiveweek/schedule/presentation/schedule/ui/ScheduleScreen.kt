@@ -30,15 +30,16 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
-import com.effectiveweek.schedule.presentation.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.GoalItem
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEffect
 import com.effectiveweek.schedule.presentation.schedule.ScheduleEvent
 import com.effectiveweek.schedule.presentation.schedule.ScheduleNavEvent
@@ -54,7 +55,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ScheduleScreen(
+internal fun ScheduleScreen(
     navigation: ScheduleNavigation,
     modifier: Modifier = Modifier,
     vm: ScheduleViewModel = koinViewModel(),
@@ -131,7 +132,7 @@ fun ScheduleScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScheduleScreenUi(
+private fun ScheduleScreenUi(
     stateProvider: () -> ScheduleUiState,
     effects: Flow<ScheduleEffect>,
     onFirstVisibleDayIndexChange: (index: Int) -> Unit,
@@ -233,7 +234,7 @@ fun ScheduleScreenUi(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleTopBar(
+private fun ScheduleTopBar(
     month: () -> String,
     onTodayClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -245,7 +246,7 @@ fun ScheduleTopBar(
         actions = {
             IconButton(onClick = onTodayClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_today),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_today),
                     contentDescription = null
                 )
             }
@@ -255,7 +256,7 @@ fun ScheduleTopBar(
 
 @Preview
 @Composable
-fun ScheduleScreenUiPreview() {
+private fun ScheduleScreenUiPreview() {
     DarkTheme {
         ScheduleScreenUi(
             stateProvider = { ScheduleUiState() },

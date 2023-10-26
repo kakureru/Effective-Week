@@ -3,7 +3,7 @@ package com.effectiveweek.schedule.presentation.goal_dialog
 import com.effectiveweek.schedule.presentation.role_pick_dialog.RoleItem
 import java.time.LocalTime
 
-data class GoalDialogState(
+internal data class GoalDialogState(
     val role: String? = "",
     val availableRoles: List<RoleItem> = emptyList(),
     val date: String? = "",
@@ -14,20 +14,20 @@ data class GoalDialogState(
     val navState: GoalDialogNavState = GoalDialogNavState.Idle,
 )
 
-data class GoalDialogTitleState(
+internal data class GoalDialogTitleState(
     val text: String = ""
 )
 
-data class GoalDialogDescriptionState(
+internal data class GoalDialogDescriptionState(
     val text: String = ""
 )
 
-sealed class GoalDialogNavState {
+internal sealed class GoalDialogNavState {
     object Idle : GoalDialogNavState()
     object Dismiss : GoalDialogNavState()
 }
 
-sealed class GoalDialogEvent {
+internal sealed class GoalDialogEvent {
     class RolePick(val roleName: String) : GoalDialogEvent()
     class TimePick(val hour: Int, val minute: Int) : GoalDialogEvent()
     class DatePick(val dateMillis: Long) : GoalDialogEvent()
@@ -38,7 +38,7 @@ sealed class GoalDialogEvent {
     class DescriptionChanged(val newDescription: String) : GoalDialogEvent()
 }
 
-sealed class GoalDialogEffect {
+internal sealed class GoalDialogEffect {
     class Error(val msgResource: Int) : GoalDialogEffect()
     object ShowRolePickDialog : GoalDialogEffect()
 }

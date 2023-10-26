@@ -1,14 +1,10 @@
 package com.effectiveweek.schedule.presentation.roles_tab.ui
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,13 +35,13 @@ import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.core.ui.draganddrop.DragSurface
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.core.R
-import com.effectiveweek.schedule.presentation.GoalItem
-import com.effectiveweek.schedule.presentation.model.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.model.GoalItem
 import com.effectiveweek.schedule.presentation.schedule.ui.dragAndDropBackground
 import kotlin.math.min
 
 @Composable
-fun RoleItem(
+internal fun RoleItem(
     goals: List<GoalItem>,
     name: String,
     onEditClick: () -> Unit,
@@ -100,7 +95,7 @@ fun RoleItem(
 }
 
 @Composable
-fun RoleItemHeader(
+private fun RoleItemHeader(
     name: String,
     onAddGoalClick: () -> Unit,
     onEditClick: () -> Unit,
@@ -136,7 +131,7 @@ fun RoleItemHeader(
 }
 
 @Composable
-fun RoleOptionsDropdownMenu(
+private fun RoleOptionsDropdownMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
     onEditClick: () -> Unit,
@@ -168,7 +163,7 @@ fun RoleOptionsDropdownMenu(
 
 @Preview
 @Composable
-fun RoleItemPreview() {
+private fun RoleItemPreview() {
     DarkTheme {
         Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
             RoleItem(

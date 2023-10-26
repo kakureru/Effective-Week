@@ -45,7 +45,7 @@ import com.effectiveweek.schedule.presentation.role_dialog.RoleDialogViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RoleDialog(
+internal fun RoleDialog(
     onDismissRequest: () -> Unit,
     viewModel: RoleDialogViewModel,
     modifier: Modifier = Modifier,
@@ -95,7 +95,7 @@ fun RoleDialog(
 }
 
 @Composable
-fun RoleDialogUi(
+private fun RoleDialogUi(
     state: RoleDialogState,
     onNameChange: (String) -> Unit,
     onConfirmClick: () -> Unit,
@@ -135,7 +135,7 @@ fun RoleDialogUi(
 
 @Preview
 @Composable
-fun RoleDialogPreview() {
+private fun RoleDialogPreview() {
     DarkTheme {
         Surface(
             shape = MaterialTheme.shapes.large.copy(

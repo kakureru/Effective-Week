@@ -2,18 +2,18 @@ package com.effectiveweek.schedule.presentation.roles_tab
 
 import com.effectiveweek.schedule.domain.model.Role
 
-data class RolesState(
+internal data class RolesState(
     val roles: List<Role> = emptyList(),
 )
 
-sealed class RolesNavEvent {
+internal sealed class RolesNavEvent {
     data object OpenRoleDialog : RolesNavEvent()
     class OpenRoleDialogWithRole(val roleName: String) : RolesNavEvent()
     class OpenGoalDialogWithGoal(val goalId: Int) : RolesNavEvent()
     class OpenGoalDialogWithRole(val roleName: String) : RolesNavEvent()
 }
 
-sealed class RolesEvent {
+internal sealed class RolesEvent {
     class EditRoleClick(val roleName: String) : RolesEvent()
     class DeleteRoleClick(val roleName: String) : RolesEvent()
     data object AddRoleClick : RolesEvent()
@@ -23,6 +23,6 @@ sealed class RolesEvent {
     class CompleteGoal(val goalId: Int) : RolesEvent()
 }
 
-sealed class RolesEffect {
+internal sealed class RolesEffect {
     class Error(val msgResource: Int) : RolesEffect()
 }

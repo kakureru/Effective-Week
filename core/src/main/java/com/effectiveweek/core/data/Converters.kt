@@ -1,4 +1,4 @@
-package com.effectiveweek.schedule.data.db
+package com.effectiveweek.core.data
 
 import androidx.room.TypeConverter
 import java.time.*

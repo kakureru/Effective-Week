@@ -3,17 +3,17 @@ package com.effectiveweek.schedule.presentation.schedule
 import com.effectiveweek.schedule.presentation.schedule.model.ScheduleDayModel
 import java.time.LocalDate
 
-data class ScheduleUiState(
+internal data class ScheduleUiState(
     val month: String = "",
     val schedule: List<ScheduleDayModel> = emptyList(),
 )
 
-sealed class ScheduleNavEvent {
+internal sealed class ScheduleNavEvent {
     class OpenGoalDialogWithGoal(val goalId: Int) : ScheduleNavEvent()
     class OpenGoalDialogWithDate(val epochDay: Long) : ScheduleNavEvent()
 }
 
-sealed class ScheduleEvent {
+internal sealed class ScheduleEvent {
     class AddGoalToScheduleDayClick(val epochDay: Long) : ScheduleEvent()
     class GoalClick(val goalId: Int) : ScheduleEvent()
     class CompleteGoal(val goalId: Int) : ScheduleEvent()
@@ -27,7 +27,7 @@ sealed class ScheduleEvent {
     data object TodayClick : ScheduleEvent()
 }
 
-sealed class ScheduleEffect {
+internal sealed class ScheduleEffect {
     class Error(val msgResource: Int) : ScheduleEffect()
     class ScrollToDay(val index: Int) : ScheduleEffect()
 }

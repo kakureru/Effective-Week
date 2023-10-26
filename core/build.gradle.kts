@@ -46,4 +46,5 @@ dependencies {
     implementation(Dependencies.lifecycleRuntime)
 
     compose()
+    room()
 }

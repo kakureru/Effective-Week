@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
 import com.effectiveweek.app.navigation.RootNavGraph
-import com.effectiveweek.app.navigation.Screen
+import com.effectiveweek.app.navigation.RootRoute
 import com.effectiveweek.core.ui.theme.DarkTheme
 
 class MainActivity : ComponentActivity(R.layout.activity_main) {
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity(R.layout.activity_main) {
             DarkTheme {
                 RootNavGraph(
                     navHostController = rememberNavController(),
-                    startDestination = Screen.Schedule.route
+                    startDestination = RootRoute.Schedule.route
                 )
             }
         }

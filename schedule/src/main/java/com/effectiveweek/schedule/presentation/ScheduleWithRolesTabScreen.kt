@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScheduleWithRolesTabScreen(
+internal fun ScheduleWithRolesTabScreen(
     scheduleNavigation: ScheduleNavigation,
     rolesNavigation: RolesNavigation,
 ) {

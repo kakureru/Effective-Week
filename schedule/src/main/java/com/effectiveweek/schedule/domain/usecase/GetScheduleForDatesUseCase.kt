@@ -9,7 +9,7 @@ import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 
-class GetScheduleForDatesUseCase(
+internal class GetScheduleForDatesUseCase(
     private val goalRepository: GoalRepository,
 ) {
     operator fun invoke(startDate: LocalDate, endDate: LocalDate): Flow<List<ScheduleDay>> {

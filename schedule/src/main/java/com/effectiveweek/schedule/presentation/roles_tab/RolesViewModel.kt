@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class RolesViewModel(
+internal class RolesViewModel(
     getRolesWithGoalsUseCase: GetRolesWithGoalsUseCase,
     private val dropGoalToRoleUseCase: DropGoalToRoleUseCase,
     private val completeGoalUseCase: CompleteGoalUseCase,

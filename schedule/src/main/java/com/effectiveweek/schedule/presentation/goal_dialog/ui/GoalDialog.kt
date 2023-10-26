@@ -62,7 +62,7 @@ import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalDialog(
+internal fun GoalDialog(
     navigation: GoalDialogNavigation,
     viewModel: GoalDialogViewModel,
     modifier: Modifier = Modifier,
@@ -177,7 +177,7 @@ fun GoalDialog(
 }
 
 @Composable
-fun GoalDialogUi(
+private fun GoalDialogUi(
     onConfirmClick: () -> Unit,
     isAddingDescription: () -> Boolean,
     modifier: Modifier = Modifier,
@@ -266,7 +266,7 @@ private fun DescriptionField(
 }
 
 @Composable
-fun DescriptionPicker(
+private fun DescriptionPicker(
     onClick: () -> Unit
 ) {
     IconButton(onClick = onClick) {

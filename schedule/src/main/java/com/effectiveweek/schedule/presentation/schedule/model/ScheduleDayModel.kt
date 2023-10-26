@@ -1,11 +1,11 @@
 package com.effectiveweek.schedule.presentation.schedule.model
 
 import com.effectiveweek.schedule.domain.model.ScheduleDay
-import com.effectiveweek.schedule.presentation.model.GoalItem
-import com.effectiveweek.schedule.presentation.model.toGoalItem
+import com.effectiveweek.schedule.presentation.goal_item.model.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.model.toGoalItem
 import java.time.LocalDate
 
-class ScheduleDayModel(
+internal class ScheduleDayModel(
     val date: LocalDate,
     val weekday: String,
     val dateNumber: String,
@@ -14,7 +14,7 @@ class ScheduleDayModel(
     val appointments: List<GoalItem>,
 )
 
-fun ScheduleDay.toScheduleDayItem() = ScheduleDayModel(
+internal fun ScheduleDay.toScheduleDayItem() = ScheduleDayModel(
     date = date,
     weekday = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() },
     dateNumber = date.dayOfMonth.toString(),

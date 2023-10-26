@@ -1,6 +1,6 @@
 package com.effectiveweek.schedule.presentation.roles_tab
 
-interface RolesNavigation {
+internal interface RolesNavigation {
     fun openRoleDialog()
     fun openRoleDialog(roleName: String)
     fun openGoalDialog(goalId: Int)

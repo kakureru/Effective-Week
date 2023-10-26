@@ -22,7 +22,7 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
-class ScheduleViewModel(
+internal class ScheduleViewModel(
     private val dropGoalToWeekUseCase: DropGoalToWeekUseCase,
     private val completeGoalUseCase: CompleteGoalUseCase,
     private val getScheduleForDatesUseCase: GetScheduleForDatesUseCase,

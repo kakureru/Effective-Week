@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.effectiveweek.schedule.data.db.Converters
+import com.effectiveweek.core.data.Converters
 import java.time.LocalDate
 import java.time.LocalTime
 

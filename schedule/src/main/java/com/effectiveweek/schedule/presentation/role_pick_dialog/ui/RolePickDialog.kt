@@ -27,7 +27,7 @@ import com.effectiveweek.schedule.presentation.role_pick_dialog.RoleItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RolePickDialog(
+internal fun RolePickDialog(
     roles: List<RoleItem>,
     onRolePicked: (roleName: String) -> Unit,
     onDismissRequest: () -> Unit,
@@ -37,9 +37,11 @@ fun RolePickDialog(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
+        dragHandle = null,
     ) {
         LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 Row(
@@ -64,7 +66,7 @@ fun RolePickDialog(
 }
 
 @Composable
-fun RolePickItem(
+private fun RolePickItem(
     name: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -80,7 +82,7 @@ fun RolePickItem(
 
 @Preview
 @Composable
-fun RolePickDialogPreview() {
+private fun RolePickDialogPreview() {
     DarkTheme {
         RolePickDialog(
             roles = rolesPreviewList,

@@ -27,7 +27,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class GoalDialogViewModel (
+internal class GoalDialogViewModel (
     private val goalId: Int,
     initDateEpochDay: Long?,
     initRole: String?,

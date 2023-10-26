@@ -1,4 +1,4 @@
-package com.effectiveweek.schedule.presentation
+package com.effectiveweek.schedule.presentation.goal_item
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -34,7 +34,7 @@ import com.effectiveweek.core.ui.theme.DarkTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun GoalItem(
+internal fun GoalItem(
     title: String,
     role: String,
     onClick: () -> Unit,
@@ -130,7 +130,7 @@ fun GoalItem(
 
 @Preview
 @Composable
-fun GoalItemPreview() {
+private fun GoalItemPreview() {
     DarkTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             GoalItem(

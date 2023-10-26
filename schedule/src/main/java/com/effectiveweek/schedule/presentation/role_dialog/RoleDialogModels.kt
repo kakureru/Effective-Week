@@ -1,15 +1,15 @@
 package com.effectiveweek.schedule.presentation.role_dialog
 
-data class RoleDialogState(
+internal data class RoleDialogState(
     val name: String = "",
     val navState: RoleDialogNavState = RoleDialogNavState.Idle,
 )
 
-sealed class RoleDialogNavState {
+internal sealed class RoleDialogNavState {
     object Idle : RoleDialogNavState()
     object Dismiss : RoleDialogNavState()
 }
 
-sealed class RoleDialogEffect {
+internal sealed class RoleDialogEffect {
     class Error(val msgResource: Int) : RoleDialogEffect()
 }

@@ -3,7 +3,7 @@ package com.effectiveweek.schedule.domain.repository
 import com.effectiveweek.schedule.domain.model.Role
 import kotlinx.coroutines.flow.Flow
 
-interface RoleRepository {
+internal interface RoleRepository {
 
     fun getRoles(): Flow<List<Role>>
 

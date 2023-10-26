@@ -1,4 +1,4 @@
-package com.effectiveweek.app.di
+package com.effectiveweek.schedule.di
 
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogViewModel
 import com.effectiveweek.schedule.presentation.role_dialog.RoleDialogViewModel
@@ -7,7 +7,7 @@ import com.effectiveweek.schedule.presentation.schedule.ScheduleViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-val viewModelModule = module {
+internal val viewModelModule = module {
 
     viewModel {
         ScheduleViewModel(

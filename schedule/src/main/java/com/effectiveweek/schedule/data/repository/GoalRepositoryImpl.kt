@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
-class GoalRepositoryImpl(
+internal class GoalRepositoryImpl(
     private val goalDao: GoalDao,
 ) : GoalRepository {
 

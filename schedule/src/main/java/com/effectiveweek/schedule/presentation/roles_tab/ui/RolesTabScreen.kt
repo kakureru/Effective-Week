@@ -40,8 +40,8 @@ import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
 import com.effectiveweek.schedule.domain.model.Goal
 import com.effectiveweek.schedule.domain.model.Role
-import com.effectiveweek.schedule.presentation.GoalItem
-import com.effectiveweek.schedule.presentation.model.toGoalItem
+import com.effectiveweek.schedule.presentation.goal_item.GoalItem
+import com.effectiveweek.schedule.presentation.goal_item.model.toGoalItem
 import com.effectiveweek.schedule.presentation.roles_tab.RolesEffect
 import com.effectiveweek.schedule.presentation.roles_tab.RolesEvent
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavEvent
@@ -55,7 +55,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun RolesTabScreen(
+internal fun RolesTabScreen(
     navigation: RolesNavigation,
     modifier: Modifier = Modifier,
     vm: RolesViewModel = koinViewModel()
@@ -104,7 +104,7 @@ fun RolesTabScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RolesTabUi(
+private fun RolesTabUi(
     roles: List<Role>,
     effects: Flow<RolesEffect>,
     onAddRoleClick: () -> Unit,
@@ -170,7 +170,7 @@ fun RolesTabUi(
 }
 
 @Composable
-fun BottomSheetPeekHeader(
+private fun BottomSheetPeekHeader(
     height: Dp,
     modifier: Modifier = Modifier,
 ) {
@@ -184,7 +184,7 @@ fun BottomSheetPeekHeader(
 }
 
 @Composable
-fun DragHandle(modifier: Modifier = Modifier) {
+private fun DragHandle(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(36.dp, 4.dp)
@@ -196,7 +196,7 @@ fun DragHandle(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun RolesTabPreview() {
+private fun RolesTabPreview() {
     DarkTheme {
         Surface(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
