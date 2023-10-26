@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import kotlinx.coroutines.delay
 
 @Composable
 fun DragListenSurface(
@@ -18,8 +19,9 @@ fun DragListenSurface(
     onDrop: ((DragData) -> Unit)? = null,
     onEnter: (() -> Unit)? = null,
     onExit: (() -> Unit)? = null,
+    onAbove: (suspend () -> Unit)? = null,
     zIndex: Float = 1f,
-    content: @Composable BoxScope.(isInBound: Boolean) -> Unit
+    content: @Composable BoxScope.(isInBound: Boolean) -> Unit = { Unit }
 ) {
     val dndState = LocalDragAndDropState.current
     val dragOffset = dndState.dragPosition
@@ -33,7 +35,12 @@ fun DragListenSurface(
         }
         else {
             onDrop?.let { dndState.onDropZoneLeave(it, zIndex) }
+            onAbove?.let { dndState.onAboveZoneLeave(zIndex) }
             onExit?.invoke()
+        }
+        while (isAboveDropSurface) {
+            onAbove?.let { dndState.onAboveDropZone(it, zIndex) }
+            delay(1) // to avoid ui lock
         }
     }
     Box(

@@ -3,15 +3,18 @@ package com.effectiveweek.schedule.presentation.roles_tab.ui
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -35,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.effectiveweek.core.ui.draganddrop.DragListenSurface
 import com.effectiveweek.core.ui.draganddrop.LocalDragAndDropState
 import com.effectiveweek.core.ui.theme.DarkTheme
 import com.effectiveweek.schedule.R
@@ -47,6 +51,7 @@ import com.effectiveweek.schedule.presentation.roles_tab.RolesEvent
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavEvent
 import com.effectiveweek.schedule.presentation.roles_tab.RolesNavigation
 import com.effectiveweek.schedule.presentation.roles_tab.RolesViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -113,7 +118,9 @@ private fun RolesTabUi(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val rowState = rememberLazyListState()
+    val rolesRowState = rememberLazyListState()
+    val scrollAmount = 50f
+    val dragListenerWidth = 60.dp
 
     LaunchedEffect(Unit) {
         effects.collect {
@@ -138,6 +145,28 @@ private fun RolesTabUi(
         modifier = modifier
     ) {
         Box {
+            DragListenSurface(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(dragListenerWidth)
+                    .align(Alignment.CenterStart),
+                onAbove = {
+                    rolesRowState.scrollBy(-scrollAmount)
+                    delay(10)
+                },
+                zIndex = 2f
+            )
+            DragListenSurface(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(dragListenerWidth)
+                    .align(Alignment.CenterEnd),
+                onAbove = {
+                    rolesRowState.scrollBy(scrollAmount)
+                    delay(10)
+                },
+                zIndex = 2f
+            )
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -145,8 +174,9 @@ private fun RolesTabUi(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxSize(),
-                    state = rowState,
-                    flingBehavior = rememberSnapFlingBehavior(lazyListState = rowState), // FIXME crash on swipe on empty list
+                    state = rolesRowState,
+                    flingBehavior = rememberSnapFlingBehavior(lazyListState = rolesRowState), // FIXME crash on swipe on empty list
+                    userScrollEnabled = LocalDragAndDropState.current.isDragging.not()
                 ) {
                     items(items = roles, key = { item -> item.name }) {
                         roleItem(it)

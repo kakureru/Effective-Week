@@ -145,7 +145,7 @@ private fun ScheduleScreenUi(
     val context = LocalContext.current
     val scheduleRowState = rememberLazyListState()
     val scrollAmount = 50f
-    val dragListenerWidth = 70.dp
+    val dragListenerWidth = 60.dp
 
     LaunchedEffect(Unit) {
         effects.collect { effect ->
@@ -194,27 +194,23 @@ private fun ScheduleScreenUi(
                     .fillMaxHeight()
                     .width(dragListenerWidth)
                     .align(Alignment.CenterStart),
-            ) { isInBound ->
-                LaunchedEffect(isInBound) {
-                    while (isInBound) {
-                        scheduleRowState.scrollBy(-scrollAmount)
-                        delay(10)
-                    }
-                }
-            }
+                onAbove = {
+                    scheduleRowState.scrollBy(-scrollAmount)
+                    delay(10)
+                },
+                zIndex = 1f
+            )
             DragListenSurface(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(dragListenerWidth)
                     .align(Alignment.CenterEnd),
-            ) { isInBound ->
-                LaunchedEffect(isInBound) {
-                    while (isInBound) {
-                        scheduleRowState.scrollBy(scrollAmount)
-                        delay(10)
-                    }
-                }
-            }
+                onAbove = {
+                    scheduleRowState.scrollBy(scrollAmount)
+                    delay(10)
+                },
+                zIndex = 1f
+            )
             LazyRow(
                 state = scheduleRowState,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
