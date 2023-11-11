@@ -2,13 +2,16 @@ package com.effectiveweek.schedule.presentation.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.effectiveweek.schedule.presentation.ScheduleWithRolesTabScreen
 import com.effectiveweek.schedule.presentation.goal_dialog.GoalDialogNavigation
@@ -19,7 +22,17 @@ import com.effectiveweek.schedule.presentation.schedule.ScheduleNavigation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-fun NavGraphBuilder.scheduleScreen(navController: NavHostController) {
+@Composable
+fun ScheduleNavHost() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = ScheduleRoute.Schedule.route) {
+        scheduleWithRolesTab(navController = navController)
+        goalDialog(navController = navController)
+        roleDialog(navController = navController)
+    }
+}
+
+internal fun NavGraphBuilder.scheduleWithRolesTab(navController: NavHostController) {
     val scheduleNavigation = object : ScheduleNavigation {
         override fun openGoalDialog(goalId: Int) {
             with(ScheduleRoute.GoalDialog) {
@@ -62,10 +75,7 @@ fun NavGraphBuilder.scheduleScreen(navController: NavHostController) {
             rolesNavigation = rolesNavigation
         )
     }
-    goalDialog(navController = navController)
-    roleDialog(navController = navController)
 }
-
 
 internal fun NavGraphBuilder.goalDialog(navController: NavHostController) {
     val navigation = object : GoalDialogNavigation {
